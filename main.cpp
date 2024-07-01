@@ -1539,5 +1539,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	CoUninitialize();
 	CloseWindow(hwnd);
 
+	delete input;
+
 	return 0;
 }
