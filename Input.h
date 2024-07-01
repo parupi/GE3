@@ -18,6 +18,23 @@ public: // メンバ関数
 	// 更新
 	void Update();
 
+	/// <summary>
+	/// キーの押下をチェック
+	/// </summary>
+	/// <param name="keyNumber">キー番号</param>
+	/// <returns>押されているか</returns>
+	bool PushKey(BYTE keyNumber);
+
+	/// <summary>
+	/// キーのトリガーをチェック
+	/// </summary>
+	/// <param name="keyNumber">キー番号</param>
+	/// <returns>トリガーか否か</returns>
+	bool TriggerKey(BYTE keyNumber);
+
 private:
+	ComPtr<IDirectInput8> directInput = nullptr;
 	ComPtr<IDirectInputDevice8> keyboard;
+	BYTE key[256] = {};
+	BYTE keyPre[256] = {};
 };
