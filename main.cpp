@@ -1,5 +1,4 @@
 #include <Windows.h>
-#include <windows.h>
 #include <d3d12.h>
 #include <dxgi1_6.h>
 #include <dxgidebug.h>
@@ -24,6 +23,8 @@ extern IMGUI_IMPL_API LRESULT ImGui_ImplWin32_WndProcHandler(HWND hWnd, UINT msg
 #pragma comment(lib,"dxgi.lib")
 #pragma comment(lib,"dxguid.lib")
 #pragma comment(lib,"dxcompiler.lib")
+
+#include "Input.h"
 
 struct Matrix3x3 {
 	float m[3][3];
@@ -1332,6 +1333,9 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	// テクスチャを切り替えるフラグ
 	bool useMonsterBall = true;
 
+	// ポインタ
+	Input* input = nullptr;
+
 	// ImGuiの初期化。
 	IMGUI_CHECKVERSION();
 	ImGui::CreateContext();
@@ -1339,6 +1343,10 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	ImGui_ImplWin32_Init(hwnd);
 	ImGui_ImplDX12_Init(device.Get(), swapChainDesc.BufferCount, rtvDesc.Format, srvDescriptorHeap.Get(), srvDescriptorHeap->GetCPUDescriptorHandleForHeapStart(), srvDescriptorHeap->GetGPUDescriptorHandleForHeapStart());
 	// こういうものであるらしい
+
+	// 入力の初期化
+	input = new Input();
+	input->Initialize(wc.hInstance, hwnd);
 
 	MSG msg{};
 	// ウィンドウの×ボタンが押されるまでループ
