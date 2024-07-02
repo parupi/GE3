@@ -1,21 +1,34 @@
 #pragma once
 #include <Windows.h>
+#include <string>
 class WindowManager
 {
 public:
-	// ƒNƒ‰ƒCƒAƒ“ƒg—Ìˆæ‚ÌƒTƒCƒY
-	static const int kClientWidth = 1280;
-	static const int kClientHeight = 720;
+	// ã‚¯ãƒ©ã‚¤ã‚¢ãƒ³ãƒˆé ˜åŸŸã®ã‚µã‚¤ã‚º
+	static const uint32_t kClientWidth = 1280;
+	static const uint32_t kClientHeight = 720;
 
-public: // ƒƒ“ƒo•Ï”
-	// ‰Šú‰»
+public: // é™çš„ãƒ¡ãƒ³ãƒå¤‰æ•°
+
+	/// <summary>
+	/// ã‚¦ã‚£ãƒ³ãƒ‰ã‚¦ãƒ—ãƒ­ã‚·ãƒ¼ã‚¸ãƒ£
+	/// </summary>
+	/// <param name="hwnd">ã‚¦ã‚£ãƒ³ãƒ‰ã‚¦ãƒãƒ³ãƒ‰ãƒ«</param>
+	/// <param name="msg">ãƒ¡ãƒƒã‚»ãƒ¼ã‚¸ç•ªå·</param>
+	/// <param name="wparam">ãƒ¡ãƒƒã‚»ãƒ¼ã‚¸æƒ…å ±1</param>
+	/// <param name="lparam">ãƒ¡ãƒƒã‚»ãƒ¼ã‚¸æƒ…å ±2</param>
+	/// <returns>æˆå¦</returns>
+	static LRESULT CALLBACK WindowProc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lparam);
+
+public: // ãƒ¡ãƒ³ãƒå¤‰æ•°
+	// åˆæœŸåŒ–
 	void Initialize();
-	// XV
+	// æ›´æ–°
 	void Update();
 
 private:
-	// WindowŠÖ˜A
-	HWND hwnd_ = nullptr;   // ƒEƒBƒ“ƒhƒEƒnƒ“ƒhƒ‹
-	WNDCLASSEX wndClass_{}; // ƒEƒBƒ“ƒhƒEƒNƒ‰ƒX
+	// Windowé–¢é€£
+	HWND hwnd_ = nullptr;   // ã‚¦ã‚£ãƒ³ãƒ‰ã‚¦ãƒãƒ³ãƒ‰ãƒ«
+	WNDCLASSEX wndClass_{}; // ã‚¦ã‚£ãƒ³ãƒ‰ã‚¦ã‚¯ãƒ©ã‚¹
 };
 
