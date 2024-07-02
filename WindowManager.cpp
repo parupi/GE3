@@ -66,8 +66,19 @@ void WindowManager::Initialize()
 	ShowWindow(hwnd_, SW_SHOW);
 }
 
-void WindowManager::Update()
+bool WindowManager::ProcessMessage()
 {
+	MSG msg{};
+	if (PeekMessage(&msg, NULL, 0, 0, PM_REMOVE))
+	{
+		TranslateMessage(&msg);
+		DispatchMessage(&msg);
+	}
+	// ウィンドウの×ボタンが押されるまでループ
+	if (msg.message == WM_QUIT) {
+		return true;
+	}
+	return false;
 }
 
 void WindowManager::Finalize()
