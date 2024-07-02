@@ -26,6 +26,9 @@ public: // メンバ変数
 	// 更新
 	void Update();
 
+	// getter
+	HWND GetHwnd() const { return hwnd_; }
+	HINSTANCE GetHInstance() const { return wndClass_.hInstance; }
 private:
 	// Window関連
 	HWND hwnd_ = nullptr;   // ウィンドウハンドル

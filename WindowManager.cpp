@@ -48,7 +48,7 @@ void WindowManager::Initialize()
 	AdjustWindowRect(&wrc, WS_OVERLAPPEDWINDOW, false);
 
 	// ウィンドウの生成
-	HWND hwnd = CreateWindow(
+	hwnd_ = CreateWindow(
 		wndClass_.lpszClassName,			//利用するクラス名
 		L"CG2",						//タイトルバーの文字(なんでもいい)
 		WS_OVERLAPPEDWINDOW,		//よく見るウィンドウスタイル
@@ -63,7 +63,7 @@ void WindowManager::Initialize()
 	);
 
 	// ウィンドウを表示する
-	ShowWindow(hwnd, SW_SHOW);
+	ShowWindow(hwnd_, SW_SHOW);
 }
 
 void WindowManager::Update()
