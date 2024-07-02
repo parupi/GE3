@@ -69,3 +69,9 @@ void WindowManager::Initialize()
 void WindowManager::Update()
 {
 }
+
+void WindowManager::Finalize()
+{
+	CloseWindow(hwnd_);
+	CoUninitialize();
+}

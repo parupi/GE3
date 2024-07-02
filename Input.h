@@ -5,6 +5,8 @@
 #define DIRECTINPUT_VERSION		0x0800	// DirectXのバージョン指定
 #include <dinput.h>
 
+#include "WindowManager.h"
+
 /// <summary>
 /// 入力処理
 /// </summary>
@@ -14,7 +16,7 @@ public: // メンバ関数
 	template <class T> using ComPtr = Microsoft::WRL::ComPtr<T>;
 
 	// 初期化
-	void Initialize(HINSTANCE hInstance, HWND hwnd);
+	void Initialize(WindowManager* winManager);
 	// 更新
 	void Update();
 
@@ -37,4 +39,6 @@ private:
 	ComPtr<IDirectInputDevice8> keyboard;
 	BYTE key[256] = {};
 	BYTE keyPre[256] = {};
+	// WindowsAPI
+	WindowManager* winManager_ = nullptr;
 };

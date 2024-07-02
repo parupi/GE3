@@ -1466,14 +1466,14 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	ImGui_ImplWin32_Shutdown();
 	ImGui::DestroyContext();
 
-	signatureBlob->Release();
+	//signatureBlob->Release();
 	if (errorBlob)
 	{
-		errorBlob->Release();
+		//errorBlob->Release();
 	}
-	pixelShaderBlob->Release();
-	vertexShaderBlob->Release();
-	CloseHandle(fenceEvent);
+	//pixelShaderBlob->Release();
+	//vertexShaderBlob->Release();
+	//CloseHandle(fenceEvent);
 
 	winManager->Finalize();
 

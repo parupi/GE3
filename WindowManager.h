@@ -25,6 +25,8 @@ public: // メンバ変数
 	void Initialize();
 	// 更新
 	void Update();
+	// 終了
+	void Finalize();
 
 	// getter
 	HWND GetHwnd() const { return hwnd_; }
@@ -32,6 +34,6 @@ public: // メンバ変数
 private:
 	// Window関連
 	HWND hwnd_ = nullptr;   // ウィンドウハンドル
-	WNDCLASSEX wndClass_{}; // ウィンドウクラス
+	WNDCLASS wndClass_{}; // ウィンドウクラス
 };
 
