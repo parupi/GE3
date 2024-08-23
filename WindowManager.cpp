@@ -1,5 +1,6 @@
 #include "WindowManager.h"
 #include "externals/imgui/imgui.h"
+#pragma comment(lib, "winmm.lib")
 
 extern IMGUI_IMPL_API LRESULT ImGui_ImplWin32_WndProcHandler(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lPatam);
 
@@ -64,6 +65,9 @@ void WindowManager::Initialize()
 
 	// ウィンドウを表示する
 	ShowWindow(hwnd_, SW_SHOW);
+
+	// システムタイマーの制度を上げる
+	timeBeginPeriod(1);
 }
 
 bool WindowManager::ProcessMessage()

@@ -4,13 +4,12 @@
 #include <dxgi1_6.h>
 #include <wrl.h>
 #include <dxcapi.h>
-
 #include "WindowManager.h"
-
 #include "Logger.h"
 #include "StringUtility.h"
-
 #include "externals/DirectXTex/DirectXTex.h"
+#include <chrono>
+#include <thread>
 
 class DirectXManager
 {
@@ -63,10 +62,18 @@ private: // メンバ変数
 
 	D3D12_RESOURCE_BARRIER barrier_{};
 
-public:
-	Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> CreateDescriptorHeap(Microsoft::WRL::ComPtr<ID3D12Device> device, D3D12_DESCRIPTOR_HEAP_TYPE heapType, UINT numDescriptors, bool shaderVisible);
+	// 記録時間(FPS固定用)
+	std::chrono::steady_clock::time_point reference_;
+
+private:
 	static D3D12_CPU_DESCRIPTOR_HANDLE GetCPUDescriptorHandle(Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> descriptorHeap, uint32_t descriptorSize, uint32_t index);
 	static D3D12_GPU_DESCRIPTOR_HANDLE GetGPUDescriptorHandle(Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> descriptorHeap, uint32_t descriptorSize, uint32_t index);
+
+	void InitializeFixFPS();
+	void UpdateFixFPS();
+public:
+
+	Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> CreateDescriptorHeap(Microsoft::WRL::ComPtr<ID3D12Device> device, D3D12_DESCRIPTOR_HEAP_TYPE heapType, UINT numDescriptors, bool shaderVisible);
 
 	D3D12_CPU_DESCRIPTOR_HANDLE GetSRVCPUDescriptorHandle(uint32_t index);
 	D3D12_GPU_DESCRIPTOR_HANDLE GetSRVGPUDescriptorHandle(uint32_t index);

@@ -18,6 +18,9 @@ void DirectXManager::Initialize(WindowManager* winManager)
 
 	winManager_ = winManager;
 
+	// FPS固定初期化
+	InitializeFixFPS();
+
 	InitializeDXGIDevice();
 	InitializeCommand();
 	CreateSwapChain();
@@ -69,6 +72,36 @@ D3D12_GPU_DESCRIPTOR_HANDLE DirectXManager::GetGPUDescriptorHandle(Microsoft::WR
 	D3D12_GPU_DESCRIPTOR_HANDLE handleGPU = descriptorHeap->GetGPUDescriptorHandleForHeapStart();
 	handleGPU.ptr += (descriptorSize * index);
 	return handleGPU;
+}
+
+void DirectXManager::InitializeFixFPS()
+{
+	// 現在時刻を記録する
+	reference_ = std::chrono::steady_clock::now();
+}
+
+void DirectXManager::UpdateFixFPS()
+{
+	// 1/60秒ぴったりの時間
+	const std::chrono::microseconds kMinTime(uint64_t(1000000.0f / 60.0f));
+	// 1/60秒よりわずかに短い時間
+	const std::chrono::microseconds kMinCheckTime(uint64_t(1000000.0f / 65.0f));
+
+	// 現在時間を取得する
+	std::chrono::steady_clock::time_point now = std::chrono::steady_clock::now();
+	// 前回記録からの経過時間を取得する
+	std::chrono::microseconds elapsed = std::chrono::duration_cast<std::chrono::microseconds>(now - reference_);
+
+	// 1/60秒 (よりわずかに短い時間) 立っていない場合
+	if (elapsed < kMinTime || elapsed < kMinCheckTime) {
+		// 1/60秒経過するまで微小なスリープを繰り返す
+		while (std::chrono::steady_clock::now() - reference_ < kMinTime) {
+			// 1マイクロ秒スリープ
+			std::this_thread::sleep_for(std::chrono::microseconds(1));
+		}
+	}
+	// 現在の時間を記録する
+	reference_ = std::chrono::steady_clock::now();
 }
 
 Microsoft::WRL::ComPtr<IDxcBlob> DirectXManager::CompileShader(const std::wstring& filePath, const wchar_t* profile)
@@ -398,68 +431,8 @@ void DirectXManager::CreateSwapChain()
 
 void DirectXManager::CreateDepthBuffer()
 {
-	// --- DepthStencilTextureをウィンドウサイズで作成 ---
+	// DepthStencilTextureをウィンドウサイズで作成
 	depthBuffer_ = CreateDepthStencilTextureResource(device_, WindowManager::kClientWidth, WindowManager::kClientHeight);
-
-	//HRESULT result = S_FALSE;
-
-	//// ヒーププロパティの設定
-	//D3D12_HEAP_PROPERTIES heapProps = {};
-	//heapProps.Type = D3D12_HEAP_TYPE_DEFAULT;
-	//heapProps.CPUPageProperty = D3D12_CPU_PAGE_PROPERTY_UNKNOWN;
-	//heapProps.MemoryPoolPreference = D3D12_MEMORY_POOL_UNKNOWN;
-	//heapProps.CreationNodeMask = 1;
-	//heapProps.VisibleNodeMask = 1;
-
-	//// リソース設定
-	//D3D12_RESOURCE_DESC depthResDesc = {};
-	//depthResDesc.Dimension = D3D12_RESOURCE_DIMENSION_TEXTURE2D;
-	//depthResDesc.Alignment = 0;
-	//depthResDesc.Width = 1280;
-	//depthResDesc.Height = 720;
-	//depthResDesc.DepthOrArraySize = 1;
-	//depthResDesc.MipLevels = 1;
-	//depthResDesc.Format = DXGI_FORMAT_D32_FLOAT;
-	//depthResDesc.SampleDesc.Count = 1;
-	//depthResDesc.SampleDesc.Quality = 0;
-	//depthResDesc.Layout = D3D12_TEXTURE_LAYOUT_UNKNOWN;
-	//depthResDesc.Flags = D3D12_RESOURCE_FLAG_ALLOW_DEPTH_STENCIL;
-
-	//// リソースのクリア値
-	//D3D12_CLEAR_VALUE clearValue = {};
-	//clearValue.Format = DXGI_FORMAT_D32_FLOAT;
-	//clearValue.DepthStencil.Depth = 1.0f;
-	//clearValue.DepthStencil.Stencil = 0;
-
-	//// リソースの生成
-	////ID3D12Resource* depthBuffer_ = nullptr;
-	//result = device_->CreateCommittedResource(
-	//	&heapProps, D3D12_HEAP_FLAG_NONE, &depthResDesc,
-	//	D3D12_RESOURCE_STATE_DEPTH_WRITE, // 深度値書き込みに使用
-	//	&clearValue, IID_PPV_ARGS(&depthBuffer_));
-	//assert(SUCCEEDED(result));
-
-	//// 深度ビュー用デスクリプタヒープ作成
-	//D3D12_DESCRIPTOR_HEAP_DESC dsvHeapDesc = {};
-	//dsvHeapDesc.NumDescriptors = 1;                    // 深度ビューは1つ
-	//dsvHeapDesc.Type = D3D12_DESCRIPTOR_HEAP_TYPE_DSV;  // デプスステンシルビュー
-	//dsvHeapDesc.Flags = D3D12_DESCRIPTOR_HEAP_FLAG_NONE;
-	//dsvHeapDesc.NodeMask = 1;
-
-	//result = device_->CreateDescriptorHeap(&dsvHeapDesc, IID_PPV_ARGS(&dsvHeap_));
-	//if (FAILED(result))
-	//{
-	//	// エラーハンドリング（例: エラーメッセージの表示）
-	//	OutputDebugStringA("Failed to create depth stencil view descriptor heap.\n");
-	//	return;
-	//}
-
-	//// 深度ビュー作成
-	//D3D12_DEPTH_STENCIL_VIEW_DESC dsvDesc = {};
-	//dsvDesc.Format = DXGI_FORMAT_D32_FLOAT; // 深度値フォーマット
-	//dsvDesc.ViewDimension = D3D12_DSV_DIMENSION_TEXTURE2D;
-	//device_->CreateDepthStencilView(
-	//	depthBuffer_.Get(), &dsvDesc, dsvHeap_->GetCPUDescriptorHandleForHeapStart());
 }
 
 void DirectXManager::CreateHeap()
@@ -468,7 +441,7 @@ void DirectXManager::CreateHeap()
 	descriptorSizeRTV_ = device_->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_RTV);
 	descriptorSizeDSV_ = device_->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_DSV);
 
-	// --- DescriptorHeapを生成 ---
+	// DescriptorHeapを生成
 	rtvHeap_ = CreateDescriptorHeap(device_, D3D12_DESCRIPTOR_HEAP_TYPE_RTV, 2, false);
 	srvHeap_ = CreateDescriptorHeap(device_, D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV, 128, true);
 	dsvHeap_ = CreateDescriptorHeap(device_, D3D12_DESCRIPTOR_HEAP_TYPE_DSV, 1, false);
@@ -498,19 +471,6 @@ void DirectXManager::CreateRenderTargetView()
 		// 次のRTVのハンドルに移動
 		rtvStartHandle.ptr += device_->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_RTV);
 	}
-
-	//// RTVの指定
-	//D3D12_RENDER_TARGET_VIEW_DESC rtvDesc{};
-	//rtvDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM_SRGB;			// 出力結果をSRGB二変換して書き込む
-	//rtvDesc.ViewDimension = D3D12_RTV_DIMENSION_TEXTURE2D;		// 2dテクスチャとして書き込む
-	//// ディスクリプタの先頭を取得する
-	////D3D12_CPU_DESCRIPTOR_HANDLE rtvStartHandle = rtvHeap_->GetCPUDescriptorHandleForHeapStart();
-	//D3D12_CPU_DESCRIPTOR_HANDLE rtvHandle = rtvHeap_->GetCPUDescriptorHandleForHeapStart();
-	//for (int i = 0; i < swapChainResources_.size(); i++) {
-	//	device_->CreateRenderTargetView(swapChainResources_[i].Get(), &rtvDesc, rtvHandle);
-	//	rtvHandle.ptr += device_->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_RTV);
-	//}
-
 }
 
 void DirectXManager::InitializeDepthStencilView()
@@ -543,8 +503,6 @@ void DirectXManager::SetViewPort()
 	viewport_.TopLeftY = 0;
 	viewport_.MinDepth = 0.0f;
 	viewport_.MaxDepth = 1.0f;
-
-
 }
 
 void DirectXManager::SetScissor()
@@ -570,7 +528,6 @@ void DirectXManager::InitializeDXCCompiler()
 
 	hr = dxcUtils_->CreateDefaultIncludeHandler(&includeHandler_);
 	assert(SUCCEEDED(hr));
-
 }
 
 void DirectXManager::InitializeImGui()
@@ -655,6 +612,9 @@ void DirectXManager::EndDraw()
 		// イベントを待つ
 		WaitForSingleObject(fenceEvent_, INFINITE);
 	}
+
+	// FPS固定
+	UpdateFixFPS();
 
 	// 次のフレーム用のコマンドリストを準備
 	hr = commandAllocator_->Reset();

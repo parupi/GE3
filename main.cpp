@@ -851,15 +851,15 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	srvDesc2.Texture2D.MipLevels = UINT(metadata2.mipLevels);
 
 	// SRVを作成するDescriptorの場所を決める
-	D3D12_CPU_DESCRIPTOR_HANDLE textureSrvHandleCPU = directXManager->GetCPUDescriptorHandle(directXManager->GetSRVHeap(), directXManager->GetDescriptorSizeRTV(), 1);
-	D3D12_GPU_DESCRIPTOR_HANDLE textureSrvHandleGPU = directXManager->GetGPUDescriptorHandle(directXManager->GetSRVHeap(), directXManager->GetDescriptorSizeRTV(), 1);
+	D3D12_CPU_DESCRIPTOR_HANDLE textureSrvHandleCPU = directXManager->GetSRVCPUDescriptorHandle(1);
+	D3D12_GPU_DESCRIPTOR_HANDLE textureSrvHandleGPU = directXManager->GetSRVGPUDescriptorHandle(1);
 
 	// SRVの生成
 	directXManager->GetDevice()->CreateShaderResourceView(textureResource.Get(), &srvDesc, textureSrvHandleCPU);
 
 	// SRVを作成するDescriptorの場所を決める
-	D3D12_CPU_DESCRIPTOR_HANDLE textureSrvHandleCPU2 = directXManager->GetCPUDescriptorHandle(directXManager->GetSRVHeap(), directXManager->GetDescriptorSizeSRV(), 2);
-	D3D12_GPU_DESCRIPTOR_HANDLE textureSrvHandleGPU2 = directXManager->GetGPUDescriptorHandle(directXManager->GetSRVHeap(), directXManager->GetDescriptorSizeSRV(), 2);
+	D3D12_CPU_DESCRIPTOR_HANDLE textureSrvHandleCPU2 = directXManager->GetSRVCPUDescriptorHandle(2);
+	D3D12_GPU_DESCRIPTOR_HANDLE textureSrvHandleGPU2 = directXManager->GetSRVGPUDescriptorHandle(2);
 	// SRVの生成
 	directXManager->GetDevice()->CreateShaderResourceView(textureResource2.Get(), &srvDesc2, textureSrvHandleCPU2);
 
