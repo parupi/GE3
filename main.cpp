@@ -1,6 +1,4 @@
 #include <Windows.h>
-
-
 #include <dxgidebug.h>
 #include <dxcapi.h>
 #include "externals/imgui/imgui.h"
@@ -25,6 +23,8 @@
 #include "Input.h"
 #include "WindowManager.h"
 #include "DirectXManager.h"
+#include "Sprite.h"
+#include "SpriteManager.h"
 
 struct Matrix3x3 {
 	float m[3][3];
@@ -476,13 +476,22 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	// ポインタ 
 	WindowManager* winManager = nullptr;
 	DirectXManager* directXManager = nullptr;
+	SpriteManager* spriteManager = nullptr;
+	Sprite* sprite = nullptr;
+	Input* input = nullptr;
 
 	// WinDowsAPIの初期化
 	winManager = new WindowManager();
 	winManager->Initialize();
-
+	// DirectXの初期化
 	directXManager = new DirectXManager();
 	directXManager->Initialize(winManager);
+	// スプライト共通部の初期化
+	spriteManager = new SpriteManager();
+	spriteManager->Initialize(directXManager);
+
+
+
 
 	HRESULT hr{};
 
@@ -866,11 +875,9 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	// テクスチャを切り替えるフラグ
 	bool useMonsterBall = true;
 
-	// ポインタ
-	Input* input = nullptr;
-
-
-	// こういうものであるらしい
+	// Spriteの初期化
+	sprite = new Sprite();
+	sprite->Initialize();
 
 	// 入力の初期化
 	input = new Input();
@@ -999,10 +1006,14 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 
 	winManager->Finalize();
 
-	delete winManager;
-	winManager = nullptr;
+	delete spriteManager;
+	spriteManager = nullptr;
+	delete sprite;
+	sprite = nullptr;
 	delete directXManager;
 	directXManager = nullptr;
+	delete winManager;
+	winManager = nullptr;
 	delete input;
 	input = nullptr;
 
