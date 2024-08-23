@@ -1,10 +1,15 @@
 #pragma once
+#include <array>
 #include <d3d12.h>
 #include <dxgi1_6.h>
 #include <wrl.h>
-#include "windowManager.h"
-#include <array>
 #include <dxcapi.h>
+
+#include "WindowManager.h"
+
+#include "Logger.h"
+#include "StringUtility.h"
+
 #include "externals/DirectXTex/DirectXTex.h"
 
 class DirectXManager
@@ -20,15 +25,22 @@ private: // メンバ変数
 
 	Microsoft::WRL::ComPtr<IDXGIFactory7> dxgiFactory_ = nullptr;
 	Microsoft::WRL::ComPtr<ID3D12Device> device_ = nullptr;
+
 	Microsoft::WRL::ComPtr<ID3D12CommandQueue> commandQueue_ = nullptr;
 	Microsoft::WRL::ComPtr<ID3D12CommandAllocator> commandAllocator_ = nullptr;
 	Microsoft::WRL::ComPtr<ID3D12GraphicsCommandList> commandList_ = nullptr;
+
 	Microsoft::WRL::ComPtr<IDXGISwapChain4> swapChain_ = nullptr;
-	std::array<Microsoft::WRL::ComPtr<ID3D12Resource>, 2> swapChainResources_;
+	DXGI_SWAP_CHAIN_DESC1 swapChainDesc{};
+	Microsoft::WRL::ComPtr<ID3D12Resource> swapChainResources_[2];
+
 	Microsoft::WRL::ComPtr<ID3D12Resource> depthBuffer_;
 	Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> rtvHeap_ = nullptr;
 	Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> dsvHeap_ = nullptr;
 	Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> srvHeap_ = nullptr;
+
+	D3D12_RENDER_TARGET_VIEW_DESC rtvDesc_{};
+
 	uint32_t descriptorSizeSRV_;
 	uint32_t descriptorSizeRTV_;
 	uint32_t descriptorSizeDSV_;
@@ -40,20 +52,22 @@ private: // メンバ変数
 	Microsoft::WRL::ComPtr<IDxcUtils> dxcUtils_ = nullptr;
 	Microsoft::WRL::ComPtr<IDxcCompiler3> dxcCompiler_ = nullptr;
 	Microsoft::WRL::ComPtr<IDxcIncludeHandler> includeHandler_ = nullptr;
-	uint64_t fenceValue = 0;
+	uint64_t fenceValue_ = 0;
 	// TransitionBurrierの設定
 	//D3D12_RESOURCE_BARRIER barrier_{};
 	// 初期値0でFenceを作る
 	Microsoft::WRL::ComPtr<ID3D12Fence> fence_ = nullptr;
 	HANDLE fenceEvent_ = nullptr;
+	// RTVを2つ作るのでディスクリプタを2つ用意
+	D3D12_CPU_DESCRIPTOR_HANDLE rtvHandles_[2]{};
 
-private: // メンバ関数
+	D3D12_RESOURCE_BARRIER barrier_{};
 
+public:
 	Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> CreateDescriptorHeap(Microsoft::WRL::ComPtr<ID3D12Device> device, D3D12_DESCRIPTOR_HEAP_TYPE heapType, UINT numDescriptors, bool shaderVisible);
 	static D3D12_CPU_DESCRIPTOR_HANDLE GetCPUDescriptorHandle(Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> descriptorHeap, uint32_t descriptorSize, uint32_t index);
 	static D3D12_GPU_DESCRIPTOR_HANDLE GetGPUDescriptorHandle(Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> descriptorHeap, uint32_t descriptorSize, uint32_t index);
 
-public:
 	D3D12_CPU_DESCRIPTOR_HANDLE GetSRVCPUDescriptorHandle(uint32_t index);
 	D3D12_GPU_DESCRIPTOR_HANDLE GetSRVGPUDescriptorHandle(uint32_t index);
 
@@ -62,6 +76,7 @@ public:
 	Microsoft::WRL::ComPtr<ID3D12Resource> CreateTextureResource(Microsoft::WRL::ComPtr<ID3D12Device> device, const DirectX::TexMetadata& metadata);
 	void UploadTextureData(Microsoft::WRL::ComPtr<ID3D12Resource> texture, const DirectX::ScratchImage& mipImages);
 	static DirectX::ScratchImage LoadTexture(const std::string& filePath);
+	Microsoft::WRL::ComPtr<ID3D12Resource> CreateBufferResource(size_t sizeInBytes);
 
 private:
 	void InitializeDXGIDevice();
@@ -101,8 +116,11 @@ public:
 
 public: // ゲッター/セッター //
 	Microsoft::WRL::ComPtr<ID3D12Device> GetDevice() { return device_; }
-
-
+	Microsoft::WRL::ComPtr<ID3D12GraphicsCommandList> GetCommandList() { return commandList_; }
+	Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> GetSRVHeap() { return srvHeap_; }
+	uint32_t GetDescriptorSizeRTV() { return descriptorSizeRTV_; }
+	uint32_t GetDescriptorSizeSRV() { return descriptorSizeSRV_; }
+	uint32_t GetDescriptorSizeDSV() { return descriptorSizeDSV_; }
 public:
 	void TransitionResource(
 		ID3D12Resource* resource,
