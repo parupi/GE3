@@ -282,7 +282,6 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	WindowManager* winManager = nullptr;
 	DirectXManager* directXManager = nullptr;
 	SpriteManager* spriteManager = nullptr;
-	Sprite* sprite = nullptr;
 	Input* input = nullptr;
 
 	// WinDowsAPIの初期化
@@ -563,7 +562,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	// Transform変数を作る
 	Transform transform{ {1.0f,1.0f,1.0f},{0.0f,3.14f,0.0f},{0.0f,0.0f,0.0f} };
 	Transform cameraTransform{ {1.0f,1.0f,1.0f},{0.0f,0.0f,0.0f},{0.0f,0.0f,-10.0f} };
-	Transform transformSprite{ {1.0f, 1.0f, 1.0f}, {0.0f, 0.0f, 0.0f}, {0.0f, 0.0f, 0.0f} };
+	
 	// UVTransform用の変数を用意
 	Transform uvTransformSprite{ {1.0f, 1.0f, 1.0f},{0.0f, 0.0f, 0.0f},{0.0f, 0.0f, 0.0f}, };
 
@@ -609,8 +608,16 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	bool useMonsterBall = true;
 
 	// Spriteの初期化
-	sprite = new Sprite();
-	sprite->Initialize(spriteManager);
+	std::vector<Sprite*> sprites;
+	for (uint32_t i = 0; i < 5; ++i) {
+		Sprite* sprite = new Sprite();
+		sprite->Initialize(spriteManager);
+
+		Vector2 initialPosition = Vector2{ i * 100.0f, 100.0f }; // 各スプライトを100ピクセルずつ右にずらして配置
+		sprite->SetPosition(initialPosition);
+
+		sprites.push_back(sprite);
+	}
 
 	// 入力の初期化
 	input = new Input();
@@ -651,12 +658,6 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 			ImGui::SliderAngle("UVRotate", &uvTransformSprite.rotate.z);
 			ImGui::TreePop();
 		}
-		if (ImGui::TreeNode("Sprite")) {
-			ImGui::DragFloat2("UVTranslate", &transformSprite.translate.x, 0.01f);
-			ImGui::DragFloat2("UVScale", &transformSprite.scale.x, 0.01f);
-			ImGui::SliderAngle("UVRotate", &transformSprite.rotate.z);
-			ImGui::TreePop();
-		}
 		ImGui::End();
 
 
@@ -678,15 +679,37 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 		//uvTransformMatrix = Multiply(uvTransformMatrix, MakeTranslateMatrix(uvTransformSprite.translate));
 		//materialDataSprite->uvTransform = uvTransformMatrix;
 
+		for (Sprite* sprite : sprites) {
+			// 平行移動用処理
+			Vector2 position = sprite->GetPosition();
+			position += Vector2{ 1.0f, 1.0f };
+			sprite->SetPosition(position);
+			// 回転
+			float rotation = sprite->GetRotation();
+			rotation += 0.01f;
+			sprite->SetRotation(rotation);
+			// 拡縮
+			Vector2 size = sprite->GetSize();
+			size.x += 0.3f;
+			size.y += 0.3f;
+			sprite->SetSize(size);
+			// 色
+			Vector4 color = sprite->GetColor();
+			color.x += 0.01f;
+			if (color.x > 1.0f) {
+				color.x -= 1.0f;
+			}
+			sprite->SetColor(color);
+			sprite->Update();
+		}
 		
-
 
 		directXManager->BeginDraw();
 
 		// RootSignatureを設定。PSOに設定しているけど別途設定が必要
 		spriteManager->DrawSet();
 
-		sprite->Update(transformSprite);
+
 		
 		directXManager->GetCommandList()->IASetVertexBuffers(0, 1, &vertexBufferView);		// VBVを設定
 		directXManager->GetCommandList()->IASetIndexBuffer(&indexBufferView);				// IBVを設定
@@ -702,11 +725,12 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 		directXManager->GetCommandList()->SetGraphicsRootDescriptorTable(2, useMonsterBall ? textureSrvHandleGPU2 : textureSrvHandleGPU);
 		directXManager->GetCommandList()->SetGraphicsRootConstantBufferView(3, directionalLightResource->GetGPUVirtualAddress());
 
-		directXManager->GetCommandList()->DrawInstanced(UINT(modelData.vertices.size()), 1, 0, 0);
+		//directXManager->GetCommandList()->DrawInstanced(UINT(modelData.vertices.size()), 1, 0, 0);
 		// 描画!（DrawCall/ドローコール）。3頂点で1つのインスタンス。インスタンスについては今後
 		//directXManager->GetCommandList()->DrawIndexedInstanced(kNumVertex, 1, 0, 0, 0);
-
-		sprite->Draw();
+		for (Sprite* sprite : sprites) {
+			sprite->Draw();
+		}
 
 		// 実際のcommandListのImGuiの描画コマンドを積む
 		ImGui_ImplDX12_RenderDrawData(ImGui::GetDrawData(), directXManager->GetCommandList().Get());
@@ -734,8 +758,10 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 
 	delete spriteManager;
 	spriteManager = nullptr;
-	delete sprite;
-	sprite = nullptr;
+	for (Sprite* sprite : sprites) {
+		delete sprite;
+		sprite = nullptr;
+	}
 	delete directXManager;
 	directXManager = nullptr;
 	delete winManager;

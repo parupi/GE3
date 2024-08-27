@@ -19,12 +19,16 @@ void Sprite::Initialize(SpriteManager* spriteManager)
 	textureSrvHandleGPU_ = spriteManager->GetDxManager()->GetSRVGPUDescriptorHandle(1);
 }
 
-void Sprite::Update(Transform transform)
+void Sprite::Update()
 {
 	SetSpriteData();
 
+	transform_.translate = { position_.x, position_.y, 0.0f };
+	transform_.rotate = { 0.0f, 0.0f, rotation_ };
+	transform_.scale = { size_.x, size_.y, 1.0f };
+
 	// Transform情報を作る
-	Matrix4x4 worldMatrix = MakeAffineMatrix(transform.scale, transform.rotate, transform.translate);
+	Matrix4x4 worldMatrix = MakeAffineMatrix(transform_.scale, transform_.rotate, transform_.translate);
 	Matrix4x4 viewMatrix = MakeIdentity4x4();
 	Matrix4x4 projectionMatrix = MakeOrthographicMatrix(0.0f, 0.0f, float(WindowManager::kClientWidth), float(WindowManager::kClientHeight), 0.0f, 100.0f);
 	Matrix4x4 worldViewProjectionMatrix = Multiply(worldMatrix, Multiply(viewMatrix, projectionMatrix));
@@ -98,7 +102,7 @@ void Sprite::SetSpriteData()
 	vertexResource_->Map(0, nullptr, reinterpret_cast<void**>(&vertexData_));
 	// スプライトの描画
 	// 左下
-	vertexData_[0].position = { 0.0f, 360.0f, 0.0f, 1.0f };
+	vertexData_[0].position = { 0.0f, 1.0f, 0.0f, 1.0f };
 	vertexData_[0].texcoord = { 0.0f, 1.0f };
 	vertexData_[0].normal = { 0.0f, 0.0f, -1.0f };
 	// 左上
@@ -106,11 +110,11 @@ void Sprite::SetSpriteData()
 	vertexData_[1].texcoord = { 0.0f, 0.0f };
 	vertexData_[1].normal = { 0.0f, 0.0f, -1.0f };
 	// 右下
-	vertexData_[2].position = { 640.0f, 360.0f, 0.0f, 1.0f };
+	vertexData_[2].position = { 1.0f, 1.0f, 0.0f, 1.0f };
 	vertexData_[2].texcoord = { 1.0f, 1.0f };
 	vertexData_[2].normal = { 0.0f, 0.0f, -1.0f };
 	// 右上
-	vertexData_[3].position = { 640.0f, 0.0f, 0.0f, 1.0f };
+	vertexData_[3].position = { 1.0f, 0.0f, 0.0f, 1.0f };
 	vertexData_[3].texcoord = { 1.0f, 0.0f };
 	vertexData_[3].normal = { 0.0f, 0.0f, -1.0f };
 
