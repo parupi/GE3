@@ -2,25 +2,7 @@
 #include "math/function.h"
 
 Sprite::~Sprite() {
-	if (vertexResource_ && vertexData_) {
-		vertexResource_->Unmap(0, nullptr);
-		vertexData_ = nullptr;
-	}
 
-	if (indexResource_ && indexData_) {
-		indexResource_->Unmap(0, nullptr);
-		indexData_ = nullptr;
-	}
-
-	if (materialResource_ && materialData_) {
-		materialResource_->Unmap(0, nullptr);
-		materialData_ = nullptr;
-	}
-
-	if (transformationMatrixResource_ && transformationMatrixData_) {
-		transformationMatrixResource_->Unmap(0, nullptr);
-		transformationMatrixData_ = nullptr;
-	}
 }
 
 void Sprite::Initialize(SpriteManager* spriteManager, std::string textureFilePath)
@@ -88,7 +70,6 @@ void Sprite::CreateIndexResource()
 {
 	// Sprite用のリソースインデックスの作成
 	indexResource_ = spriteManager_->GetDxManager()->CreateBufferResource(sizeof(uint32_t) * 6);
-
 	// リソースの先頭のアドレスから使う
 	indexBufferView_.BufferLocation = indexResource_->GetGPUVirtualAddress();
 	// 使用するリソースのサイズはインデックス6つ分のサイズ

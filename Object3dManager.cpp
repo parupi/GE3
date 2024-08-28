@@ -1,15 +1,7 @@
-#include "SpriteManager.h"
+#include "Object3dManager.h"
 
-SpriteManager::~SpriteManager()
+void Object3dManager::Initialize(DirectXManager* directXManager)
 {
-	signatureBlob->Release();
-	if (errorBlob)
-	{
-		errorBlob->Release();
-	}
-}
-
-void SpriteManager::Initialize(DirectXManager* directXManager) {
 	assert(directXManager);
 	dxManager_ = directXManager;
 
@@ -21,7 +13,15 @@ void SpriteManager::Initialize(DirectXManager* directXManager) {
 	CreatePipelineState();
 }
 
-void SpriteManager::CreateRootSignature() {
+void Object3dManager::DrawSet()
+{
+	dxManager_->GetCommandList()->SetGraphicsRootSignature(rootSignature_.Get());
+	dxManager_->GetCommandList()->SetPipelineState(graphicsPipelineState_.Get());			// PSOを設定
+	dxManager_->GetCommandList()->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+}
+
+void Object3dManager::CreateRootSignature()
+{
 	// RootSignature作成
 	D3D12_ROOT_SIGNATURE_DESC descriptionRootSignature{};
 	descriptionRootSignature.Flags = D3D12_ROOT_SIGNATURE_FLAG_ALLOW_INPUT_ASSEMBLER_INPUT_LAYOUT;
@@ -73,12 +73,12 @@ void SpriteManager::CreateRootSignature() {
 		assert(false);
 	}
 	// バイナリをもとに生成
-	
+
 	hr = dxManager_->GetDevice()->CreateRootSignature(0, signatureBlob->GetBufferPointer(), signatureBlob->GetBufferSize(), IID_PPV_ARGS(&rootSignature_));
 	assert(SUCCEEDED(hr));
 }
 
-D3D12_INPUT_LAYOUT_DESC SpriteManager::CreateInputElementDesc()
+D3D12_INPUT_LAYOUT_DESC Object3dManager::CreateInputElementDesc()
 {
 	// InputLayout
 	D3D12_INPUT_ELEMENT_DESC inputElementDescs[3] = {};
@@ -101,13 +101,13 @@ D3D12_INPUT_LAYOUT_DESC SpriteManager::CreateInputElementDesc()
 	return inputLayoutDesc;
 }
 
-void SpriteManager::CreateBlendState()
+void Object3dManager::CreateBlendState()
 {
 	// すべての色要素を書き込む
 	blendDesc_.RenderTarget[0].RenderTargetWriteMask = D3D12_COLOR_WRITE_ENABLE_ALL;
 }
 
-void SpriteManager::CreateRasterizerState()
+void Object3dManager::CreateRasterizerState()
 {
 	// 裏面(時計回り)を表示しない
 	rasterizerDesc_.CullMode = D3D12_CULL_MODE_NONE;
@@ -115,7 +115,7 @@ void SpriteManager::CreateRasterizerState()
 	rasterizerDesc_.FillMode = D3D12_FILL_MODE_SOLID;
 }
 
-void SpriteManager::LoadShader()
+void Object3dManager::LoadShader()
 {
 	// Shaderをコンパイルする
 	vertexShaderBlob_ = dxManager_->CompileShader(L"./resource/shaders/Object3d.VS.hlsl", L"vs_6_0");
@@ -125,8 +125,7 @@ void SpriteManager::LoadShader()
 	assert(pixelShaderBlob_ != nullptr);
 }
 
-
-void SpriteManager::CreatePipelineState()
+void Object3dManager::CreatePipelineState()
 {
 	HRESULT hr;
 
@@ -165,11 +164,4 @@ void SpriteManager::CreatePipelineState()
 	//Microsoft::WRL::ComPtr<ID3D12PipelineState> graphicsPipelineState = nullptr;
 	hr = dxManager_->GetDevice()->CreateGraphicsPipelineState(&graphicsPipelineStateDesc, IID_PPV_ARGS(&graphicsPipelineState_));
 	assert(SUCCEEDED(hr));
-}
-
-void SpriteManager::DrawSet()
-{
-	dxManager_->GetCommandList()->SetGraphicsRootSignature(rootSignature_.Get());
-	dxManager_->GetCommandList()->SetPipelineState(graphicsPipelineState_.Get());			// PSOを設定
-	dxManager_->GetCommandList()->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 }
