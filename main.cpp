@@ -83,14 +83,48 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 
 		sprites.push_back(sprite);
 	}
+	//// objectの初期化
+	//std::vector<Model*> models;
+	//std::vector<Object3d*> objects;
+	//for (uint32_t i = 0; i < 2; ++i) {
+	//	Model* model = new Model();
+	//	model->Initialize(modelManager);
 
-	Model* model = new Model();
-	model->Initialize(modelManager);
+	//	Vector3 initPosition = Vector3{ 0.0f, 0.0f, 0.0f };
+	//	model->SetPosition(initPosition);
+	//	
+	//	Object3d* object = new Object3d();
+	//	object->Initialize(objectManager);
 
-	Object3d* object3d = new Object3d();
-	object3d->Initialize(objectManager);
+	//	Vector3 objectPosition = Vector3{ i * 30.0f, i* 30.0f, 0.0f };
+	//	object->SetPosition(objectPosition);
 
-	object3d->SetModel(model);
+	//	object->SetModel(model);
+	//	models.push_back(model);
+	//	objects.push_back(object);
+	//}
+	std::vector<Object3d*> objects;
+	std::vector<Model*> models;
+
+	for (int i = 0; i < 2; ++i) {
+		// Modelの初期化
+		Model* model = new Model();
+		model->Initialize(modelManager);
+		models.push_back(model);
+
+		// Object3dの初期化
+		Object3d* object = new Object3d();
+		object->Initialize(objectManager);
+		object->SetModel(model);
+		objects.push_back(object);
+	}
+
+	// それぞれのObject3dに位置や回転を設定
+	models[0]->SetPosition({ 0.0f, 0.0f, 0.0f }); // 原点
+	models[0]->SetRotation({ 0.0f, 0.0f, 0.0f }); // 回転なし
+
+	models[1]->SetPosition({ 3.0f, 0.0f, 0.0f }); // X軸に5.0単位ずらす
+	models[1]->SetRotation({ 0.0f, 45.0f, 0.0f }); // Y軸周りに45度回転
 
 	// 入力の初期化
 	input = new Input();
@@ -133,24 +167,32 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 			//sprite->SetIsFlipY(true);
 			sprite->Update();
 		}
-		
-		object3d->Update();
+
+
+		for (auto& object : objects) {
+			object->Update();
+		}
+
+
 
 		directXManager->BeginDraw();
 
 		objectManager->DrawSet();
 
-		object3d->Draw();
+		for (auto& object : objects) {
+			object->Draw();
+		}
+
 
 		spriteManager->DrawSet();
-	
+
 		for (Sprite* sprite : sprites) {
 			sprite->Draw();
 		}
 
 		// 実際のcommandListのImGuiの描画コマンドを積む
 		ImGui_ImplDX12_RenderDrawData(ImGui::GetDrawData(), directXManager->GetCommandList().Get());
-		
+
 		directXManager->EndDraw();
 	}
 
@@ -171,10 +213,14 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	for (Sprite* sprite : sprites) {
 		delete sprite;
 	}
-	delete object3d;
-	object3d = nullptr;
-	delete model;
-	model = nullptr;
+	for (Object3d* object : objects) {
+		delete object;
+		object = nullptr;
+	}
+	for (Model* model : models) {
+		delete model;
+		model = nullptr;
+	}
 	delete directXManager;
 	directXManager = nullptr;
 	winManager->Finalize();

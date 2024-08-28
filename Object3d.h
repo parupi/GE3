@@ -43,6 +43,5 @@ private: // メンバ変数
 	Transform cameraTransform_;
 public: // ゲッター // セッター // 
 	void SetModel(Model* model) { model_ = model; }
-
 };
 

@@ -16,7 +16,6 @@ void Model::Initialize(ModelManager* modelManager)
 	TextureManager::GetInstance()->LoadTexture(modelData_.material.textureFilePath);
 	// 読み込んだテクスチャの番号を取得
 	modelData_.material.textureIndex = TextureManager::GetInstance()->GetTextureIndexByFilePath(modelData_.material.textureFilePath);
-
 }
 
 void Model::Draw()

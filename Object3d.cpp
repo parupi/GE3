@@ -17,6 +17,10 @@ void Object3d::Initialize(Object3dManager* objectManager)
 
 void Object3d::Update()
 {
+	transform_.scale = model_->GetSize();
+	transform_.rotate = model_->GetRotation();
+	transform_.translate = model_->GetPosition();
+
 	Matrix4x4 worldMatrix = MakeAffineMatrix(transform_.scale, transform_.rotate, transform_.translate);
 	Matrix4x4 cameraMatrix = MakeAffineMatrix(cameraTransform_.scale, cameraTransform_.rotate, cameraTransform_.translate);
 	Matrix4x4 viewMatrix = Inverse(cameraMatrix);
@@ -60,115 +64,3 @@ void Object3d::CreateDirectionalLightResource()
 	directionalLightData_->direction = { 0.0f, -1.0f, 0.0f };
 	directionalLightData_->intensity = 1.0f;
 }
-
-//Object3d::MaterialData Object3d::LoadMaterialTemplateFile(const std::string& directoryPath, const std::string& filename)
-//{
-//	MaterialData materialData;
-//	std::string line;
-//	std::ifstream file(directoryPath + "/" + filename);
-//	assert(file.is_open());
-//
-//	while (std::getline(file, line)) {
-//		std::string identifier;
-//		std::istringstream s(line);
-//		s >> identifier;
-//
-//		if (identifier == "newmtl") {
-//			s >> materialData.name;
-//		}
-//		else if (identifier == "Ns") {
-//			s >> materialData.Ns;
-//		}
-//		else if (identifier == "Ka") {
-//			s >> materialData.Ka.r >> materialData.Ka.g >> materialData.Ka.b;
-//		}
-//		else if (identifier == "Kd") {
-//			s >> materialData.Kd.r >> materialData.Kd.g >> materialData.Kd.b;
-//		}
-//		else if (identifier == "Ks") {
-//			s >> materialData.Ks.r >> materialData.Ks.g >> materialData.Ks.b;
-//		}
-//		else if (identifier == "Ni") {
-//			s >> materialData.Ni;
-//		}
-//		else if (identifier == "d") {
-//			s >> materialData.d;
-//		}
-//		else if (identifier == "illum") {
-//			s >> materialData.illum;
-//		}
-//		else if (identifier == "map_Kd") {
-//			std::string textureFilename;
-//			s >> textureFilename;
-//			materialData.textureFilePath = directoryPath + "/" + textureFilename;
-//		}
-//	}
-//	return materialData;
-//}
-//
-//Object3d::ModelData Object3d::LoadObjFile(const std::string& directoryPath, const std::string& filename)
-//{
-//	ModelData modelData;
-//	std::vector<Vector4> positions;
-//	std::vector<Vector3> normals;
-//	std::vector<Vector2> texcoords;
-//	std::string line;
-//
-//	std::ifstream file(directoryPath + "/" + filename);
-//	assert(file.is_open());
-//
-//	while (std::getline(file, line)) {
-//		std::string identifier;
-//		std::istringstream s(line);
-//		s >> identifier;
-//
-//		if (identifier == "v") {
-//			Vector4 position;
-//			s >> position.x >> position.y >> position.z;
-//			position.x *= -1.0f;
-//			position.w = 1.0f;
-//			positions.push_back(position);
-//		}
-//		else if (identifier == "vt") {
-//			Vector2 texcoord;
-//			s >> texcoord.x >> texcoord.y;
-//			texcoord.y = 1.0f - texcoord.y;
-//			texcoords.push_back(texcoord);
-//		}
-//		else if (identifier == "vn") {
-//			Vector3 normal;
-//			s >> normal.x >> normal.y >> normal.z;
-//			normal.x *= -1.0f;
-//			normals.push_back(normal);
-//		}
-//		else if (identifier == "f") {
-//			VertexData triangle[3];
-//			for (int32_t faceVertex = 0; faceVertex < 3; ++faceVertex) {
-//				std::string vertexDefinition;
-//				s >> vertexDefinition;
-//				std::istringstream v(vertexDefinition);
-//				uint32_t elementIndices[3];
-//				for (int32_t element = 0; element < 3; ++element) {
-//					std::string index;
-//					std::getline(v, index, '/');
-//					elementIndices[element] = std::stoi(index);
-//				}
-//				Vector4 position = positions[elementIndices[0] - 1];
-//				Vector2 texcoord = texcoords[elementIndices[1] - 1];
-//				Vector3 normal = normals[elementIndices[2] - 1];
-//				VertexData vertex = { position, texcoord, normal };
-//				triangle[faceVertex] = vertex;
-//			}
-//			modelData.vertices.push_back(triangle[2]);
-//			modelData.vertices.push_back(triangle[1]);
-//			modelData.vertices.push_back(triangle[0]);
-//		}
-//		else if (identifier == "mtllib") {
-//			std::string materialFilename;
-//			s >> materialFilename;
-//			modelData.material = LoadMaterialTemplateFile(directoryPath, materialFilename);
-//		}
-//	}
-//
-//	return modelData;
-//}
