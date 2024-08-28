@@ -1,5 +1,5 @@
 #pragma once
-#include "ModelManager.h"
+#include "ModelLoader.h"
 #include "math/Vector4.h"
 #include "math/Vector3.h"
 #include "math/Vector2.h"
@@ -9,7 +9,7 @@ class Model
 {
 public: // メンバ関数
 	// 初期化
-	void Initialize(ModelManager* modelManager);
+	void Initialize(ModelLoader* modelLoader, const std::string& directoryPath, const std::string& fileName);
 
 	void Draw();
 private:
@@ -55,7 +55,7 @@ private: // 構造体
 
 
 private:
-	ModelManager* modelManager_ = nullptr;
+	ModelLoader* modelLoader_ = nullptr;
 
 	ModelData modelData_;
 

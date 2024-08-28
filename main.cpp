@@ -17,6 +17,7 @@
 #include "Object3d.h"
 #include "Object3dmanager.h"
 #include "Model.h"
+#include "ModelLoader.h"
 #include "ModelManager.h"
 
 struct D3DResourceLeakChecker {
@@ -41,7 +42,6 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	DirectXManager* directXManager = nullptr;
 	SpriteManager* spriteManager = nullptr;
 	Object3dManager* objectManager = nullptr;
-	ModelManager* modelManager = nullptr;
 	Input* input = nullptr;
 
 	// WinDowsAPIの初期化
@@ -51,7 +51,10 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	directXManager = new DirectXManager();
 	directXManager->Initialize(winManager);
 
+	// 2Dテクスチャマネージャーの初期化
 	TextureManager::GetInstance()->Initialize(directXManager);
+	// 3Dテクスチャマネージャーの初期化
+	ModelManager::GetInstance()->Initialize(directXManager);
 
 	// スプライト共通部の初期化
 	spriteManager = new SpriteManager();
@@ -59,13 +62,13 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	// オブジェクト共通部
 	objectManager = new Object3dManager();
 	objectManager->Initialize(directXManager);
-	// モデル共通部
-	modelManager = new ModelManager();
-	modelManager->Initialize(directXManager);
 
 	// Textureのロード
 	TextureManager::GetInstance()->LoadTexture("resource/uvChecker.png");
 	TextureManager::GetInstance()->LoadTexture("resource/monsterBall.png");
+	// .objファイルからモデルを読み込む
+	ModelManager::GetInstance()->LoadModel("plane.obj");
+	ModelManager::GetInstance()->LoadModel("axis.obj");
 
 	// Spriteの初期化
 	std::vector<Sprite*> sprites;
@@ -83,33 +86,19 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 
 		sprites.push_back(sprite);
 	}
-	//// objectの初期化
-	//std::vector<Model*> models;
-	//std::vector<Object3d*> objects;
-	//for (uint32_t i = 0; i < 2; ++i) {
-	//	Model* model = new Model();
-	//	model->Initialize(modelManager);
 
-	//	Vector3 initPosition = Vector3{ 0.0f, 0.0f, 0.0f };
-	//	model->SetPosition(initPosition);
-	//	
-	//	Object3d* object = new Object3d();
-	//	object->Initialize(objectManager);
-
-	//	Vector3 objectPosition = Vector3{ i * 30.0f, i* 30.0f, 0.0f };
-	//	object->SetPosition(objectPosition);
-
-	//	object->SetModel(model);
-	//	models.push_back(model);
-	//	objects.push_back(object);
-	//}
 	std::vector<Object3d*> objects;
 	std::vector<Model*> models;
 
 	for (int i = 0; i < 2; ++i) {
 		// Modelの初期化
 		Model* model = new Model();
-		model->Initialize(modelManager);
+		if (i == 1) {
+			model->Initialize(ModelManager::GetInstance()->GetModelLoader(), "resource", "axis.obj");
+		}
+		else {
+			model->Initialize(ModelManager::GetInstance()->GetModelLoader(), "resource", "plane.obj");
+		}
 		models.push_back(model);
 
 		// Object3dの初期化
@@ -120,11 +109,11 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	}
 
 	// それぞれのObject3dに位置や回転を設定
-	models[0]->SetPosition({ 0.0f, 0.0f, 0.0f }); // 原点
-	models[0]->SetRotation({ 0.0f, 0.0f, 0.0f }); // 回転なし
+	models[0]->SetPosition({ -2.0f, 0.0f, 0.0f }); 
+	models[0]->SetRotation({ 0.0f, 0.0f, 0.0f }); 
 
-	models[1]->SetPosition({ 3.0f, 0.0f, 0.0f }); // X軸に5.0単位ずらす
-	models[1]->SetRotation({ 0.0f, 45.0f, 0.0f }); // Y軸周りに45度回転
+	models[1]->SetPosition({ 2.0f, 0.0f, 0.0f }); 
+	models[1]->SetRotation({ 0.0f, 45.0f, 0.0f }); 
 
 	// 入力の初期化
 	input = new Input();
@@ -204,12 +193,12 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	delete input;
 	input = nullptr;
 	TextureManager::GetInstance()->Finalize();
+	ModelManager::GetInstance()->Finalize();
 	delete spriteManager;
 	spriteManager = nullptr;
 	delete objectManager;
 	objectManager = nullptr;
-	delete modelManager;
-	modelManager = nullptr;
+
 	for (Sprite* sprite : sprites) {
 		delete sprite;
 	}

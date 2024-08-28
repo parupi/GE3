@@ -64,3 +64,9 @@ void Object3d::CreateDirectionalLightResource()
 	directionalLightData_->direction = { 0.0f, -1.0f, 0.0f };
 	directionalLightData_->intensity = 1.0f;
 }
+
+void Object3d::SetModel(const std::string& filePath)
+{
+	// モデルを検索してセットする
+	model_ = ModelManager::GetInstance()->FindModel(filePath);
+}

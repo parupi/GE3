@@ -2,12 +2,12 @@
 #include "math/function.h"
 #include "TextureManager.h"
 
-void Model::Initialize(ModelManager* modelManager)
+void Model::Initialize(ModelLoader* modelManager, const std::string& directoryPath, const std::string& fileName)
 {
-	modelManager_ = modelManager;
+	modelLoader_ = modelManager;
 
 	// モデルの読み込み
-	modelData_ = LoadObjFile("resource", "plane.obj");
+	modelData_ = LoadObjFile(directoryPath, fileName);
 
 	CreateVertexResource();
 	CreateMaterialResource();
@@ -21,19 +21,19 @@ void Model::Initialize(ModelManager* modelManager)
 void Model::Draw()
 {
 	// VertexBufferViewを設定
-	modelManager_->GetDxManager()->GetCommandList()->IASetVertexBuffers(0, 1, &vertexBufferView_);
+	modelLoader_->GetDxManager()->GetCommandList()->IASetVertexBuffers(0, 1, &vertexBufferView_);
 	// マテリアルCBufferの場所を指定
-	modelManager_->GetDxManager()->GetCommandList()->SetGraphicsRootConstantBufferView(0, materialResource_->GetGPUVirtualAddress());
+	modelLoader_->GetDxManager()->GetCommandList()->SetGraphicsRootConstantBufferView(0, materialResource_->GetGPUVirtualAddress());
 	// SRVのDescriptorTableの先頭を設定。
-	modelManager_->GetDxManager()->GetCommandList()->SetGraphicsRootDescriptorTable(2, TextureManager::GetInstance()->GetSrvHandleGPU(modelData_.material.textureIndex));
+	modelLoader_->GetDxManager()->GetCommandList()->SetGraphicsRootDescriptorTable(2, TextureManager::GetInstance()->GetSrvHandleGPU(modelData_.material.textureIndex));
 	// ドローコール
-	modelManager_->GetDxManager()->GetCommandList()->DrawInstanced(UINT(modelData_.vertices.size()), 1, 0, 0);
+	modelLoader_->GetDxManager()->GetCommandList()->DrawInstanced(UINT(modelData_.vertices.size()), 1, 0, 0);
 }
 
 void Model::CreateVertexResource()
 {
 	// 頂点リソースを作る
-	vertexResource_ = modelManager_->GetDxManager()->CreateBufferResource(sizeof(VertexData) * modelData_.vertices.size());
+	vertexResource_ = modelLoader_->GetDxManager()->CreateBufferResource(sizeof(VertexData) * modelData_.vertices.size());
 	// 頂点バッファビューを作成する
 	vertexBufferView_.BufferLocation = vertexResource_->GetGPUVirtualAddress();	// リソースの先頭アドレスから使う
 	vertexBufferView_.SizeInBytes = UINT(sizeof(VertexData) * modelData_.vertices.size());		// 使用するリソースのサイズは頂点のサイズ
@@ -46,7 +46,7 @@ void Model::CreateVertexResource()
 void Model::CreateMaterialResource()
 {
 	// マテリアル用のリソースを作る。今回はFcolor1つ分のサイズを用意する
-	materialResource_ = modelManager_->GetDxManager()->CreateBufferResource(sizeof(Material));
+	materialResource_ = modelLoader_->GetDxManager()->CreateBufferResource(sizeof(Material));
 	// 書き込むためのアドレスを取得
 	materialResource_->Map(0, nullptr, reinterpret_cast<void**>(&materialData_));
 	// 白を入れる

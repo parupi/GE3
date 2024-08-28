@@ -7,6 +7,7 @@
 #include "math/function.h"
 #include <fstream>
 #include "Model.h"
+#include "ModelManager.h"
 class Object3dManager;
 
 class Object3d
@@ -43,5 +44,6 @@ private: // メンバ変数
 	Transform cameraTransform_;
 public: // ゲッター // セッター // 
 	void SetModel(Model* model) { model_ = model; }
+	void SetModel(const std::string& filePath);
 };
 
