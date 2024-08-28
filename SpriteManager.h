@@ -5,8 +5,8 @@
 class SpriteManager
 {
 public:
+	~SpriteManager();
 	void Initialize(DirectXManager* directXManager);
-
 
 	void DrawSet();
 
@@ -32,6 +32,9 @@ private:
 
 	Microsoft::WRL::ComPtr<IDxcBlob> vertexShaderBlob_ = nullptr;
 	Microsoft::WRL::ComPtr<IDxcBlob> pixelShaderBlob_ = nullptr;
+
+	ID3DBlob* signatureBlob = nullptr;
+	ID3DBlob* errorBlob = nullptr;
 
 public:
 	DirectXManager* GetDxManager() const { return dxManager_; }

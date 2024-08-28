@@ -12,6 +12,8 @@
 
 using namespace Microsoft::WRL;
 
+const uint32_t DirectXManager::kMaxSRVCount = 512;
+
 void DirectXManager::Initialize(WindowManager* winManager)
 {
 	assert(winManager);
@@ -38,6 +40,13 @@ void DirectXManager::Initialize(WindowManager* winManager)
 
 DirectXManager::~DirectXManager()
 {
+
+	//if (commandAllocator_) {
+	//	commandAllocator_->Release();
+	//	commandAllocator_ = nullptr;
+	//}
+	// その他のリソースも同様にRelease
+	//ImGui::DestroyContext();
 	if (fenceEvent_) {
 		CloseHandle(fenceEvent_);
 	}
@@ -202,7 +211,7 @@ ComPtr<ID3D12Resource> DirectXManager::CreateDepthStencilTextureResource(ComPtr<
 	return resource;
 }
 
-ComPtr<ID3D12Resource> DirectXManager::CreateTextureResource(ComPtr<ID3D12Device> device, const DirectX::TexMetadata& metadata)
+ComPtr<ID3D12Resource> DirectXManager::CreateTextureResource(const DirectX::TexMetadata& metadata)
 {
 	// 1. metadataをもとにResourceの設定
 	D3D12_RESOURCE_DESC resourceDesc{};
@@ -222,7 +231,7 @@ ComPtr<ID3D12Resource> DirectXManager::CreateTextureResource(ComPtr<ID3D12Device
 
 	// 3. Resourceを生成する
 	Microsoft::WRL::ComPtr<ID3D12Resource> resource = nullptr;
-	HRESULT hr = device->CreateCommittedResource(
+	HRESULT hr = device_->CreateCommittedResource(
 		&heapProperties,							// Heapの設定
 		D3D12_HEAP_FLAG_NONE,						// Heapの特殊な設定。特になし。
 		&resourceDesc,								// Resourceの設定
@@ -252,23 +261,6 @@ void DirectXManager::UploadTextureData(ComPtr<ID3D12Resource> texture, const Dir
 		);
 		assert(SUCCEEDED(hr));
 	}
-}
-
-DirectX::ScratchImage DirectXManager::LoadTexture(const std::string& filePath)
-{
-	// テクスチャファイルを呼んでプログラムで扱えるようにする
-	DirectX::ScratchImage image{};
-	std::wstring filePathW = StringUtility::ConvertString(filePath);
-	HRESULT hr = DirectX::LoadFromWICFile(filePathW.c_str(), DirectX::WIC_FLAGS_FORCE_SRGB, nullptr, image);
-	assert(SUCCEEDED(hr));
-
-	// ミニマップの作成
-	DirectX::ScratchImage mipImages{};
-	hr = DirectX::GenerateMipMaps(image.GetImages(), image.GetImageCount(), image.GetMetadata(), DirectX::TEX_FILTER_SRGB, 0, mipImages);
-	assert(SUCCEEDED(hr));
-
-	// ミニマップ付きのデータを返す
-	return mipImages;
 }
 
 Microsoft::WRL::ComPtr<ID3D12Resource> DirectXManager::CreateBufferResource(size_t sizeInBytes)
@@ -443,7 +435,7 @@ void DirectXManager::CreateHeap()
 
 	// DescriptorHeapを生成
 	rtvHeap_ = CreateDescriptorHeap(device_, D3D12_DESCRIPTOR_HEAP_TYPE_RTV, 2, false);
-	srvHeap_ = CreateDescriptorHeap(device_, D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV, 128, true);
+	srvHeap_ = CreateDescriptorHeap(device_, D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV, kMaxSRVCount, true);
 	dsvHeap_ = CreateDescriptorHeap(device_, D3D12_DESCRIPTOR_HEAP_TYPE_DSV, 1, false);
 }
 

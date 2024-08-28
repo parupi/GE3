@@ -87,6 +87,6 @@ bool WindowManager::ProcessMessage()
 
 void WindowManager::Finalize()
 {
-	CloseWindow(hwnd_);
 	CoUninitialize();
+	CloseWindow(hwnd_);
 }

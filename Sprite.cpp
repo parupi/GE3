@@ -1,22 +1,41 @@
 #include "Sprite.h"
 #include "math/function.h"
 
-void Sprite::Initialize(SpriteManager* spriteManager)
+Sprite::~Sprite() {
+	if (vertexResource_ && vertexData_) {
+		vertexResource_->Unmap(0, nullptr);
+		vertexData_ = nullptr;
+	}
+
+	if (indexResource_ && indexData_) {
+		indexResource_->Unmap(0, nullptr);
+		indexData_ = nullptr;
+	}
+
+	if (materialResource_ && materialData_) {
+		materialResource_->Unmap(0, nullptr);
+		materialData_ = nullptr;
+	}
+
+	if (transformationMatrixResource_ && transformationMatrixData_) {
+		transformationMatrixResource_->Unmap(0, nullptr);
+		transformationMatrixData_ = nullptr;
+	}
+}
+
+void Sprite::Initialize(SpriteManager* spriteManager, std::string textureFilePath)
 {
 	assert(spriteManager);
 	spriteManager_ = spriteManager;
+
+	// 単位行列を書き込んでおく
+	textureIndex = TextureManager::GetInstance()->GetTextureIndexByFilePath(textureFilePath);
 
 	// 各種リソースを作る
 	CreateVertexResource();
 	CreateIndexResource();
 	CreateMaterialResource();
 	CreateTransformationResource();
-
-	// マテリアルリソース
-	//SetSpriteData();
-
-	textureSrvHandleCPU_ = spriteManager->GetDxManager()->GetSRVCPUDescriptorHandle(1);
-	textureSrvHandleGPU_ = spriteManager->GetDxManager()->GetSRVGPUDescriptorHandle(1);
 }
 
 void Sprite::Update()
@@ -44,6 +63,9 @@ void Sprite::Draw()
 	spriteManager_->GetDxManager()->GetCommandList()->IASetIndexBuffer(&indexBufferView_);
 	// TransformationMatrixCBufferの場所を設定
 	spriteManager_->GetDxManager()->GetCommandList()->SetGraphicsRootConstantBufferView(0, materialResource_->GetGPUVirtualAddress());
+
+	spriteManager_->GetDxManager()->GetCommandList()->SetGraphicsRootDescriptorTable(2, TextureManager::GetInstance()->GetSrvHandleGPU(textureIndex));
+
 	//// 描画!（DrawCall/ドローコール）。3頂点で1つのインスタンス。インスタンスについては今後
 	spriteManager_->GetDxManager()->GetCommandList()->DrawIndexedInstanced(6, 1, 0, 0, 0);
 }
@@ -64,7 +86,7 @@ void Sprite::CreateIndexResource()
 {
 	// Sprite用のリソースインデックスの作成
 	indexResource_ = spriteManager_->GetDxManager()->CreateBufferResource(sizeof(uint32_t) * 6);
-	
+
 	// リソースの先頭のアドレスから使う
 	indexBufferView_.BufferLocation = indexResource_->GetGPUVirtualAddress();
 	// 使用するリソースのサイズはインデックス6つ分のサイズ

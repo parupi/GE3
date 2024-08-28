@@ -1,5 +1,6 @@
 #pragma once
 #include "SpriteManager.h"
+#include "TextureManager.h"
 #include "math/Vector2.h"
 #include "math/Vector3.h"
 #include "math/Vector4.h"
@@ -9,7 +10,8 @@ class SpriteManager;
 // スプライト
 class Sprite {
 public:
-	void Initialize(SpriteManager* spriteManager);
+	~Sprite();
+	void Initialize(SpriteManager* spriteManager, std::string textureFilePath);
 	void Update();
 	void Draw();
 
@@ -60,6 +62,9 @@ private:
 
 	D3D12_CPU_DESCRIPTOR_HANDLE textureSrvHandleCPU_;
 	D3D12_GPU_DESCRIPTOR_HANDLE textureSrvHandleGPU_;
+
+	// テクスチャ番号
+	uint32_t textureIndex = 0;
 
 private: // 実用化用変数
 	Transform transform_{ {1.0f, 1.0f, 1.0f}, {0.0f, 0.0f, 0.0f}, {0.0f, 0.0f, 0.0f} };

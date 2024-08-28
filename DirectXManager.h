@@ -18,31 +18,37 @@ public: // メンバ関数
 	void Initialize(WindowManager* winManager);
 	~DirectXManager();
 
+public:
+
+	// 最大SRV数 (最大テクスチャ枚数)
+	static const uint32_t kMaxSRVCount;
+
 private: // メンバ変数
 	// WindowAPI
 	WindowManager* winManager_ = nullptr;
 
 	Microsoft::WRL::ComPtr<IDXGIFactory7> dxgiFactory_ = nullptr;
-	Microsoft::WRL::ComPtr<ID3D12Device> device_ = nullptr;
+	static inline Microsoft::WRL::ComPtr<ID3D12Device> device_ = nullptr;
 
 	Microsoft::WRL::ComPtr<ID3D12CommandQueue> commandQueue_ = nullptr;
 	Microsoft::WRL::ComPtr<ID3D12CommandAllocator> commandAllocator_ = nullptr;
-	Microsoft::WRL::ComPtr<ID3D12GraphicsCommandList> commandList_ = nullptr;
+	static inline Microsoft::WRL::ComPtr<ID3D12GraphicsCommandList> commandList_ = nullptr;
 
 	Microsoft::WRL::ComPtr<IDXGISwapChain4> swapChain_ = nullptr;
 	DXGI_SWAP_CHAIN_DESC1 swapChainDesc{};
 	Microsoft::WRL::ComPtr<ID3D12Resource> swapChainResources_[2];
 
 	Microsoft::WRL::ComPtr<ID3D12Resource> depthBuffer_;
-	Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> rtvHeap_ = nullptr;
-	Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> dsvHeap_ = nullptr;
-	Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> srvHeap_ = nullptr;
+	
+	static inline Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> rtvHeap_ = nullptr;
+	static inline Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> dsvHeap_ = nullptr;
+	static inline Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> srvHeap_ = nullptr;
 
 	D3D12_RENDER_TARGET_VIEW_DESC rtvDesc_{};
 
-	uint32_t descriptorSizeSRV_;
-	uint32_t descriptorSizeRTV_;
-	uint32_t descriptorSizeDSV_;
+	static inline uint32_t descriptorSizeSRV_;
+	static inline uint32_t descriptorSizeRTV_;
+	static inline uint32_t descriptorSizeDSV_;
 	// シザー矩形
 	D3D12_RECT scissorRect_{};
 	// ビューポート
@@ -75,14 +81,14 @@ public:
 
 	Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> CreateDescriptorHeap(Microsoft::WRL::ComPtr<ID3D12Device> device, D3D12_DESCRIPTOR_HEAP_TYPE heapType, UINT numDescriptors, bool shaderVisible);
 
-	D3D12_CPU_DESCRIPTOR_HANDLE GetSRVCPUDescriptorHandle(uint32_t index);
-	D3D12_GPU_DESCRIPTOR_HANDLE GetSRVGPUDescriptorHandle(uint32_t index);
+	static D3D12_CPU_DESCRIPTOR_HANDLE GetSRVCPUDescriptorHandle(uint32_t index);
+	static D3D12_GPU_DESCRIPTOR_HANDLE GetSRVGPUDescriptorHandle(uint32_t index);
 
 	Microsoft::WRL::ComPtr<IDxcBlob> CompileShader(const std::wstring& filePath, const wchar_t* profile);
 	Microsoft::WRL::ComPtr<ID3D12Resource> CreateDepthStencilTextureResource(Microsoft::WRL::ComPtr<ID3D12Device> device, int32_t width, int32_t height);
-	Microsoft::WRL::ComPtr<ID3D12Resource> CreateTextureResource(Microsoft::WRL::ComPtr<ID3D12Device> device, const DirectX::TexMetadata& metadata);
-	void UploadTextureData(Microsoft::WRL::ComPtr<ID3D12Resource> texture, const DirectX::ScratchImage& mipImages);
-	static DirectX::ScratchImage LoadTexture(const std::string& filePath);
+	static Microsoft::WRL::ComPtr<ID3D12Resource> CreateTextureResource(const DirectX::TexMetadata& metadata);
+	static void UploadTextureData(Microsoft::WRL::ComPtr<ID3D12Resource> texture, const DirectX::ScratchImage& mipImages);
+	
 	Microsoft::WRL::ComPtr<ID3D12Resource> CreateBufferResource(size_t sizeInBytes);
 
 private:
@@ -122,8 +128,8 @@ public:
 	void EndDraw();
 
 public: // ゲッター/セッター //
-	Microsoft::WRL::ComPtr<ID3D12Device> GetDevice() { return device_; }
-	Microsoft::WRL::ComPtr<ID3D12GraphicsCommandList> GetCommandList() { return commandList_; }
+	static Microsoft::WRL::ComPtr<ID3D12Device> GetDevice() { return device_; }
+	static Microsoft::WRL::ComPtr<ID3D12GraphicsCommandList> GetCommandList() { return commandList_; }
 	Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> GetSRVHeap() { return srvHeap_; }
 	uint32_t GetDescriptorSizeRTV() { return descriptorSizeRTV_; }
 	uint32_t GetDescriptorSizeSRV() { return descriptorSizeSRV_; }

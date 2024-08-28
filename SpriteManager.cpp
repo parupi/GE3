@@ -1,5 +1,14 @@
 #include "SpriteManager.h"
 
+SpriteManager::~SpriteManager()
+{
+	signatureBlob->Release();
+	if (errorBlob)
+	{
+		errorBlob->Release();
+	}
+}
+
 void SpriteManager::Initialize(DirectXManager* directXManager) {
 	assert(directXManager);
 	dxManager_ = directXManager;
@@ -57,8 +66,7 @@ void SpriteManager::CreateRootSignature() {
 	descriptionRootSignature.NumStaticSamplers = _countof(staticSamplers);
 
 	// シリアライズしてバイナリにする
-	ID3DBlob* signatureBlob = nullptr;
-	ID3DBlob* errorBlob = nullptr;
+
 	HRESULT hr = D3D12SerializeRootSignature(&descriptionRootSignature, D3D_ROOT_SIGNATURE_VERSION_1, &signatureBlob, &errorBlob);
 	if (FAILED(hr)) {
 		Logger::Log(reinterpret_cast<char*>(errorBlob->GetBufferPointer()));
@@ -68,6 +76,8 @@ void SpriteManager::CreateRootSignature() {
 	
 	hr = dxManager_->GetDevice()->CreateRootSignature(0, signatureBlob->GetBufferPointer(), signatureBlob->GetBufferSize(), IID_PPV_ARGS(&rootSignature_));
 	assert(SUCCEEDED(hr));
+
+
 }
 
 
