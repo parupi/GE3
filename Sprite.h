@@ -23,6 +23,7 @@ private:
 	void CreateTransformationResource();
 	void SetSpriteData();
 
+	void AdjustTextureSize();
 private:
 
 	// 構造体
@@ -66,11 +67,23 @@ private:
 	// テクスチャ番号
 	uint32_t textureIndex = 0;
 
+	// 左右フリップ
+	bool isFlipX_ = false;
+	// 上下フリップ
+	bool isFlipY_ = false;
+
 private: // 実用化用変数
 	Transform transform_{ {1.0f, 1.0f, 1.0f}, {0.0f, 0.0f, 0.0f}, {0.0f, 0.0f, 0.0f} };
 	Vector2 position_ = { 0.0f, 0.0f };
 	float rotation_ = 0.0f;
-	Vector2 size_ = {160.0f, 90.0f };
+	Vector2 size_ = { 80.0f, 80.0f };
+
+	Vector2 anchorPoint_ = { 0.0f, 0.0f };
+
+	// テクスチャ左上座標
+	Vector2 textureLeftTop_ = { 0.0f, 0.0f };
+	// テクスチャ切り出しサイズ
+	Vector2 textureSize_ = { 100.0f, 100.0f };
 
 public: // ゲッター//セッター //
 	// 平行移動
@@ -85,4 +98,19 @@ public: // ゲッター//セッター //
 	// 色
 	const Vector4& GetColor() const { return materialData_->color; }
 	void SetColor(const Vector4& color) { materialData_->color = color; }
-};
+	// アンカー
+	const Vector2& GetAnchorPoint() const { return anchorPoint_; }
+	void SetAnchorPoint(const Vector2& anchorPoint) { anchorPoint_ = anchorPoint; }
+	// フリップX
+	const bool& GetIsFlipX() const {return isFlipX_;}
+	void SetIsFlipX(bool isFlipX) { isFlipX_ = isFlipX; }
+	// フリップY
+	const bool& GetIsFlipY() const { return isFlipY_; }
+	void SetIsFlipY(bool isFlipY) { isFlipY_ = isFlipY; }
+	// 左上座標
+	const Vector2& GetTextureLeftTop() const { return textureLeftTop_; }
+	void SetTextureLeftTop(Vector2 textureLeftTop) { textureLeftTop_ = textureLeftTop; }
+	// 切り出しサイズ
+	const Vector2& GetTextureSize() const { return textureSize_; }
+	void SetTextureSize(Vector2 textureSize) { textureSize_ = textureSize; }
+}; 

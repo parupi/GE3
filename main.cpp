@@ -624,16 +624,16 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 
 	// Spriteの初期化
 	std::vector<Sprite*> sprites;
-	for (uint32_t i = 0; i < 5; ++i) {
+	for (uint32_t i = 0; i < 2; ++i) {
 		Sprite* sprite = new Sprite();
-		if (i == 2 || i == 4) {
+		if (i == 1) {
 			sprite->Initialize(spriteManager, "resource/monsterBall.png");
 		}
 		else {
 			sprite->Initialize(spriteManager, "resource/uvChecker.png");
 		}
 
-		Vector2 initialPosition = Vector2{ i * 100.0f, 100.0f }; // 各スプライトを100ピクセルずつ右にずらして配置
+		Vector2 initialPosition = Vector2{ i * 360.0f, 100.0f }; // 各スプライトを100ピクセルずつ右にずらして配置
 		sprite->SetPosition(initialPosition);
 
 		sprites.push_back(sprite);
@@ -701,25 +701,27 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 
 		for (Sprite* sprite : sprites) {
 			// 平行移動用処理
-			Vector2 position = sprite->GetPosition();
-			position += Vector2{ 1.0f, 1.0f };
-			sprite->SetPosition(position);
+			//Vector2 position = sprite->GetPosition();
+			//position += Vector2{ 1.0f, 1.0f };
+			//sprite->SetPosition(position);
 			// 回転
-			float rotation = sprite->GetRotation();
-			rotation += 0.01f;
-			sprite->SetRotation(rotation);
+			//float rotation = sprite->GetRotation();
+			//rotation += 0.01f;
+			//sprite->SetRotation(rotation);
 			// 拡縮
-			Vector2 size = sprite->GetSize();
-			size.x += 0.3f;
-			size.y += 0.3f;
-			sprite->SetSize(size);
+			//Vector2 size = sprite->GetSize();
+			//size.x += 0.3f;
+			//size.y += 0.3f;
+			//sprite->SetSize(size);
 			// 色
-			Vector4 color = sprite->GetColor();
-			color.x += 0.01f;
-			if (color.x > 1.0f) {
-				color.x -= 1.0f;
-			}
-			sprite->SetColor(color);
+			//Vector4 color = sprite->GetColor();
+			//color.x += 0.01f;
+			//if (color.x > 1.0f) {
+			//	color.x -= 1.0f;
+			//}
+			//sprite->SetColor(color);
+			//sprite->SetIsFlipX(true);
+			//sprite->SetIsFlipY(true);
 			sprite->Update();
 		}
 		

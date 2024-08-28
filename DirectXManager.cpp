@@ -40,13 +40,6 @@ void DirectXManager::Initialize(WindowManager* winManager)
 
 DirectXManager::~DirectXManager()
 {
-
-	//if (commandAllocator_) {
-	//	commandAllocator_->Release();
-	//	commandAllocator_ = nullptr;
-	//}
-	// その他のリソースも同様にRelease
-	//ImGui::DestroyContext();
 	if (fenceEvent_) {
 		CloseHandle(fenceEvent_);
 	}
