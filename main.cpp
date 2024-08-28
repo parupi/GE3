@@ -16,6 +16,8 @@
 #include "TextureManager.h"
 #include "Object3d.h"
 #include "Object3dmanager.h"
+#include "Model.h"
+#include "ModelManager.h"
 
 struct D3DResourceLeakChecker {
 	~D3DResourceLeakChecker() {
@@ -39,6 +41,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	DirectXManager* directXManager = nullptr;
 	SpriteManager* spriteManager = nullptr;
 	Object3dManager* objectManager = nullptr;
+	ModelManager* modelManager = nullptr;
 	Input* input = nullptr;
 
 	// WinDowsAPIの初期化
@@ -53,9 +56,12 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	// スプライト共通部の初期化
 	spriteManager = new SpriteManager();
 	spriteManager->Initialize(directXManager);
-	// オブジェクトマネージャー
+	// オブジェクト共通部
 	objectManager = new Object3dManager();
 	objectManager->Initialize(directXManager);
+	// モデル共通部
+	modelManager = new ModelManager();
+	modelManager->Initialize(directXManager);
 
 	// Textureのロード
 	TextureManager::GetInstance()->LoadTexture("resource/uvChecker.png");
@@ -78,8 +84,13 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 		sprites.push_back(sprite);
 	}
 
+	Model* model = new Model();
+	model->Initialize(modelManager);
+
 	Object3d* object3d = new Object3d();
 	object3d->Initialize(objectManager);
+
+	object3d->SetModel(model);
 
 	// 入力の初期化
 	input = new Input();
@@ -133,7 +144,6 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 
 		spriteManager->DrawSet();
 	
-
 		for (Sprite* sprite : sprites) {
 			sprite->Draw();
 		}
@@ -156,11 +166,15 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	spriteManager = nullptr;
 	delete objectManager;
 	objectManager = nullptr;
+	delete modelManager;
+	modelManager = nullptr;
 	for (Sprite* sprite : sprites) {
 		delete sprite;
 	}
 	delete object3d;
 	object3d = nullptr;
+	delete model;
+	model = nullptr;
 	delete directXManager;
 	directXManager = nullptr;
 	winManager->Finalize();
