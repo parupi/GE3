@@ -211,37 +211,7 @@ ComPtr<ID3D12Resource> DirectXManager::CreateDepthStencilTextureResource(ComPtr<
 	return resource;
 }
 
-ComPtr<ID3D12Resource> DirectXManager::CreateTextureResource(const DirectX::TexMetadata& metadata)
-{
-	// 1. metadataをもとにResourceの設定
-	D3D12_RESOURCE_DESC resourceDesc{};
-	resourceDesc.Width = UINT(metadata.width);									// Textureの幅
-	resourceDesc.Height = UINT(metadata.height);								// textureの高さ
-	resourceDesc.MipLevels = UINT16(metadata.mipLevels);						// mipmapの数
-	resourceDesc.DepthOrArraySize = UINT16(metadata.arraySize);					// 奥行 or 配列textureの配列数
-	resourceDesc.Format = metadata.format;										// TextureのFormat
-	resourceDesc.SampleDesc.Count = 1;											// サンプリングカウント。1固定
-	resourceDesc.Dimension = D3D12_RESOURCE_DIMENSION(metadata.dimension);		// Textureの次元数。普段使っているものは2次元
 
-	// 2. 利用するHeapの設定。非常に特殊な運用。02_04exで一般的なケース版がある
-	D3D12_HEAP_PROPERTIES heapProperties{};
-	heapProperties.Type = D3D12_HEAP_TYPE_CUSTOM;								// 細かい設定を行う
-	heapProperties.CPUPageProperty = D3D12_CPU_PAGE_PROPERTY_WRITE_BACK;		// WriteBackポリシーでCPUアクセス可能
-	heapProperties.MemoryPoolPreference = D3D12_MEMORY_POOL_L0;					// プロセッサの近くに配置
-
-	// 3. Resourceを生成する
-	Microsoft::WRL::ComPtr<ID3D12Resource> resource = nullptr;
-	HRESULT hr = device_->CreateCommittedResource(
-		&heapProperties,							// Heapの設定
-		D3D12_HEAP_FLAG_NONE,						// Heapの特殊な設定。特になし。
-		&resourceDesc,								// Resourceの設定
-		D3D12_RESOURCE_STATE_GENERIC_READ,			// 初回のResourceState。Textureは基本読むだけ
-		nullptr,									// Clear最適値。使わないのでnullptr
-		IID_PPV_ARGS(&resource)
-	);					// 作成するResourceポインタへのポインタ
-	assert(SUCCEEDED(hr));
-	return resource;
-}
 
 void DirectXManager::UploadTextureData(ComPtr<ID3D12Resource> texture, const DirectX::ScratchImage& mipImages)
 {
@@ -285,6 +255,38 @@ Microsoft::WRL::ComPtr<ID3D12Resource> DirectXManager::CreateBufferResource(size
 	HRESULT hr = device_->CreateCommittedResource(&uploadHeapProperties, D3D12_HEAP_FLAG_NONE, &resourceDesc, D3D12_RESOURCE_STATE_GENERIC_READ, nullptr, IID_PPV_ARGS(&resource));
 	assert(SUCCEEDED(hr));
 
+	return resource;
+}
+
+Microsoft::WRL::ComPtr<ID3D12Resource> DirectXManager::CreateTextureResource(const DirectX::TexMetadata& metadata)
+{
+	// 1. metadataをもとにResourceの設定
+	D3D12_RESOURCE_DESC resourceDesc{};
+	resourceDesc.Width = UINT(metadata.width);									// Textureの幅
+	resourceDesc.Height = UINT(metadata.height);								// textureの高さ
+	resourceDesc.MipLevels = UINT16(metadata.mipLevels);						// mipmapの数
+	resourceDesc.DepthOrArraySize = UINT16(metadata.arraySize);					// 奥行 or 配列textureの配列数
+	resourceDesc.Format = metadata.format;										// TextureのFormat
+	resourceDesc.SampleDesc.Count = 1;											// サンプリングカウント。1固定
+	resourceDesc.Dimension = D3D12_RESOURCE_DIMENSION(metadata.dimension);		// Textureの次元数。普段使っているものは2次元
+
+	// 2. 利用するHeapの設定。非常に特殊な運用。02_04exで一般的なケース版がある
+	D3D12_HEAP_PROPERTIES heapProperties{};
+	heapProperties.Type = D3D12_HEAP_TYPE_CUSTOM;								// 細かい設定を行う
+	heapProperties.CPUPageProperty = D3D12_CPU_PAGE_PROPERTY_WRITE_BACK;		// WriteBackポリシーでCPUアクセス可能
+	heapProperties.MemoryPoolPreference = D3D12_MEMORY_POOL_L0;					// プロセッサの近くに配置
+
+	// 3. Resourceを生成する
+	Microsoft::WRL::ComPtr<ID3D12Resource> resource = nullptr;
+	HRESULT hr = device_->CreateCommittedResource(
+		&heapProperties,							// Heapの設定
+		D3D12_HEAP_FLAG_NONE,						// Heapの特殊な設定。特になし。
+		&resourceDesc,								// Resourceの設定
+		D3D12_RESOURCE_STATE_GENERIC_READ,			// 初回のResourceState。Textureは基本読むだけ
+		nullptr,									// Clear最適値。使わないのでnullptr
+		IID_PPV_ARGS(&resource)
+	);					// 作成するResourceポインタへのポインタ
+	assert(SUCCEEDED(hr));
 	return resource;
 }
 

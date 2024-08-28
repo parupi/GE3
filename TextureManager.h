@@ -3,6 +3,7 @@
 #include "externals/DirectXTex/DirectXTex.h"
 #include <wrl.h>
 #include <d3d12.h>
+#include "DirectXManager.h"
 class TextureManager
 {
 private:
@@ -18,7 +19,7 @@ public:
 	// 終了
 	void Finalize();
 	// 初期化
-	void Initialize();
+	void Initialize(DirectXManager* dxManager);
 public:
 	void LoadTexture(const std::string& filePath);
 
@@ -38,6 +39,7 @@ private:
 	// テクスチャデータ
 	std::vector<TextureData> textureData_;
 
+	DirectXManager* dxManager_ = nullptr;
 public:
 	// SRVインデックスの開始番号
 	static uint32_t kSRVIndexTop;
