@@ -7,7 +7,7 @@
 #include "WindowManager.h"
 #include "Logger.h"
 #include "StringUtility.h"
-#include "externals/DirectXTex/DirectXTex.h"
+#include "DirectXTex.h"
 #include <chrono>
 #include <thread>
 

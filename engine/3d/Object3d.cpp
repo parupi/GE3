@@ -2,7 +2,7 @@
 #include "Object3dManager.h"
 
 #include "TextureManager.h"
-#include "externals/imgui/imgui.h"
+#include "imgui.h"
 
 void Object3d::Initialize(Object3dManager* objectManager)
 {

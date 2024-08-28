@@ -1,6 +1,8 @@
 #include "Model.h"
-#include "math/function.h"
+#include "function.h"
 #include "TextureManager.h"
+#include <Vector4.h>
+#include <Vector2.h>
 
 void Model::Initialize(ModelLoader* modelManager, const std::string& directoryPath, const std::string& fileName)
 {

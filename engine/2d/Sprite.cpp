@@ -1,5 +1,5 @@
 #include "Sprite.h"
-#include "math/function.h"
+#include "function.h"
 
 Sprite::~Sprite() {
 
