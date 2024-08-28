@@ -1,5 +1,5 @@
 #include "TextureManager.h"
-#include "DirectXManager.h"
+
 
 TextureManager* TextureManager::instance = nullptr;
 
@@ -20,11 +20,12 @@ void TextureManager::Finalize()
 	instance = nullptr;
 }
 
-void TextureManager::Initialize()
+void TextureManager::Initialize(DirectXManager* dxManager)
 {
 	// SRVの数と同数
 	textureData_.reserve(DirectXManager::kMaxSRVCount);
 
+	dxManager_ = dxManager;
 }
 
 void TextureManager::LoadTexture(const std::string& filePath)
@@ -61,14 +62,14 @@ void TextureManager::LoadTexture(const std::string& filePath)
 
 	textureData.filePath = filePath;
 	textureData.metadata = mipImages.GetMetadata();
-	textureData.resource = DirectXManager::CreateTextureResource(textureData.metadata);
-	DirectXManager::UploadTextureData(textureData.resource, mipImages);
+	textureData.resource = dxManager_->CreateTextureResource(textureData.metadata);
+	dxManager_->UploadTextureData(textureData.resource, mipImages);
 
 	// テクスチャデータの要素数番号をSRVのインデックスとする
 	uint32_t srvIndex = static_cast<uint32_t>(textureData_.size() - 1) + kSRVIndexTop;
 
-	textureData.srvHandleCPU = DirectXManager::GetSRVCPUDescriptorHandle(srvIndex);
-	textureData.srvHandleGPU = DirectXManager::GetSRVGPUDescriptorHandle(srvIndex);
+	textureData.srvHandleCPU = dxManager_->GetSRVCPUDescriptorHandle(srvIndex);
+	textureData.srvHandleGPU = dxManager_->GetSRVGPUDescriptorHandle(srvIndex);
 
 	D3D12_SHADER_RESOURCE_VIEW_DESC srvDesc{};
 	// SRVの設定を行う
@@ -81,7 +82,7 @@ void TextureManager::LoadTexture(const std::string& filePath)
 	srvDesc.Texture2D.ResourceMinLODClamp = 0.0f;
 
 	// 設定をもとにSRVの生成
-	DirectXManager::GetDevice()->CreateShaderResourceView(textureData.resource.Get(), &srvDesc, textureData.srvHandleCPU);
+	dxManager_->GetDevice()->CreateShaderResourceView(textureData.resource.Get(), &srvDesc, textureData.srvHandleCPU);
 }
 
 uint32_t TextureManager::GetTextureIndexByFilePath(const std::string& filePath)

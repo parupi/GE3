@@ -296,7 +296,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	spriteManager = new SpriteManager();
 	spriteManager->Initialize(directXManager);
 
-	TextureManager::GetInstance()->Initialize();
+	TextureManager::GetInstance()->Initialize(directXManager);
 
 	HRESULT hr{};
 
