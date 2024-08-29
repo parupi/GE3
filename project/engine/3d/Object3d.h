@@ -8,6 +8,7 @@
 #include <fstream>
 #include "Model.h"
 #include "ModelManager.h"
+#include <Camera.h>
 class Object3dManager;
 
 class Object3d
@@ -33,6 +34,7 @@ private: // 構造体
 private: // メンバ変数
 	Object3dManager* objectManager_ = nullptr;
 	Model* model_ = nullptr;
+	Camera* camera_ = nullptr;
 
 	Microsoft::WRL::ComPtr<ID3D12Resource> wvpResource_ = nullptr;
 	Microsoft::WRL::ComPtr<ID3D12Resource> directionalLightResource_ = nullptr;
@@ -41,9 +43,11 @@ private: // メンバ変数
 	DirectionalLight* directionalLightData_ = nullptr;
 
 	Transform transform_;
-	Transform cameraTransform_;
 public: // ゲッター // セッター // 
+	// モデル
 	void SetModel(Model* model) { model_ = model; }
 	void SetModel(const std::string& filePath);
+	// カメラ
+	void SetCamera(Camera* camera) { camera_ = camera; }
 };
 

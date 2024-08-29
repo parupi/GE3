@@ -12,7 +12,8 @@ void Object3d::Initialize(Object3dManager* objectManager)
 	CreateDirectionalLightResource();
 
 	transform_ = { {1.0f,1.0f,1.0f},{0.0f,0.0f,0.0f},{0.0f,0.0f,0.0f} };
-	cameraTransform_ = { {1.0f,1.0f,1.0f},{0.3f,0.0f,0.0f},{0.0f,4.0f,-10.0f} };
+	
+	camera_ = objectManager_->GetDefaultCamera();
 }
 
 void Object3d::Update()
@@ -22,12 +23,17 @@ void Object3d::Update()
 	transform_.translate = model_->GetPosition();
 
 	Matrix4x4 worldMatrix = MakeAffineMatrix(transform_.scale, transform_.rotate, transform_.translate);
-	Matrix4x4 cameraMatrix = MakeAffineMatrix(cameraTransform_.scale, cameraTransform_.rotate, cameraTransform_.translate);
-	Matrix4x4 viewMatrix = Inverse(cameraMatrix);
-	Matrix4x4 projectionMatrix = MakePerspectiveFovMatrix(0.45f, float(WindowManager::kClientWidth) / float(WindowManager::kClientHeight), 0.1f, 100.0f);
-	Matrix4x4 worldViewProjectionMatrix = Multiply(worldMatrix, Multiply(viewMatrix, projectionMatrix));
-	wvpData_->World = worldViewProjectionMatrix;
+	Matrix4x4 worldViewProjectionMatrix;
+	if (camera_) {
+		const Matrix4x4& viewProjectionMatrix = camera_->GetViewProjectionMatrix();
+		worldViewProjectionMatrix = worldMatrix * viewProjectionMatrix;
+	}
+	else {
+		worldViewProjectionMatrix = worldMatrix;
+	}
 	wvpData_->WVP = worldViewProjectionMatrix;
+	wvpData_->World = worldMatrix;
+	
 }
 
 void Object3d::Draw()

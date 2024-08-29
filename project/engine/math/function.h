@@ -1,10 +1,8 @@
 #pragma once
-#include "Vector3.h"
+#include <Vector3.h>
 #include "assert.h"
 #include "cmath"
-#include "Matrix4x4.h"
-#include "Vector3.h"
-#include "Matrix4x4.h"
+#include <Matrix4x4.h>
 
 static const int kColumnWidth = 60;
 static const int kRowHeight = 20;

@@ -179,22 +179,6 @@ Matrix4x4 MakeViewPortMatrix(float left, float top, float width, float height, f
 }
 Vector3 Cross(const Vector3& v1, const Vector3& v2) { return {v1.y * v2.z - v1.z * v2.y, v1.z * v2.x - v1.x * v2.z, v1.x * v2.y - v1.y * v2.x}; };
 
-//void VectorScreenPrintf(int x, int y, const Vector3& vector, const char* label) {
-//	Novice::ScreenPrintf(x, y, "%.02f", vector.x);
-//	Novice::ScreenPrintf(x + kColumnWidth, y, "%.02f", vector.y);
-//	Novice::ScreenPrintf(x + kColumnWidth * 2, y, "%.02f", vector.z);
-//	Novice::ScreenPrintf(x + kColumnWidth * 3, y, "%s", label);
-//}
-//
-//void MatrixScreenPrintf(int x, int y, const Matrix4x4& matrix, const char* label) {
-//	Novice::ScreenPrintf(x, y, "%s", label);
-//	for (int row = 0; row < 4; ++row) {
-//		for (int column = 0; column < 4; ++column) {
-//			Novice::ScreenPrintf(x + column * kColumnWidth, y + (1 + row) * kRowHeight, "%6.02f", matrix.m[row][column]);
-//		}
-//	}
-//}
-
 Matrix4x4 LookAt(const Vector3& eye, const Vector3& target, const Vector3& up) {
 	Vector3 zaxis = Normalize(target - eye);     // forward
 	Vector3 xaxis = Normalize(Cross(up, zaxis)); // right

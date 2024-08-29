@@ -61,6 +61,11 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	// オブジェクト共通部
 	objectManager = new Object3dManager();
 	objectManager->Initialize(directXManager);
+	// カメラの生成
+	Camera* camera = new Camera();
+	//camera->SetRotate({})
+	//camera->SetTranslate({})
+	objectManager->SetDefaultCamera(camera);
 
 	// Textureのロード
 	TextureManager::GetInstance()->LoadTexture("resource/uvChecker.png");
@@ -156,7 +161,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 			sprite->Update();
 		}
 
-
+		camera->Update();
 		for (auto& object : objects) {
 			object->Update();
 		}

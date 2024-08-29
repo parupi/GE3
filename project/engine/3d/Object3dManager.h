@@ -1,5 +1,6 @@
 #pragma once
 #include "DirectXManager.h"
+#include <Camera.h>
 class Object3dManager
 {
 public:
@@ -17,6 +18,9 @@ private:
 private:
 	// DirectXのポインタ
 	DirectXManager* dxManager_ = nullptr;
+	// カメラのポインタ
+	Camera* defaultCamera_ = nullptr;
+
 	// ルートシグネチャ
 	Microsoft::WRL::ComPtr<ID3D12RootSignature> rootSignature_ = nullptr;
 	// PSO
@@ -33,8 +37,10 @@ private:
 	ID3DBlob* signatureBlob = nullptr;
 	ID3DBlob* errorBlob = nullptr;
 
-public:
+public: // ゲッター // セッター //
 	DirectXManager* GetDxManager() const { return dxManager_; }
-
+	// デフォルトカメラ
+	void SetDefaultCamera(Camera* camera) { defaultCamera_ = camera; }
+	Camera* GetDefaultCamera() const { return defaultCamera_; }
 };
 
