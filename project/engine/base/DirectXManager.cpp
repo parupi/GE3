@@ -12,8 +12,6 @@
 
 using namespace Microsoft::WRL;
 
-const uint32_t DirectXManager::kMaxSRVCount = 512;
-
 void DirectXManager::Initialize(WindowManager* winManager)
 {
 	assert(winManager);
@@ -62,19 +60,19 @@ ComPtr<ID3D12DescriptorHeap> DirectXManager::CreateDescriptorHeap(ComPtr<ID3D12D
 	return descriptorHeap;
 }
 
-D3D12_CPU_DESCRIPTOR_HANDLE DirectXManager::GetCPUDescriptorHandle(Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> descriptorHeap, uint32_t descriptorSize, uint32_t index)
-{
-	D3D12_CPU_DESCRIPTOR_HANDLE handleCPU = descriptorHeap->GetCPUDescriptorHandleForHeapStart();
-	handleCPU.ptr += (descriptorSize * index);
-	return handleCPU;
-}
-
-D3D12_GPU_DESCRIPTOR_HANDLE DirectXManager::GetGPUDescriptorHandle(Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> descriptorHeap, uint32_t descriptorSize, uint32_t index)
-{
-	D3D12_GPU_DESCRIPTOR_HANDLE handleGPU = descriptorHeap->GetGPUDescriptorHandleForHeapStart();
-	handleGPU.ptr += (descriptorSize * index);
-	return handleGPU;
-}
+//D3D12_CPU_DESCRIPTOR_HANDLE DirectXManager::GetCPUDescriptorHandle(Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> descriptorHeap, uint32_t descriptorSize, uint32_t index)
+//{
+//	D3D12_CPU_DESCRIPTOR_HANDLE handleCPU = descriptorHeap->GetCPUDescriptorHandleForHeapStart();
+//	handleCPU.ptr += (descriptorSize * index);
+//	return handleCPU;
+//}
+//
+//D3D12_GPU_DESCRIPTOR_HANDLE DirectXManager::GetGPUDescriptorHandle(Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> descriptorHeap, uint32_t descriptorSize, uint32_t index)
+//{
+//	D3D12_GPU_DESCRIPTOR_HANDLE handleGPU = descriptorHeap->GetGPUDescriptorHandleForHeapStart();
+//	handleGPU.ptr += (descriptorSize * index);
+//	return handleGPU;
+//}
 
 void DirectXManager::InitializeFixFPS()
 {
@@ -283,15 +281,15 @@ Microsoft::WRL::ComPtr<ID3D12Resource> DirectXManager::CreateBufferResource(size
 	return resource;
 }
 
-D3D12_CPU_DESCRIPTOR_HANDLE DirectXManager::GetSRVCPUDescriptorHandle(uint32_t index)
-{
-	return GetCPUDescriptorHandle(srvHeap_, descriptorSizeSRV_, index);
-}
-
-D3D12_GPU_DESCRIPTOR_HANDLE DirectXManager::GetSRVGPUDescriptorHandle(uint32_t index)
-{
-	return GetGPUDescriptorHandle(srvHeap_, descriptorSizeSRV_, index);
-}
+//D3D12_CPU_DESCRIPTOR_HANDLE DirectXManager::GetSRVCPUDescriptorHandle(uint32_t index)
+//{
+//	return GetCPUDescriptorHandle(srvHeap_, descriptorSizeSRV_, index);
+//}
+//
+//D3D12_GPU_DESCRIPTOR_HANDLE DirectXManager::GetSRVGPUDescriptorHandle(uint32_t index)
+//{
+//	return GetGPUDescriptorHandle(srvHeap_, descriptorSizeSRV_, index);
+//}
 
 void DirectXManager::InitializeDXGIDevice()
 {
@@ -424,13 +422,12 @@ void DirectXManager::CreateDepthBuffer()
 
 void DirectXManager::CreateHeap()
 {
-	descriptorSizeSRV_ = device_->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
+	
 	descriptorSizeRTV_ = device_->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_RTV);
 	descriptorSizeDSV_ = device_->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_DSV);
 
 	// DescriptorHeapを生成
 	rtvHeap_ = CreateDescriptorHeap(device_, D3D12_DESCRIPTOR_HEAP_TYPE_RTV, 2, false);
-	srvHeap_ = CreateDescriptorHeap(device_, D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV, kMaxSRVCount, true);
 	dsvHeap_ = CreateDescriptorHeap(device_, D3D12_DESCRIPTOR_HEAP_TYPE_DSV, 1, false);
 }
 
@@ -519,14 +516,14 @@ void DirectXManager::InitializeDXCCompiler()
 
 void DirectXManager::InitializeImGui()
 {
-	// --- ImGuiの初期化 ---
-	IMGUI_CHECKVERSION();
-	ImGui::CreateContext();
-	ImGui::StyleColorsDark();
-	ImGui_ImplWin32_Init(winManager_->GetHwnd());
-	ImGui_ImplDX12_Init(
-		device_.Get(), swapChainDesc.BufferCount, rtvDesc_.Format, srvHeap_.Get(), srvHeap_->GetCPUDescriptorHandleForHeapStart(),
-		srvHeap_->GetGPUDescriptorHandleForHeapStart());
+	//// --- ImGuiの初期化 ---
+	//IMGUI_CHECKVERSION();
+	//ImGui::CreateContext();
+	//ImGui::StyleColorsDark();
+	//ImGui_ImplWin32_Init(winManager_->GetHwnd());
+	//ImGui_ImplDX12_Init(
+	//	device_.Get(), swapChainDesc.BufferCount, rtvDesc_.Format, srvHeap_.Get(), srvHeap_->GetCPUDescriptorHandleForHeapStart(),
+	//	srvHeap_->GetGPUDescriptorHandleForHeapStart());
 }
 
 void DirectXManager::BeginDraw()
@@ -553,12 +550,10 @@ void DirectXManager::BeginDraw()
 	// 深度ビューのクリア
 	ClearDepthStencilView();
 
-	// SRV用のデスクリプタヒープを指定する
-	Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> descriptorHeaps[] = { srvHeap_ };
-	commandList_->SetDescriptorHeaps(1, descriptorHeaps->GetAddressOf());
+
 
 	// ImGuiの描画コマンドを積む
-	RenderImGui();
+	//RenderImGui();
 
 	// ビューポートとシザーレクトの設定
 	SetViewportAndScissorRect();
@@ -626,9 +621,9 @@ void DirectXManager::TransitionResource(ID3D12Resource* resource, D3D12_RESOURCE
 
 void DirectXManager::StartImGuiFrame()
 {
-	ImGui_ImplDX12_NewFrame();
-	ImGui_ImplWin32_NewFrame();
-	ImGui::NewFrame();
+	//ImGui_ImplDX12_NewFrame();
+	//ImGui_ImplWin32_NewFrame();
+	//ImGui::NewFrame();
 }
 
 void DirectXManager::SetRenderTargets(UINT backBufferIndex)
@@ -658,7 +653,7 @@ void DirectXManager::ClearRenderTarget(UINT backBufferIndex)
 
 void DirectXManager::RenderImGui()
 {
-	ImGui::Render();
+	//ImGui::Render();
 	//ImGui_ImplDX12_RenderDrawData(ImGui::GetDrawData(), commandList_.Get());
 }
 

@@ -12,7 +12,7 @@ void Sprite::Initialize(SpriteManager* spriteManager, std::string textureFilePat
 
 	// 単位行列を書き込んでおく
 	textureIndex = TextureManager::GetInstance()->GetTextureIndexByFilePath(textureFilePath);
-
+	textureFilePath_ = textureFilePath;
 	// 各種リソースを作る
 	CreateVertexResource();
 	CreateIndexResource();
@@ -48,7 +48,7 @@ void Sprite::Draw()
 	// TransformationMatrixCBufferの場所を設定
 	spriteManager_->GetDxManager()->GetCommandList()->SetGraphicsRootConstantBufferView(0, materialResource_->GetGPUVirtualAddress());
 
-	spriteManager_->GetDxManager()->GetCommandList()->SetGraphicsRootDescriptorTable(2, TextureManager::GetInstance()->GetSrvHandleGPU(textureIndex));
+	spriteManager_->GetDxManager()->GetCommandList()->SetGraphicsRootDescriptorTable(2, TextureManager::GetInstance()->GetSrvHandleGPU(textureFilePath_));
 
 	//// 描画!（DrawCall/ドローコール）。3頂点で1つのインスタンス。インスタンスについては今後
 	spriteManager_->GetDxManager()->GetCommandList()->DrawIndexedInstanced(6, 1, 0, 0, 0);
@@ -120,7 +120,7 @@ void Sprite::SetSpriteData()
 		bottom = -bottom;
 	}
 
-	const DirectX::TexMetadata& metadata = TextureManager::GetInstance()->GetMetaData(textureIndex);
+	const DirectX::TexMetadata& metadata = TextureManager::GetInstance()->GetMetaData(textureFilePath_);
 	float tex_left = textureLeftTop_.x / metadata.width;
 	float tex_right = (textureLeftTop_.x + textureSize_.x) / metadata.width;
 	float tex_top = textureLeftTop_.y / metadata.height;
@@ -158,7 +158,7 @@ void Sprite::SetSpriteData()
 void Sprite::AdjustTextureSize()
 {
 	// テクスチャメタデータを取得
-	const DirectX::TexMetadata& metadata = TextureManager::GetInstance()->GetMetaData(textureIndex);
+	const DirectX::TexMetadata& metadata = TextureManager::GetInstance()->GetMetaData(textureFilePath_);
 
 	textureSize_.x = static_cast<float>(metadata.width);
 	textureSize_.y = static_cast<float>(metadata.height);

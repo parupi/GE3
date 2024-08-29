@@ -14,11 +14,6 @@ Camera::Camera()
 
 void Camera::Update()
 {
-	ImGui::Begin("Camera");
-	ImGui::DragFloat3("rotate", & transform_.rotate.x, 0.01f);
-	ImGui::DragFloat3("translate", & transform_.translate.x, 0.01f);
-	ImGui::End();
-
 	worldMatrix_ = MakeAffineMatrix(transform_.scale, transform_.rotate, transform_.translate);
 	viewMatrix_ = Inverse(worldMatrix_);
 	projectionMatrix_ = MakePerspectiveFovMatrix(horizontalFOV_, aspectRatio_, nearClip_, farClip_);

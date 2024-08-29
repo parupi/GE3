@@ -20,8 +20,7 @@ public: // メンバ関数
 
 public:
 
-	// 最大SRV数 (最大テクスチャ枚数)
-	static const uint32_t kMaxSRVCount;
+
 
 private: // メンバ変数
 	// WindowAPI
@@ -42,11 +41,10 @@ private: // メンバ変数
 	
 	Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> rtvHeap_ = nullptr;
 	Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> dsvHeap_ = nullptr;
-	Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> srvHeap_ = nullptr;
+	
 
 	D3D12_RENDER_TARGET_VIEW_DESC rtvDesc_{};
 
-	static inline uint32_t descriptorSizeSRV_;
 	static inline uint32_t descriptorSizeRTV_;
 	static inline uint32_t descriptorSizeDSV_;
 	// シザー矩形
@@ -72,8 +70,7 @@ private: // メンバ変数
 	std::chrono::steady_clock::time_point reference_;
 
 private:
-	static D3D12_CPU_DESCRIPTOR_HANDLE GetCPUDescriptorHandle(Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> descriptorHeap, uint32_t descriptorSize, uint32_t index);
-	static D3D12_GPU_DESCRIPTOR_HANDLE GetGPUDescriptorHandle(Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> descriptorHeap, uint32_t descriptorSize, uint32_t index);
+	
 
 	void InitializeFixFPS();
 	void UpdateFixFPS();
@@ -81,8 +78,8 @@ public:
 
 	Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> CreateDescriptorHeap(Microsoft::WRL::ComPtr<ID3D12Device> device, D3D12_DESCRIPTOR_HEAP_TYPE heapType, UINT numDescriptors, bool shaderVisible);
 
-	D3D12_CPU_DESCRIPTOR_HANDLE GetSRVCPUDescriptorHandle(uint32_t index);
-	D3D12_GPU_DESCRIPTOR_HANDLE GetSRVGPUDescriptorHandle(uint32_t index);
+	//D3D12_CPU_DESCRIPTOR_HANDLE GetCPUDescriptorHandle(Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> descriptorHeap, uint32_t descriptorSize, uint32_t index);
+	//D3D12_GPU_DESCRIPTOR_HANDLE GetGPUDescriptorHandle(Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> descriptorHeap, uint32_t descriptorSize, uint32_t index);
 
 	Microsoft::WRL::ComPtr<IDxcBlob> CompileShader(const std::wstring& filePath, const wchar_t* profile);
 	Microsoft::WRL::ComPtr<ID3D12Resource> CreateDepthStencilTextureResource(Microsoft::WRL::ComPtr<ID3D12Device> device, int32_t width, int32_t height);
@@ -130,9 +127,9 @@ public:
 public: // ゲッター/セッター //
 	Microsoft::WRL::ComPtr<ID3D12Device> GetDevice() { return device_; }
 	Microsoft::WRL::ComPtr<ID3D12GraphicsCommandList> GetCommandList() { return commandList_; }
-	Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> GetSRVHeap() { return srvHeap_; }
+	//Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> GetSRVHeap() { return srvHeap_; }
 	uint32_t GetDescriptorSizeRTV() { return descriptorSizeRTV_; }
-	uint32_t GetDescriptorSizeSRV() { return descriptorSizeSRV_; }
+	//uint32_t GetDescriptorSizeSRV() { return descriptorSizeSRV_; }
 	uint32_t GetDescriptorSizeDSV() { return descriptorSizeDSV_; }
 public:
 	void TransitionResource(

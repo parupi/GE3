@@ -27,7 +27,7 @@ void Model::Draw()
 	// マテリアルCBufferの場所を指定
 	modelLoader_->GetDxManager()->GetCommandList()->SetGraphicsRootConstantBufferView(0, materialResource_->GetGPUVirtualAddress());
 	// SRVのDescriptorTableの先頭を設定。
-	modelLoader_->GetDxManager()->GetCommandList()->SetGraphicsRootDescriptorTable(2, TextureManager::GetInstance()->GetSrvHandleGPU(modelData_.material.textureIndex));
+	modelLoader_->GetDxManager()->GetCommandList()->SetGraphicsRootDescriptorTable(2, TextureManager::GetInstance()->GetSrvHandleGPU(modelData_.material.textureFilePath));
 	// ドローコール
 	modelLoader_->GetDxManager()->GetCommandList()->DrawInstanced(UINT(modelData_.vertices.size()), 1, 0, 0);
 }

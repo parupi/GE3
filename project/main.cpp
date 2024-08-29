@@ -1,8 +1,5 @@
 #include <Windows.h>
 #include <dxgidebug.h>
-#include "externals/imgui/imgui.h"
-#include "externals/imgui/imgui_impl_dx12.h"
-#include "externals/imgui/imgui_impl_win32.h"
 #include <cstdint>
 
 #pragma comment(lib,"dxguid.lib")
@@ -18,6 +15,7 @@
 #include "Model.h"
 #include "ModelLoader.h"
 #include "ModelManager.h"
+#include "SrvManager.h"
 
 struct D3DResourceLeakChecker {
 	~D3DResourceLeakChecker() {
@@ -39,6 +37,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	// ポインタ 
 	WindowManager* winManager = nullptr;
 	DirectXManager* directXManager = nullptr;
+	SrvManager* srvManager = nullptr;
 	SpriteManager* spriteManager = nullptr;
 	Object3dManager* objectManager = nullptr;
 	Input* input = nullptr;
@@ -49,9 +48,12 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	// DirectXの初期化
 	directXManager = new DirectXManager();
 	directXManager->Initialize(winManager);
+	// SRVマネージャーの初期化
+	srvManager = new SrvManager();
+	srvManager->Initialize(directXManager);
 
 	// 2Dテクスチャマネージャーの初期化
-	TextureManager::GetInstance()->Initialize(directXManager);
+	TextureManager::GetInstance()->Initialize(directXManager, srvManager);
 	// 3Dテクスチャマネージャーの初期化
 	ModelManager::GetInstance()->Initialize(directXManager);
 
@@ -130,9 +132,9 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 			break;
 		}
 
-		ImGui_ImplDX12_NewFrame();
-		ImGui_ImplWin32_NewFrame();
-		ImGui::NewFrame();
+		//ImGui_ImplDX12_NewFrame();
+		//ImGui_ImplWin32_NewFrame();
+		//ImGui::NewFrame();
 		// ゲームの処理
 
 		for (Sprite* sprite : sprites) {
@@ -169,6 +171,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 
 
 		directXManager->BeginDraw();
+		srvManager->BeginDraw();
 
 		objectManager->DrawSet();
 
@@ -183,16 +186,16 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 			sprite->Draw();
 		}
 
-		// 実際のcommandListのImGuiの描画コマンドを積む
-		ImGui_ImplDX12_RenderDrawData(ImGui::GetDrawData(), directXManager->GetCommandList().Get());
+		//// 実際のcommandListのImGuiの描画コマンドを積む
+		//ImGui_ImplDX12_RenderDrawData(ImGui::GetDrawData(), directXManager->GetCommandList().Get());
 
 		directXManager->EndDraw();
 	}
 
-	// ImGuiの終了処理。
-	ImGui_ImplDX12_Shutdown();
-	ImGui_ImplWin32_Shutdown();
-	ImGui::DestroyContext();
+	//// ImGuiの終了処理。
+	//ImGui_ImplDX12_Shutdown();
+	//ImGui_ImplWin32_Shutdown();
+	//ImGui::DestroyContext();
 
 	delete input;
 	input = nullptr;
@@ -214,6 +217,8 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 		delete model;
 		model = nullptr;
 	}
+	delete srvManager;
+	srvManager = nullptr;
 	delete directXManager;
 	directXManager = nullptr;
 	winManager->Finalize();
