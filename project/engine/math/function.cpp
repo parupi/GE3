@@ -221,3 +221,29 @@ Vector3 ExtractTranslation(const Matrix4x4& matrix) {
 	translation.z = matrix.m[3][2];
 	return translation;
 }
+
+Matrix4x4 ScaleMatrixFromVector3(const Vector3& scale)
+{
+	Matrix4x4 scaleMatrix = {};
+	scaleMatrix.m[0][0] = scale.x;  // X方向のスケール
+	scaleMatrix.m[1][1] = scale.y;  // Y方向のスケール
+	scaleMatrix.m[2][2] = scale.z;  // Z方向のスケール
+	scaleMatrix.m[3][3] = 1.0f;     // W成分は1.0
+
+	return scaleMatrix;
+}
+
+Matrix4x4 TranslationMatrixFromVector3(const Vector3& translate)
+{
+	Matrix4x4 translationMatrix = {};
+	translationMatrix.m[0][0] = 1.0f;  // 単位行列の成分
+	translationMatrix.m[1][1] = 1.0f;  // 単位行列の成分
+	translationMatrix.m[2][2] = 1.0f;  // 単位行列の成分
+	translationMatrix.m[3][3] = 1.0f;  // 単位行列の成分
+
+	translationMatrix.m[3][0] = translate.x;  // X方向の移動
+	translationMatrix.m[3][1] = translate.y;  // Y方向の移動
+	translationMatrix.m[3][2] = translate.z;  // Z方向の移動
+
+	return translationMatrix;
+}

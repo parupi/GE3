@@ -16,6 +16,7 @@
 #include "ModelLoader.h"
 #include "ModelManager.h"
 #include "SrvManager.h"
+#include <ParticleManager.h>
 
 struct D3DResourceLeakChecker {
 	~D3DResourceLeakChecker() {
@@ -56,6 +57,8 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	TextureManager::GetInstance()->Initialize(directXManager, srvManager);
 	// 3Dテクスチャマネージャーの初期化
 	ModelManager::GetInstance()->Initialize(directXManager);
+	// パーティクルマネージャーの初期化
+	ParticleManager::GetInstance()->Initialize(directXManager, srvManager);
 
 	// スプライト共通部の初期化
 	spriteManager = new SpriteManager();
@@ -75,6 +78,10 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	// .objファイルからモデルを読み込む
 	ModelManager::GetInstance()->LoadModel("plane.obj");
 	ModelManager::GetInstance()->LoadModel("axis.obj");
+	// パーティクルのグループを生成
+	ParticleManager::GetInstance()->CreateParticleGroup("circle", "resource/uvChecker.png");
+	// パーティクルにカメラをセットする
+	ParticleManager::GetInstance()->SetCamera(camera);
 
 	// Spriteの初期化
 	std::vector<Sprite*> sprites;
@@ -167,8 +174,8 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 		for (auto& object : objects) {
 			object->Update();
 		}
-
-
+		// パーティクルのアップデート
+		ParticleManager::GetInstance()->Update();
 
 		directXManager->BeginDraw();
 		srvManager->BeginDraw();
@@ -185,7 +192,8 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 		for (Sprite* sprite : sprites) {
 			sprite->Draw();
 		}
-
+		// パーティクルの描画
+		ParticleManager::GetInstance()->Draw();
 		//// 実際のcommandListのImGuiの描画コマンドを積む
 		//ImGui_ImplDX12_RenderDrawData(ImGui::GetDrawData(), directXManager->GetCommandList().Get());
 
@@ -201,6 +209,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	input = nullptr;
 	TextureManager::GetInstance()->Finalize();
 	ModelManager::GetInstance()->Finalize();
+	ParticleManager::GetInstance()->Finalize();
 	delete spriteManager;
 	spriteManager = nullptr;
 	delete objectManager;

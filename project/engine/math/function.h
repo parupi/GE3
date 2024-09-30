@@ -93,3 +93,7 @@ Matrix4x4 LookAt(const Vector3& eye, const Vector3& target, const Vector3& up);
 Vector3 TransformNormal(const Vector3& v, const Matrix4x4& m);
 
 Vector3 ExtractTranslation(const Matrix4x4& matrix);
+
+Matrix4x4 ScaleMatrixFromVector3(const Vector3& scale);
+
+Matrix4x4 TranslationMatrixFromVector3(const Vector3& translate);
