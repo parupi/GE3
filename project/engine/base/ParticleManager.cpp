@@ -1,6 +1,4 @@
 #include "ParticleManager.h"
-
-#include "ParticleManager.h"
 #include <function.h>
 #include <TextureManager.h>
 #include <numbers>
