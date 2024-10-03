@@ -36,5 +36,8 @@ private:
 	// 次に使用するSRVインデックス
 	uint32_t useIndex = 0;
 
+public: // ゲッター // セッター //
+
+
 };
 

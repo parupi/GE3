@@ -1,13 +1,12 @@
 #pragma once
+#pragma once
 #include <DirectXManager.h>
 #include <SrvManager.h>
 #include <random>
 #include <Vector4.h>
 #include <Matrix4x4.h>
 #include <Camera.h>
-
-
-
+#include <Vector2.h>
 class ParticleManager
 {
 private:
@@ -32,8 +31,7 @@ public:
 	void Draw();
 	// パーティクルグループを登録する
 	void CreateParticleGroup(const std::string name, const std::string textureFilePath);
-	// nameで指定した名前のパーティクルグループにパーティクルを発生させる関数
-	void Emit(const std::string name, const Vector3& position, uint32_t count);
+
 	// カメラをセットする
 	void SetCamera(Camera* camera) { camera_ = camera; }
 private: // 構造体
@@ -85,6 +83,22 @@ private: // 構造体
 		float frequencyTime; //!< 頻度用時刻
 	};
 
+	struct TransformationMatrix {
+		Matrix4x4 WVP;
+		Matrix4x4 World;
+	};
+
+	struct VertexData {
+		Vector4 position;
+		Vector2 texcoord;
+		Vector3 normal;
+	};
+
+	struct ModelData {
+		std::vector<VertexData> vertices;
+		MaterialData material;
+	};
+
 private:
 
 	void CreateRootSignature();
@@ -93,10 +107,14 @@ private:
 	void CreateRasterizerState();
 	void LoadShader();
 	void CreatePipelineState();
+	// パーティクル用のリソースの生成
 	void CreateParticleResource();
+	// WVP用のリソースを生成 
+	void CreateWVPResource();
 	// パーティクルを生成する関数
 	Particle MakeNewParticle(std::mt19937& randomEngine, const Vector3& translate);
-
+	// nameで指定した名前のパーティクルグループにパーティクルを発生させる関数
+	std::list<Particle> Emit(const std::string name, const Vector3& position, uint32_t count);
 private:
 	// ルートシグネチャ
 	Microsoft::WRL::ComPtr<ID3D12RootSignature> rootSignature_ = nullptr;
@@ -122,14 +140,18 @@ private:
 
 	D3D12_VERTEX_BUFFER_VIEW vertexBufferView_{};
 
-	const uint32_t kNumMaxInstance = 100;	// 最大インスタンス数
+	const uint32_t kNumMaxInstance = 128;	// 最大インスタンス数
 	// パーティクル用リソースの宣言
 	Microsoft::WRL::ComPtr<ID3D12Resource> instancingResource_;
 	ParticleForGPU* instancingData_ = nullptr;
+	VertexData* vertexData_ = nullptr;
+
+	D3D12_CPU_DESCRIPTOR_HANDLE srvHandleCPU_;
+	D3D12_GPU_DESCRIPTOR_HANDLE srvHandleGPU_;
 
 	std::unordered_map<std::string, ParticleGroup> particleGroups_;
 
-	bool isBillboard = false;
+	bool isBillboard = true;
 	const float kDeltaTime = 1.0f / 60.0f;
 
 	Matrix4x4 scaleMatrix;
@@ -139,4 +161,3 @@ private:
 	std::list<Particle> particles;
 	uint32_t numInstance = 0;
 };
-
