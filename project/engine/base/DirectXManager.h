@@ -10,6 +10,7 @@
 #include "DirectXTex.h"
 #include <chrono>
 #include <thread>
+#include <vector>
 
 class DirectXManager
 {
@@ -35,7 +36,7 @@ private: // メンバ変数
 
 	Microsoft::WRL::ComPtr<IDXGISwapChain4> swapChain_ = nullptr;
 	DXGI_SWAP_CHAIN_DESC1 swapChainDesc{};
-	Microsoft::WRL::ComPtr<ID3D12Resource> swapChainResources_[2];
+	std::vector<Microsoft::WRL::ComPtr<ID3D12Resource>> backBuffers_;
 
 	Microsoft::WRL::ComPtr<ID3D12Resource> depthBuffer_;
 	
@@ -131,6 +132,8 @@ public: // ゲッター/セッター //
 	uint32_t GetDescriptorSizeRTV() { return descriptorSizeRTV_; }
 	//uint32_t GetDescriptorSizeSRV() { return descriptorSizeSRV_; }
 	uint32_t GetDescriptorSizeDSV() { return descriptorSizeDSV_; }
+	// バックバッファの数を取得
+	size_t GetBackBufferCount() { return backBuffers_.size(); }
 public:
 	void TransitionResource(
 		ID3D12Resource* resource,

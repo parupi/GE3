@@ -17,6 +17,7 @@
 #include "ModelManager.h"
 #include "SrvManager.h"
 #include <ParticleManager.h>
+#include "ImGuiManager.h"
 
 struct D3DResourceLeakChecker {
 	~D3DResourceLeakChecker() {
@@ -53,12 +54,14 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	srvManager = new SrvManager();
 	srvManager->Initialize(directXManager);
 
+	ImGuiManager::GetInstance()->Initialize(winManager, directXManager);
+
 	// 2Dテクスチャマネージャーの初期化
 	TextureManager::GetInstance()->Initialize(directXManager, srvManager);
 	// 3Dテクスチャマネージャーの初期化
 	ModelManager::GetInstance()->Initialize(directXManager);
 	// パーティクルマネージャーの初期化
-	ParticleManager::GetInstance()->Initialize(directXManager, srvManager);
+	//ParticleManager::GetInstance()->Initialize(directXManager, srvManager);
 
 	// スプライト共通部の初期化
 	spriteManager = new SpriteManager();
@@ -79,9 +82,9 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	ModelManager::GetInstance()->LoadModel("plane.obj");
 	ModelManager::GetInstance()->LoadModel("axis.obj");
 	// パーティクルのグループを生成
-	ParticleManager::GetInstance()->CreateParticleGroup("circle", "resource/uvChecker.png");
+	//ParticleManager::GetInstance()->CreateParticleGroup("circle", "resource/uvChecker.png");
 	// パーティクルにカメラをセットする
-	ParticleManager::GetInstance()->SetCamera(camera);
+	//ParticleManager::GetInstance()->SetCamera(camera);
 
 	// Spriteの初期化
 	std::vector<Sprite*> sprites;
@@ -139,9 +142,8 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 			break;
 		}
 
-		//ImGui_ImplDX12_NewFrame();
-		//ImGui_ImplWin32_NewFrame();
-		//ImGui::NewFrame();
+		ImGuiManager::GetInstance()->Begin();
+
 		// ゲームの処理
 
 		for (Sprite* sprite : sprites) {
@@ -175,8 +177,8 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 			object->Update();
 		}
 		// パーティクルのアップデート
-		ParticleManager::GetInstance()->Update();
-
+		//ParticleManager::GetInstance()->Update();
+		ImGuiManager::GetInstance()->End();
 		directXManager->BeginDraw();
 		srvManager->BeginDraw();
 
@@ -193,23 +195,18 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 			sprite->Draw();
 		}
 		// パーティクルの描画
-		ParticleManager::GetInstance()->Draw();
-		//// 実際のcommandListのImGuiの描画コマンドを積む
-		//ImGui_ImplDX12_RenderDrawData(ImGui::GetDrawData(), directXManager->GetCommandList().Get());
+		//ParticleManager::GetInstance()->Draw();
+
+		ImGuiManager::GetInstance()->Draw();
 
 		directXManager->EndDraw();
 	}
-
-	//// ImGuiの終了処理。
-	//ImGui_ImplDX12_Shutdown();
-	//ImGui_ImplWin32_Shutdown();
-	//ImGui::DestroyContext();
 
 	delete input;
 	input = nullptr;
 	TextureManager::GetInstance()->Finalize();
 	ModelManager::GetInstance()->Finalize();
-	ParticleManager::GetInstance()->Finalize();
+	//ParticleManager::GetInstance()->Finalize();
 	delete spriteManager;
 	spriteManager = nullptr;
 	delete objectManager;
@@ -226,6 +223,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 		delete model;
 		model = nullptr;
 	}
+	ImGuiManager::GetInstance()->Finalize();
 	delete srvManager;
 	srvManager = nullptr;
 	delete directXManager;

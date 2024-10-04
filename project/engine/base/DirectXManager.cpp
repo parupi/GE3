@@ -435,11 +435,11 @@ void DirectXManager::CreateRenderTargetView()
 {
 	HRESULT hr{};
 	// SwapChainからResourceを引っ張ってくる
-	//Microsoft::WRL::ComPtr<ID3D12Resource> swapChainResources[2] = { nullptr };
-	hr = swapChain_->GetBuffer(0, IID_PPV_ARGS(&swapChainResources_[0]));
+	backBuffers_.resize(2);
+	hr = swapChain_->GetBuffer(0, IID_PPV_ARGS(&backBuffers_[0]));
 	// うまく取得できなければ起動できない
 	assert(SUCCEEDED(hr));
-	hr = swapChain_->GetBuffer(1, IID_PPV_ARGS(&swapChainResources_[1]));
+	hr = swapChain_->GetBuffer(1, IID_PPV_ARGS(&backBuffers_[1]));
 	assert(SUCCEEDED(hr));
 	Logger::Log("Complete get ID3D12Resource!!!\n");// リソースの取得完了のログを出す
 
@@ -451,7 +451,7 @@ void DirectXManager::CreateRenderTargetView()
 
 	for (uint32_t i = 0; i < 2; ++i) {
 		rtvHandles_[i] = rtvStartHandle;
-		device_->CreateRenderTargetView(swapChainResources_[i].Get(), &rtvDesc_, rtvHandles_[i]);
+		device_->CreateRenderTargetView(backBuffers_[i].Get(), &rtvDesc_, rtvHandles_[i]);
 		// 次のRTVのハンドルに移動
 		rtvStartHandle.ptr += device_->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_RTV);
 	}
@@ -536,7 +536,7 @@ void DirectXManager::BeginDraw()
 
 	// バックバッファのリソースバリアを設定
 	TransitionResource(
-		swapChainResources_[backBufferIndex].Get(),
+		backBuffers_[backBufferIndex].Get(),
 		D3D12_RESOURCE_STATE_PRESENT,
 		D3D12_RESOURCE_STATE_RENDER_TARGET
 	);
