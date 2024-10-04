@@ -97,7 +97,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 			sprite->Initialize(spriteManager, "resource/uvChecker.png");
 		}
 
-		Vector2 initialPosition = Vector2{ i * 50.0f, 0.0f }; // 各スプライトを100ピクセルずつ右にずらして配置
+		Vector2 initialPosition = Vector2{ 100.0f, 100.0f }; // 各スプライトを100ピクセルずつ右にずらして配置
 		sprite->SetPosition(initialPosition);
 
 		sprites.push_back(sprite);
@@ -145,7 +145,6 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 		ImGuiManager::GetInstance()->Begin();
 
 		// ゲームの処理
-
 		for (Sprite* sprite : sprites) {
 			// 平行移動用処理
 			//Vector2 position = sprite->GetPosition();

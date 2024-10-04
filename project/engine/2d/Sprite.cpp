@@ -1,5 +1,6 @@
 #include "Sprite.h"
 #include "function.h"
+#include <imgui.h>
 
 Sprite::~Sprite() {
 
@@ -24,6 +25,11 @@ void Sprite::Initialize(SpriteManager* spriteManager, std::string textureFilePat
 
 void Sprite::Update()
 {
+	ImGui::SetNextWindowSize(ImVec2(500.0f, 100.0f));
+	ImGui::Begin("Sprite");
+	ImGui::SliderFloat2("position", &position_.x, 10.0f, 200.0f, "%4.1f");
+	ImGui::End();
+
 	SetSpriteData();
 
 	transform_.translate = { position_.x, position_.y, 0.0f };
