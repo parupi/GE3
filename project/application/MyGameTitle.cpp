@@ -2,16 +2,7 @@
 
 void MyGameTitle::Initialize()
 {
-	// WinDowsAPIの初期化
-	winManager = new WindowManager();
-	winManager->Initialize();
-	// DirectXの初期化
-	directXManager = new DirectXManager();
-	directXManager->Initialize(winManager);
-	// SRVマネージャーの初期化
-	srvManager = new SrvManager();
-	srvManager->Initialize(directXManager);
-
+	GuchisFramework::Initialize();
 	// ImGui初期化
 	ImGuiManager::GetInstance()->Initialize(winManager, directXManager);
 	// 2Dテクスチャマネージャーの初期化
@@ -88,15 +79,12 @@ void MyGameTitle::Initialize()
 	models[1]->SetPosition({ 2.0f, 0.0f, 0.0f });
 	models[1]->SetRotation({ 0.0f, 45.0f, 0.0f });
 
-	// 入力の初期化
-	input = new Input();
-	input->Initialize(winManager);
+
 }
 
 void MyGameTitle::Finalize()
 {
-	delete input;
-	input = nullptr;
+
 	TextureManager::GetInstance()->Finalize();
 	ModelManager::GetInstance()->Finalize();
 	//ParticleManager::GetInstance()->Finalize();
@@ -117,17 +105,12 @@ void MyGameTitle::Finalize()
 		model = nullptr;
 	}
 	ImGuiManager::GetInstance()->Finalize();
-	delete srvManager;
-	srvManager = nullptr;
-	delete directXManager;
-	directXManager = nullptr;
-	winManager->Finalize();
-	delete winManager;
-	winManager = nullptr;
+	GuchisFramework::Finalize();
 }
 
 void MyGameTitle::Update()
 {
+	GuchisFramework::Update();
 	ImGuiManager::GetInstance()->Begin();
 
 	// ゲームの処理
@@ -163,6 +146,7 @@ void MyGameTitle::Update()
 	}
 	// パーティクルのアップデート
 	//ParticleManager::GetInstance()->Update();
+
 	ImGuiManager::GetInstance()->End();
 }
 
@@ -189,10 +173,5 @@ void MyGameTitle::Draw()
 	ImGuiManager::GetInstance()->Draw();
 
 	directXManager->EndDraw();
-
 }
 
-bool MyGameTitle::IsEndRequest()
-{
-	return winManager->ProcessMessage();
-}
