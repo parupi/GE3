@@ -5,10 +5,21 @@
 class SpriteManager
 {
 public:
-	~SpriteManager();
-	void Initialize(DirectXManager* directXManager);
+	static SpriteManager* instance;
 
+	SpriteManager() = default;
+	~SpriteManager() = default;
+	SpriteManager(SpriteManager&) = default;
+	SpriteManager& operator=(SpriteManager&) = default;
+public:
+	// シングルトンインスタンスの取得
+	static SpriteManager* GetInstance();
+	// 初期化
+	void Initialize(DirectXManager* directXManager);
+	// 描画前処理
 	void DrawSet();
+	// 終了
+	void Finalize();
 
 private:
 	void CreateRootSignature();

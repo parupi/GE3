@@ -13,6 +13,9 @@
 #include <ParticleManager.h>
 #include "GuchisFramework.h"
 #include "ImGuiManager.h"
+#include <GameScene.h>
+
+
 class MyGameTitle : public GuchisFramework
 {
 public: 
@@ -25,16 +28,10 @@ public:
 	// 描画
 	void Draw() override;
 private:
+	// シーン
+	GameScene* gameScene_ = nullptr;
 
 
 
-	// ポインタ 
-	SpriteManager* spriteManager = nullptr;
-	Object3dManager* objectManager = nullptr;
-	std::vector<Object3d*> objects;
-	std::vector<Model*> models;
-	std::vector<Sprite*> sprites;
-	Camera* camera;
-	// エンドフラグ
 };
 

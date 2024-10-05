@@ -6,11 +6,11 @@ void GuchisFramework::Initialize()
 	winManager = new WindowManager();
 	winManager->Initialize();
 	// DirectXの初期化
-	directXManager = new DirectXManager();
-	directXManager->Initialize(winManager);
+	dxManager = new DirectXManager();
+	dxManager->Initialize(winManager);
 	// SRVマネージャーの初期化
 	srvManager = new SrvManager();
-	srvManager->Initialize(directXManager);
+	srvManager->Initialize(dxManager);
 	// 入力の初期化
 	input = new Input();
 	input->Initialize(winManager);
@@ -23,8 +23,8 @@ void GuchisFramework::Finalize()
 
 	delete srvManager;
 	srvManager = nullptr;
-	delete directXManager;
-	directXManager = nullptr;
+	delete dxManager;
+	dxManager = nullptr;
 	winManager->Finalize();
 	delete winManager;
 	winManager = nullptr;

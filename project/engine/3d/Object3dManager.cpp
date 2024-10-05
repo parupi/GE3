@@ -1,5 +1,15 @@
 #include "Object3dManager.h"
 
+Object3dManager* Object3dManager::instance = nullptr;
+
+Object3dManager* Object3dManager::GetInstance()
+{
+	if (instance == nullptr) {
+		instance = new Object3dManager;
+	}
+	return instance;
+}
+
 void Object3dManager::Initialize(DirectXManager* directXManager)
 {
 	assert(directXManager);
@@ -18,6 +28,12 @@ void Object3dManager::DrawSet()
 	dxManager_->GetCommandList()->SetGraphicsRootSignature(rootSignature_.Get());
 	dxManager_->GetCommandList()->SetPipelineState(graphicsPipelineState_.Get());			// PSOを設定
 	dxManager_->GetCommandList()->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+}
+
+void Object3dManager::Finalize()
+{
+	delete instance;
+	instance = nullptr;
 }
 
 void Object3dManager::CreateRootSignature()

@@ -3,11 +3,21 @@
 #include <Camera.h>
 class Object3dManager
 {
+	static Object3dManager* instance;
+
+	Object3dManager() = default;
+	~Object3dManager() = default;
+	Object3dManager(Object3dManager&) = default;
+	Object3dManager& operator=(Object3dManager&) = default;
 public:
+	// シングルトンインスタンスの取得
+	static Object3dManager* GetInstance();
+	// 初期化
 	void Initialize(DirectXManager* directXManager);
-
+	// 描画前処理
 	void DrawSet();
-
+	// 終了
+	void Finalize();
 private:
 	void CreateRootSignature();
 	D3D12_INPUT_LAYOUT_DESC CreateInputElementDesc();

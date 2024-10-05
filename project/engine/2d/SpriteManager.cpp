@@ -1,12 +1,13 @@
 #include "SpriteManager.h"
 
-SpriteManager::~SpriteManager()
+SpriteManager* SpriteManager::instance = nullptr;
+
+SpriteManager* SpriteManager::GetInstance()
 {
-	signatureBlob->Release();
-	if (errorBlob)
-	{
-		errorBlob->Release();
+	if (instance == nullptr) {
+		instance = new SpriteManager;
 	}
+	return instance;
 }
 
 void SpriteManager::Initialize(DirectXManager* directXManager) {
@@ -172,4 +173,15 @@ void SpriteManager::DrawSet()
 	dxManager_->GetCommandList()->SetGraphicsRootSignature(rootSignature_.Get());
 	dxManager_->GetCommandList()->SetPipelineState(graphicsPipelineState_.Get());			// PSOを設定
 	dxManager_->GetCommandList()->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+}
+
+void SpriteManager::Finalize()
+{
+	signatureBlob->Release();
+	if (errorBlob)
+	{
+		errorBlob->Release();
+	}
+	delete instance;
+	instance = nullptr;
 }

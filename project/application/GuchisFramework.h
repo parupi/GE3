@@ -31,7 +31,7 @@ protected:
 	D3DResourceLeakChecker leakCheck;
 
 	WindowManager* winManager = nullptr;
-	DirectXManager* directXManager = nullptr;
+	DirectXManager* dxManager = nullptr;
 	SrvManager* srvManager = nullptr;
 	Input* input = nullptr;
 };
