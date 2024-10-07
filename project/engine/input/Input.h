@@ -12,11 +12,23 @@
 /// </summary>
 class Input 
 {
-public: // メンバ関数
+private:
+	static Input* instance;
+
+	Input() = default;
+	~Input() = default;
+	Input(Input&) = default;
+	Input& operator=(Input&) = default;
+public:
+	// シングルトンインスタンスの取得
+	static Input* GetInstance();
+
 	template <class T> using ComPtr = Microsoft::WRL::ComPtr<T>;
 
 	// 初期化
 	void Initialize(WindowManager* winManager);
+	// 終了
+	void Finalize();
 	// 更新
 	void Update();
 

@@ -28,9 +28,6 @@ public:
 	void Draw() override;
 private:
 	// シーン
-	//GameScene* gameScene_ = nullptr;
-	TitleScene* titleScene_ = nullptr;
-
-
+	//SceneManager* sceneManager_ = nullptr;
 };
 

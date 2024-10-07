@@ -1,6 +1,7 @@
 #pragma once
 #include <Camera.h>
 #include <BaseScene.h>
+#include "SceneManager.h"
 class TitleScene : public BaseScene
 {
 public:

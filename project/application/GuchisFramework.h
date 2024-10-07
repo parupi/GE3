@@ -3,8 +3,8 @@
 #include "DirectXManager.h"
 #include "SrvManager.h"
 #include "Input.h"
-
 #include "LeakChecker.h"
+#include <SceneManager.h>
 
 class GuchisFramework
 {
@@ -33,6 +33,7 @@ protected:
 	WindowManager* winManager = nullptr;
 	DirectXManager* dxManager = nullptr;
 	SrvManager* srvManager = nullptr;
-	Input* input = nullptr;
+	//SceneManager* sceneManager_ = nullptr;
+
 };
 

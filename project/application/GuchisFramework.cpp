@@ -12,15 +12,15 @@ void GuchisFramework::Initialize()
 	srvManager = new SrvManager();
 	srvManager->Initialize(dxManager);
 	// 入力の初期化
-	input = new Input();
-	input->Initialize(winManager);
+	Input::GetInstance()->Initialize(winManager);
+	// シーンマネージャーの初期化
+
 }
 
 void GuchisFramework::Finalize()
 {
-	delete input;
-	input = nullptr;
-
+	SceneManager::GetInstance()->Finalize();
+	Input::GetInstance()->Finalize();
 	delete srvManager;
 	srvManager = nullptr;
 	delete dxManager;
@@ -32,12 +32,8 @@ void GuchisFramework::Finalize()
 
 void GuchisFramework::Update()
 {
-
-
-
-
-
-
+	SceneManager::GetInstance()->Update();
+	Input::GetInstance()->Update();
 }
 
 void GuchisFramework::Run()
