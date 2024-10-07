@@ -1,4 +1,5 @@
 #include "MyGameTitle.h"
+#include <SceneFactory.h>
 
 void MyGameTitle::Initialize()
 {
@@ -17,13 +18,17 @@ void MyGameTitle::Initialize()
 	Object3dManager::GetInstance()->Initialize(dxManager);
 
 	// 最初のシーンを生成
-	BaseScene* scene = new TitleScene();
+	sceneFactory_ = new SceneFactory();
 	// シーンマネージャーに最初のシーンをセット
-	SceneManager::GetInstance()->SetNextScene(scene);
+	SceneManager::GetInstance()->SetSceneFactory(sceneFactory_);
+	// シーンマネージャーに最初のシーンをセット
+	SceneManager::GetInstance()->ChangeScene("TITLE");
 }
 
 void MyGameTitle::Finalize()
 {
+	delete sceneFactory_;
+	sceneFactory_ = nullptr;
 	TextureManager::GetInstance()->Finalize();
 	ModelManager::GetInstance()->Finalize();
 	//ParticleManager::GetInstance()->Finalize();

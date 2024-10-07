@@ -13,8 +13,7 @@
 #include <ParticleManager.h>
 #include "GuchisFramework.h"
 #include "ImGuiManager.h"
-#include <GameScene.h>
-#include <TitleScene.h>
+
 class MyGameTitle : public GuchisFramework
 {
 public: 
@@ -26,8 +25,5 @@ public:
 	void Update() override;
 	// 描画
 	void Draw() override;
-private:
-	// シーン
-	//SceneManager* sceneManager_ = nullptr;
 };
 

@@ -5,6 +5,8 @@
 #include "Input.h"
 #include "LeakChecker.h"
 #include <SceneManager.h>
+#include <SceneFactory.h>
+#include <AbstractSceneFactory.h>
 
 class GuchisFramework
 {
@@ -34,6 +36,6 @@ protected:
 	DirectXManager* dxManager = nullptr;
 	SrvManager* srvManager = nullptr;
 	//SceneManager* sceneManager_ = nullptr;
-
+	AbstractSceneFactory* sceneFactory_ = nullptr;
 };
 

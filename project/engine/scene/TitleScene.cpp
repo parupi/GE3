@@ -22,9 +22,10 @@ void TitleScene::Update()
 {
 	if (Input::GetInstance()->TriggerKey(DIK_SPACE)) {
 		// ゲームプレイシーン(次シーン)を生成
-		BaseScene* scene = new GameScene();
+		//BaseScene* scene = new GameScene();
 		// シーンの切り替え依頼
-		sceneManager_->SetNextScene(scene);
+		//sceneManager_->SetNextScene(scene);
+		SceneManager::GetInstance()->ChangeScene("GAMEPLAY");
 	}
 }
 

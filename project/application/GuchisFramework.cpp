@@ -13,8 +13,6 @@ void GuchisFramework::Initialize()
 	srvManager->Initialize(dxManager);
 	// 入力の初期化
 	Input::GetInstance()->Initialize(winManager);
-	// シーンマネージャーの初期化
-
 }
 
 void GuchisFramework::Finalize()
