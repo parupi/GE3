@@ -1,11 +1,7 @@
 #pragma once
-#include <Object3d.h>
-#include <Sprite.h>
-#include <Model.h>
-#include <vector>
 #include <Camera.h>
 #include <BaseScene.h>
-class GameScene : public BaseScene
+class TitleScene : public BaseScene
 {
 public:
 	// 初期化
@@ -20,8 +16,6 @@ public:
 private:
 	Camera* camera = nullptr;
 
-	std::vector<Object3d*> objects;
-	std::vector<Model*> models;
-	std::vector<Sprite*> sprites;
+
 };
 

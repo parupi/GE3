@@ -16,13 +16,18 @@ void MyGameTitle::Initialize()
 	// オブジェクト共通部
 	Object3dManager::GetInstance()->Initialize(dxManager);
 
-	gameScene_ = new GameScene();
-	gameScene_->Initialize();
+	titleScene_ = new TitleScene();
+	titleScene_->Initialize();
+
+	//gameScene_ = new GameScene();
+	//gameScene_->Initialize();
+	
 }
 
 void MyGameTitle::Finalize()
 {
-	gameScene_->Finalize();
+	//gameScene_->Finalize();
+	titleScene_->Finalize();
 
 	TextureManager::GetInstance()->Finalize();
 	ModelManager::GetInstance()->Finalize();
@@ -39,8 +44,8 @@ void MyGameTitle::Update()
 	GuchisFramework::Update();
 	ImGuiManager::GetInstance()->Begin();
 
-
-	gameScene_->Update();
+	titleScene_->Update();
+	//gameScene_->Update();
 
 	ImGuiManager::GetInstance()->End();
 }
@@ -50,7 +55,8 @@ void MyGameTitle::Draw()
 	dxManager->BeginDraw();
 	srvManager->BeginDraw();
 
-	gameScene_->Draw();
+	titleScene_->Draw();
+	//gameScene_->Draw();
 
 	ImGuiManager::GetInstance()->Draw();
 

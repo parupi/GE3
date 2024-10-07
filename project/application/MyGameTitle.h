@@ -14,8 +14,7 @@
 #include "GuchisFramework.h"
 #include "ImGuiManager.h"
 #include <GameScene.h>
-
-
+#include <TitleScene.h>
 class MyGameTitle : public GuchisFramework
 {
 public: 
@@ -29,8 +28,8 @@ public:
 	void Draw() override;
 private:
 	// シーン
-	GameScene* gameScene_ = nullptr;
-
+	//GameScene* gameScene_ = nullptr;
+	TitleScene* titleScene_ = nullptr;
 
 
 };

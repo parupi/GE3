@@ -57,7 +57,7 @@ void GameScene::Initialize()
 		object->SetModel(model);
 		objects.push_back(object);
 	}
-
+	
 	// それぞれのObject3dに位置や回転を設定
 	models[0]->SetPosition({ -2.0f, 0.0f, 0.0f });
 	models[0]->SetRotation({ 0.0f, 0.0f, 0.0f });
