@@ -146,13 +146,13 @@
     <ClCompile Include="engine\base\ParticleManager.cpp">
       <Filter>ソース ファイル</Filter>
     </ClCompile>
-    <ClCompile Include="engine\debug\ImGuiManager.cpp">
+    <ClCompile Include="engine\debuger\ImGuiManager.cpp">
       <Filter>ソース ファイル</Filter>
     </ClCompile>
     <ClCompile Include="engine\core\MyGameTitle.cpp">
       <Filter>ソース ファイル</Filter>
     </ClCompile>
-    <ClCompile Include="engine\debug\LeakChecker.cpp">
+    <ClCompile Include="engine\debuger\LeakChecker.cpp">
       <Filter>ソース ファイル</Filter>
     </ClCompile>
     <ClCompile Include="engine\core\GuchisFramework.cpp">
@@ -278,13 +278,13 @@
     <ClInclude Include="engine\base\ParticleManager.h">
       <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
-    <ClInclude Include="engine\debug\ImGuiManager.h">
+    <ClInclude Include="engine\debuger\ImGuiManager.h">
       <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
     <ClInclude Include="engine\core\MyGameTitle.h">
       <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
-    <ClInclude Include="engine\debug\LeakChecker.h">
+    <ClInclude Include="engine\debuger\LeakChecker.h">
       <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
     <ClInclude Include="engine\core\GuchisFramework.h">
