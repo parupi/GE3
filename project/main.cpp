@@ -2,11 +2,9 @@
 
 // Windowsアプリでのエントリーポイント(main関数)
 int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
-	GuchisFramework* game = new MyGameTitle();
+	std::unique_ptr<GuchisFramework> game = std::make_unique<MyGameTitle>();
 
 	game->Run();
-
-	delete game;
 
 	return 0;
 }

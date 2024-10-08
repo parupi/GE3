@@ -3,29 +3,23 @@
 void GuchisFramework::Initialize()
 {
 	// WinDowsAPIの初期化
-	winManager = new WindowManager();
+	winManager = std::make_unique<WindowManager>();
 	winManager->Initialize();
 	// DirectXの初期化
-	dxManager = new DirectXManager();
-	dxManager->Initialize(winManager);
+	dxManager = std::make_unique<DirectXManager>();
+	dxManager->Initialize(winManager.get());
 	// SRVマネージャーの初期化
-	srvManager = new SrvManager();
-	srvManager->Initialize(dxManager);
+	srvManager = std::make_unique<SrvManager>();
+	srvManager->Initialize(dxManager.get());
 	// 入力の初期化
-	Input::GetInstance()->Initialize(winManager);
+	Input::GetInstance()->Initialize(winManager.get());
 }
 
 void GuchisFramework::Finalize()
 {
 	SceneManager::GetInstance()->Finalize();
 	Input::GetInstance()->Finalize();
-	delete srvManager;
-	srvManager = nullptr;
-	delete dxManager;
-	dxManager = nullptr;
 	winManager->Finalize();
-	delete winManager;
-	winManager = nullptr;
 }
 
 void GuchisFramework::Update()

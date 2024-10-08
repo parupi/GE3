@@ -2,6 +2,7 @@
 #include <Camera.h>
 #include <BaseScene.h>
 #include "SceneManager.h"
+#include <memory>
 class TitleScene : public BaseScene
 {
 public:
@@ -15,8 +16,6 @@ public:
 	void Draw() override;
 
 private:
-	Camera* camera = nullptr;
-
-
+	std::unique_ptr<Camera> camera_ = nullptr;
 };
 

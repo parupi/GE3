@@ -9,7 +9,7 @@
 class TextureManager
 {
 private:
-	static TextureManager* instance;
+	static std::unique_ptr<TextureManager> instance;
 
 	TextureManager() = default;
 	~TextureManager() = default;

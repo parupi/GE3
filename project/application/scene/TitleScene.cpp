@@ -6,25 +6,19 @@
 void TitleScene::Initialize()
 {
 	// カメラの生成
-	camera = new Camera();
-	Object3dManager::GetInstance()->SetDefaultCamera(camera);
+	camera_ = std::make_unique<Camera>();
+	Object3dManager::GetInstance()->SetDefaultCamera(camera_.get());
 
 }
 
 void TitleScene::Finalize()
 {
-	delete camera;
-	camera = nullptr;
-
 }
 
 void TitleScene::Update()
 {
 	if (Input::GetInstance()->TriggerKey(DIK_SPACE)) {
-		// ゲームプレイシーン(次シーン)を生成
-		//BaseScene* scene = new GameScene();
 		// シーンの切り替え依頼
-		//sceneManager_->SetNextScene(scene);
 		SceneManager::GetInstance()->ChangeScene("GAMEPLAY");
 	}
 }

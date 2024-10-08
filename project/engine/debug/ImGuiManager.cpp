@@ -3,14 +3,15 @@
 #include <imgui_impl_win32.h>
 #include <imgui_impl_dx12.h>
 
-ImGuiManager* ImGuiManager::instance = nullptr;
+std::unique_ptr<ImGuiManager> ImGuiManager::instance = nullptr;
+std::once_flag initInstanceFlag;
 
 ImGuiManager* ImGuiManager::GetInstance()
 {
-	if (instance == nullptr) {
-		instance = new ImGuiManager;
-	}
-	return instance;
+	std::call_once(initInstanceFlag, []() {
+		instance = std::make_unique<ImGuiManager>();
+	});
+	return instance.get();
 }
 
 void ImGuiManager::Initialize(WindowManager* winManager, DirectXManager* directXManager)
@@ -41,8 +42,6 @@ void ImGuiManager::Initialize(WindowManager* winManager, DirectXManager* directX
 		srvHeap_->GetCPUDescriptorHandleForHeapStart(),
 		srvHeap_->GetGPUDescriptorHandleForHeapStart()
 	);
-
-
 }
 
 void ImGuiManager::Begin()
@@ -70,9 +69,6 @@ void ImGuiManager::Draw()
 
 void ImGuiManager::Finalize()
 {
-	delete instance;
-	instance = nullptr;
-
 	ImGui_ImplDX12_Shutdown();
 	ImGui_ImplWin32_Shutdown();
 	ImGui::DestroyContext();
