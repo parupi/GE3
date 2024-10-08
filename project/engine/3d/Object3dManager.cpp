@@ -1,13 +1,14 @@
 #include "Object3dManager.h"
 
-Object3dManager* Object3dManager::instance = nullptr;
+std::unique_ptr<Object3dManager> Object3dManager::instance = nullptr;
+std::once_flag Object3dManager::initInstanceFlag;
 
 Object3dManager* Object3dManager::GetInstance()
 {
-	if (instance == nullptr) {
-		instance = new Object3dManager;
-	}
-	return instance;
+	std::call_once(initInstanceFlag, []() {
+		instance = std::make_unique<Object3dManager>();
+		});
+	return instance.get();
 }
 
 void Object3dManager::Initialize(DirectXManager* directXManager)
@@ -28,12 +29,6 @@ void Object3dManager::DrawSet()
 	dxManager_->GetCommandList()->SetGraphicsRootSignature(rootSignature_.Get());
 	dxManager_->GetCommandList()->SetPipelineState(graphicsPipelineState_.Get());			// PSOを設定
 	dxManager_->GetCommandList()->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
-}
-
-void Object3dManager::Finalize()
-{
-	delete instance;
-	instance = nullptr;
 }
 
 void Object3dManager::CreateRootSignature()

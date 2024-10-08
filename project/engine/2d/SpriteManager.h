@@ -1,17 +1,19 @@
 #pragma once
 #include "DirectXManager.h"
-
+#include <memory>
+#include <mutex>
 // スプライト共通部
 class SpriteManager
 {
 public:
-	static SpriteManager* instance;
+	static std::unique_ptr<SpriteManager> instance;
+	static std::once_flag initInstanceFlag;
 
-	SpriteManager() = default;
-	~SpriteManager() = default;
 	SpriteManager(SpriteManager&) = default;
 	SpriteManager& operator=(SpriteManager&) = default;
 public:
+	SpriteManager() = default;
+	~SpriteManager() = default;
 	// シングルトンインスタンスの取得
 	static SpriteManager* GetInstance();
 	// 初期化

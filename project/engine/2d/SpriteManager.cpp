@@ -1,13 +1,14 @@
 #include "SpriteManager.h"
 
-SpriteManager* SpriteManager::instance = nullptr;
+std::unique_ptr<SpriteManager> SpriteManager::instance = nullptr;
+std::once_flag SpriteManager::initInstanceFlag;
 
 SpriteManager* SpriteManager::GetInstance()
 {
-	if (instance == nullptr) {
-		instance = new SpriteManager;
-	}
-	return instance;
+	std::call_once(initInstanceFlag, []() {
+		instance = std::make_unique<SpriteManager>();
+		});
+	return instance.get();
 }
 
 void SpriteManager::Initialize(DirectXManager* directXManager) {
@@ -182,6 +183,4 @@ void SpriteManager::Finalize()
 	{
 		errorBlob->Release();
 	}
-	delete instance;
-	instance = nullptr;
 }

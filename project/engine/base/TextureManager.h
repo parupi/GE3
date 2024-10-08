@@ -6,20 +6,20 @@
 #include <string>
 #include <unordered_map>
 #include <wrl.h>
+#include <mutex>
 class TextureManager
 {
 private:
 	static std::unique_ptr<TextureManager> instance;
+	static std::once_flag initInstanceFlag;
 
-	TextureManager() = default;
-	~TextureManager() = default;
 	TextureManager(TextureManager&) = default;
 	TextureManager& operator=(TextureManager&) = default;
 public:
+	TextureManager() = default;
+	~TextureManager() = default;
 	// シングルトンインスタンスの取得
 	static TextureManager* GetInstance();
-	// 終了
-	void Finalize();
 	// 初期化
 	void Initialize(DirectXManager* dxManager, SrvManager* srvManager);
 

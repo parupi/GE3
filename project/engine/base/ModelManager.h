@@ -3,21 +3,20 @@
 #include <memory>
 #include <string>
 #include "Model.h"
+#include <mutex>
 class ModelManager
 {
 private:
-	static ModelManager* instance;
+	static std::unique_ptr<ModelManager> instance;
+	static std::once_flag initInstanceFlag;
 
-	ModelManager() = default;
-	~ModelManager() = default;
 	ModelManager(ModelManager&) = default;
 	ModelManager& operator=(ModelManager&) = default;
-
 public:
+	ModelManager() = default;
+	~ModelManager() = default;
 	// シングルトンインスタンスの取得
 	static ModelManager* GetInstance();
-	// 終了
-	void Finalize();
 	// 初期化
 	void Initialize(DirectXManager* dxManager);
 
@@ -31,9 +30,9 @@ public:
 
 private:
 
-	ModelLoader* modelLoader = nullptr;
+	std::unique_ptr<ModelLoader> modelLoader = nullptr;
 
 public:
-	ModelLoader* GetModelLoader() {return modelLoader;}
+	ModelLoader* GetModelLoader() {return modelLoader.get();}
 };
 

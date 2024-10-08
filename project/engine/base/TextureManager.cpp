@@ -1,23 +1,17 @@
 #include "TextureManager.h"
 
-
-TextureManager* TextureManager::instance = nullptr;
+std::unique_ptr<TextureManager> TextureManager::instance = nullptr;
+std::once_flag TextureManager::initInstanceFlag;
 
 // ImGuiで0番を使うため、1番から使用
 uint32_t TextureManager::kSRVIndexTop = 1;
 
 TextureManager* TextureManager::GetInstance()
 {
-	if (instance == nullptr) {
-		instance = new TextureManager;
-	}
-	return instance;
-}
-
-void TextureManager::Finalize()
-{
-	delete instance;
-	instance = nullptr;
+	std::call_once(initInstanceFlag, []() {
+		instance = std::make_unique<TextureManager>();
+		});
+	return instance.get();
 }
 
 void TextureManager::Initialize(DirectXManager* dxManager, SrvManager* srvManager)

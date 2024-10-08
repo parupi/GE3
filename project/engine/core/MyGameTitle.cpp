@@ -27,11 +27,8 @@ void MyGameTitle::Initialize()
 
 void MyGameTitle::Finalize()
 {
-	TextureManager::GetInstance()->Finalize();
-	ModelManager::GetInstance()->Finalize();
 	//ParticleManager::GetInstance()->Finalize();
 	SpriteManager::GetInstance()->Finalize();
-	Object3dManager::GetInstance()->Finalize();
 
 	ImGuiManager::GetInstance()->Finalize();
 	GuchisFramework::Finalize();

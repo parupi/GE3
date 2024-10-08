@@ -1,24 +1,19 @@
 #include "ModelManager.h"
 
-ModelManager* ModelManager::instance = nullptr;
+std::unique_ptr<ModelManager> ModelManager::instance = nullptr;
+std::once_flag ModelManager::initInstanceFlag;
 
 ModelManager* ModelManager::GetInstance()
 {
-	if (instance == nullptr) {
-		instance = new ModelManager;
-	}
-	return instance;
-}
-
-void ModelManager::Finalize()
-{
-	delete instance;
-	instance = nullptr;
+	std::call_once(initInstanceFlag, []() {
+		instance = std::make_unique<ModelManager>();
+		});
+	return instance.get();
 }
 
 void ModelManager::Initialize(DirectXManager* dxManager)
 {
-	modelLoader = new ModelLoader;
+	modelLoader = std::make_unique<ModelLoader>();
 	modelLoader->Initialize(dxManager);
 }
 
@@ -32,7 +27,7 @@ void ModelManager::LoadModel(const std::string& filePath)
 
 	// モデルの生成とファイルの読み込み
 	std::unique_ptr<Model> model = std::make_unique<Model>();
-	model->Initialize(modelLoader, "resource", filePath);
+	model->Initialize(modelLoader.get(), "resource", filePath);
 
 	// モデルをmapコンテナに格納する
 	models.insert(std::make_pair(filePath, std::move(model)));

@@ -5,6 +5,7 @@
 #include <vector>
 #include <Camera.h>
 #include <BaseScene.h>
+#include <memory>
 class GameScene : public BaseScene
 {
 public:
@@ -18,7 +19,7 @@ public:
 	void Draw() override;
 
 private:
-	Camera* camera = nullptr;
+	std::unique_ptr<Camera> camera = nullptr;
 
 	std::vector<Object3d*> objects;
 	std::vector<Model*> models;

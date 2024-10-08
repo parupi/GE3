@@ -1,14 +1,15 @@
 #include "SceneManager.h"
 #include <cassert>
 
-SceneManager* SceneManager::instance = nullptr;
+std::unique_ptr<SceneManager> SceneManager::instance = nullptr;
+std::once_flag SceneManager::initInstanceFlag;
 
 SceneManager* SceneManager::GetInstance()
 {
-	if (instance == nullptr) {
-		instance = new SceneManager;
-	}
-	return instance;
+	std::call_once(initInstanceFlag, []() {
+		instance = std::make_unique<SceneManager>();
+		});
+	return instance.get();
 }
 
 void SceneManager::Finalize()
@@ -16,9 +17,6 @@ void SceneManager::Finalize()
 	// 最後のシーンの終了と解放
 	scene_->Finalize();
 	delete scene_;
-
-	delete instance;
-	instance = nullptr;
 }
 
 void SceneManager::Update()

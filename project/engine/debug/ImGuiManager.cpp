@@ -4,7 +4,7 @@
 #include <imgui_impl_dx12.h>
 
 std::unique_ptr<ImGuiManager> ImGuiManager::instance = nullptr;
-std::once_flag initInstanceFlag;
+std::once_flag ImGuiManager::initInstanceFlag;
 
 ImGuiManager* ImGuiManager::GetInstance()
 {

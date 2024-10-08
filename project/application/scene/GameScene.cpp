@@ -7,8 +7,8 @@
 void GameScene::Initialize()
 {
 	// カメラの生成
-	camera = new Camera();
-	Object3dManager::GetInstance()->SetDefaultCamera(camera);
+	camera = std::make_unique<Camera>();
+	Object3dManager::GetInstance()->SetDefaultCamera(camera.get());
 
 	// Textureのロード
 	TextureManager::GetInstance()->LoadTexture("resource/uvChecker.png");
@@ -79,8 +79,6 @@ void GameScene::Finalize()
 		delete model;
 		model = nullptr;
 	}
-	delete camera;
-	camera = nullptr;
 }
 
 void GameScene::Update()
