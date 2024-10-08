@@ -149,19 +149,19 @@
     <ClCompile Include="engine\debug\ImGuiManager.cpp">
       <Filter>ソース ファイル</Filter>
     </ClCompile>
-    <ClCompile Include="application\MyGameTitle.cpp">
+    <ClCompile Include="engine\core\MyGameTitle.cpp">
       <Filter>ソース ファイル</Filter>
     </ClCompile>
     <ClCompile Include="engine\debug\LeakChecker.cpp">
       <Filter>ソース ファイル</Filter>
     </ClCompile>
-    <ClCompile Include="application\GuchisFramework.cpp">
+    <ClCompile Include="engine\core\GuchisFramework.cpp">
       <Filter>ソース ファイル</Filter>
     </ClCompile>
-    <ClCompile Include="engine\scene\GameScene.cpp">
+    <ClCompile Include="application\scene\GameScene.cpp">
       <Filter>ソース ファイル</Filter>
     </ClCompile>
-    <ClCompile Include="engine\scene\TitleScene.cpp">
+    <ClCompile Include="application\scene\TitleScene.cpp">
       <Filter>ソース ファイル</Filter>
     </ClCompile>
     <ClCompile Include="engine\scene\BaseScene.cpp">
@@ -278,19 +278,19 @@
     <ClInclude Include="engine\debug\ImGuiManager.h">
       <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
-    <ClInclude Include="application\MyGameTitle.h">
+    <ClInclude Include="engine\core\MyGameTitle.h">
       <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
     <ClInclude Include="engine\debug\LeakChecker.h">
       <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
-    <ClInclude Include="application\GuchisFramework.h">
+    <ClInclude Include="engine\core\GuchisFramework.h">
       <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
-    <ClInclude Include="engine\scene\GameScene.h">
+    <ClInclude Include="application\scene\GameScene.h">
       <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
-    <ClInclude Include="engine\scene\TitleScene.h">
+    <ClInclude Include="application\scene\TitleScene.h">
       <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
     <ClInclude Include="engine\scene\BaseScene.h">
