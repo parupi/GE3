@@ -5,6 +5,7 @@
 #include <fstream>
 #include <wrl.h>
 #include <mutex>
+#include <unordered_map>
 class Audio
 {
 	static Audio* instance;
@@ -48,7 +49,7 @@ public:
 	// 初期化
 	void Initialize();
 	// 音声読み込み
-	SoundData SoundLoadWave(const char* filename);
+	void SoundLoadWave(const char* filename);
 	// 音声データ解放
 	void SoundUnload(SoundData* soundData);
 	// 音声の再生
@@ -58,5 +59,10 @@ public:
 private:
 	Microsoft::WRL::ComPtr<IXAudio2> xAudio2;
 	IXAudio2MasteringVoice* masterVoice;
+
+	std::unordered_map<std::string, Audio::SoundData> soundDataMap;
+
+public:
+	auto GetSoundData() { return soundDataMap; }
 };
 

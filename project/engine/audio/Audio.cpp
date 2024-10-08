@@ -22,7 +22,7 @@ void Audio::Initialize()
 
 }
 
-Audio::SoundData Audio::SoundLoadWave(const char* filename)
+void Audio::SoundLoadWave(const char* filename)
 {
 	HRESULT result;
 	
@@ -84,8 +84,10 @@ Audio::SoundData Audio::SoundLoadWave(const char* filename)
 	soundData.pBuffer = reinterpret_cast<BYTE*>(pBuffer);
 	soundData.bufferSize = data.size;
 
+	soundDataMap[filename] = soundData;
+
 	// 読み込んだ音声データをreturn
-	return soundData;
+	//return soundData;
 }
 
 void Audio::SoundUnload(SoundData* soundData)
