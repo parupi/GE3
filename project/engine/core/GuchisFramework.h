@@ -7,6 +7,7 @@
 #include <SceneManager.h>
 #include <SceneFactory.h>
 #include <AbstractSceneFactory.h>
+#include <Audio.h>
 
 class GuchisFramework
 {

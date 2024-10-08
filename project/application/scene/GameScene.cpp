@@ -1,8 +1,7 @@
-#include "GameScene.h"
+#include <GameScene.h>
 #include <TextureManager.h>
 #include <ModelManager.h>
 #include <ParticleManager.h>
-
 
 void GameScene::Initialize()
 {
@@ -20,7 +19,7 @@ void GameScene::Initialize()
 	//ParticleManager::GetInstance()->CreateParticleGroup("circle", "resource/uvChecker.png");
 	// パーティクルにカメラをセットする
 	//ParticleManager::GetInstance()->SetCamera(camera);
-
+	Audio::GetInstance()->SoundPlayWave(Audio::GetInstance()->SoundLoadWave("resource/sound/fanfare.wav"));
 
 	// Spriteの初期化
 	for (uint32_t i = 0; i < 2; ++i) {

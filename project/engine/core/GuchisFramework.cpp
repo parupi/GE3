@@ -13,6 +13,8 @@ void GuchisFramework::Initialize()
 	srvManager->Initialize(dxManager.get());
 	// 入力の初期化
 	Input::GetInstance()->Initialize(winManager.get());
+	// Audioの初期化
+	Audio::GetInstance()->Initialize();
 }
 
 void GuchisFramework::Finalize()

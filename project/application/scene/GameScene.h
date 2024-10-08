@@ -6,6 +6,7 @@
 #include <Camera.h>
 #include <BaseScene.h>
 #include <memory>
+#include <Audio.h>
 class GameScene : public BaseScene
 {
 public:
@@ -24,5 +25,7 @@ private:
 	std::vector<Object3d*> objects;
 	std::vector<Model*> models;
 	std::vector<Sprite*> sprites;
+
+	uint32_t soundHandle = 0u;
 };
 
