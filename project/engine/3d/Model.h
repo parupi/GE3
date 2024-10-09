@@ -14,7 +14,7 @@ public: // メンバ関数
 	void Draw();
 private:
 	void CreateVertexResource();
-	void CreateMaterialResource();
+	
 
 private: // 構造体
 
@@ -22,13 +22,6 @@ private: // 構造体
 		Vector4 position;
 		Vector2 texcoord;
 		Vector3 normal;
-	};
-
-	struct Material {
-		Vector4 color;
-		bool enableLighting;
-		float padding[3];
-		Matrix4x4 uvTransform;
 	};
 
 	struct Color {
@@ -60,10 +53,8 @@ private:
 	ModelData modelData_;
 
 	Microsoft::WRL::ComPtr<ID3D12Resource> vertexResource_ = nullptr;
-	Microsoft::WRL::ComPtr<ID3D12Resource> materialResource_ = nullptr;
 
 	VertexData* vertexData_ = nullptr;
-	Material* materialData_ = nullptr;
 
 	D3D12_VERTEX_BUFFER_VIEW vertexBufferView_;
 

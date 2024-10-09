@@ -23,9 +23,11 @@ private:
 	std::unique_ptr<Camera> camera = nullptr;
 
 	std::vector<Object3d*> objects;
-	std::vector<Model*> models;
+	//std::vector<Model*> models;
 	std::vector<Sprite*> sprites;
 
+	Vector4 color1 = { 1.0f, 1.0f, 1.0f, 1.0f };
+	Vector4 color2 = { 1.0f, 1.0f, 1.0f, 1.0f };
 	uint32_t soundHandle = 0u;
 };
 

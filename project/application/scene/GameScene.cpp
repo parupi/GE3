@@ -2,6 +2,7 @@
 #include <TextureManager.h>
 #include <ModelManager.h>
 #include <ParticleManager.h>
+#include <imgui.h>
 
 void GameScene::Initialize()
 {
@@ -18,47 +19,37 @@ void GameScene::Initialize()
 	// パーティクルのグループを生成
 	//ParticleManager::GetInstance()->CreateParticleGroup("circle", "resource/uvChecker.png");
 	// パーティクルにカメラをセットする
-	//ParticleManager::GetInstance()->SetCamera(camera);
+	//ParticleManager::GetInstance()->SetCamera(camera.get());
 	Audio::GetInstance()->SoundLoadWave("resource/sound/fanfare.wav");
 	Audio::GetInstance()->SoundPlayWave(Audio::GetInstance()->GetSoundData()["resource/sound/fanfare.wav"]);
 
 	// Spriteの初期化
 	for (uint32_t i = 0; i < 2; ++i) {
-		
 		Sprite* sprite = new Sprite();
 		if (i == 1) {
-			sprite->Initialize(SpriteManager::GetInstance(), "resource/monsterBall.png");
+			sprite->Initialize("resource/monsterBall.png");
 		}
 		else {
-			sprite->Initialize(SpriteManager::GetInstance(), "resource/uvChecker.png");
+			sprite->Initialize("resource/uvChecker.png");
 		}
 
-		Vector2 initialPosition = Vector2{ 100.0f, 100.0f }; // 各スプライトを100ピクセルずつ右にずらして配置
+		Vector2 initialPosition = Vector2{ 48.0f * i, 0.0f }; // 各スプライトを100ピクセルずつ右にずらして配置
 		sprite->SetPosition(initialPosition);
 
 		sprites.push_back(sprite);
 	}
 
 	for (int i = 0; i < 2; ++i) {
-
-		// Modelの初期化
-		//Model* model = new Model();
+		// Object3dの初期化
 		Object3d* object = new Object3d();
-		object->Initialize(Object3dManager::GetInstance());
+		object->Initialize();
 		if (i == 1) {
-			object->SetModel("axis.obj");
-			//model->Initialize(ModelManager::GetInstance()->GetModelLoader(), "resource", "axis.obj");
+			object->SetModel("plane.obj");
 		}
 		else {
-			object->SetModel("plane.obj");
-			//model->Initialize(ModelManager::GetInstance()->GetModelLoader(), "resource", "plane.obj");
+			object->SetModel("axis.obj");
 		}
-		//models.push_back(model);
 
-		// Object3dの初期化
-	
-
-		
 		objects.push_back(object);
 	}
 	
@@ -79,15 +70,25 @@ void GameScene::Finalize()
 		delete object;
 		object = nullptr;
 	}
-	for (Model* model : models) {
-		delete model;
-		model = nullptr;
-	}
+	//for (Model* model : models) {
+	//	delete model;
+	//	model = nullptr;
+	//}
 }
 
 void GameScene::Update()
 {
 	camera->Update();
+
+
+
+	ImGui::Begin("obj");
+	ImGui::SliderFloat4("obj1", &color1.x, 0.0f, 1.0f);
+	ImGui::SliderFloat4("obj2", &color2.x, 0.0f, 1.0f);
+	ImGui::End();
+
+	objects[0]->SetColor(color1);
+	objects[1]->SetColor(color2);
 
 	// ゲームの処理
 	for (auto& object : objects) {

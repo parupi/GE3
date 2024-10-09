@@ -11,7 +11,7 @@ class SpriteManager;
 class Sprite {
 public:
 	~Sprite();
-	void Initialize(SpriteManager* spriteManager, std::string textureFilePath);
+	void Initialize(std::string textureFilePath);
 	void Update();
 	void Draw();
 
