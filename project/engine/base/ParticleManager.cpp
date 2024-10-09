@@ -37,69 +37,6 @@ void ParticleManager::Initialize(DirectXManager* dxManager, SrvManager* srvManag
 	CreateParticleResource();
 }
 
-//void ParticleManager::Update()
-//{
-//	for (auto& [groupName, particleGroup] : particleGroups_) {
-//		Matrix4x4 backToFrontMatrix = MakeRotateYMatrix(std::numbers::pi_v<float>);
-//		Matrix4x4 billboardMatrix = Multiply(backToFrontMatrix, camera_->GetWorldMatrix());
-//
-//		Matrix4x4 viewMatrix = Inverse(camera_->GetWorldMatrix());
-//		Matrix4x4 viewProjectionMatrix = Multiply(viewMatrix, camera_->GetProjectionMatrix());
-//
-//		emitter.frequencyTime += kDeltaTime;
-//		if (emitter.frequencyTime >= emitter.frequency) {
-//			// パーティクルを生成して指定したパーティクルグループに追加
-//			Emit(groupName, emitter.transform.translate, 3);
-//
-//			// 発生したパーティクルの時間をリセット
-//			emitter.frequencyTime -= emitter.frequency;
-//		}
-//
-//		uint32_t numInstance = 0;  // 各グループごとにリセット
-//
-//		for (auto particleIterator = particleGroup.particleList.begin(); particleIterator != particleGroup.particleList.end();) {
-//			if ((*particleIterator).lifeTime <= (*particleIterator).currentTime) {
-//				particleIterator = particleGroup.particleList.erase(particleIterator);
-//				continue;
-//			}
-//
-//			(*particleIterator).transform.translate += (*particleIterator).velocity * kDeltaTime;
-//			(*particleIterator).currentTime += kDeltaTime;
-//			float alpha = 1.0f - ((*particleIterator).currentTime / (*particleIterator).lifeTime);
-//
-//			Matrix4x4 scaleMatrix = ScaleMatrixFromVector3((*particleIterator).transform.scale);
-//			Matrix4x4 translateMatrix = TranslationMatrixFromVector3((*particleIterator).transform.translate);
-//			Matrix4x4 worldMatrix{};
-//			if (isBillboard) {
-//				worldMatrix = Multiply(Multiply(scaleMatrix, billboardMatrix), translateMatrix);
-//			}
-//			else {
-//				worldMatrix = MakeAffineMatrix((*particleIterator).transform.scale, (*particleIterator).transform.rotate, (*particleIterator).transform.translate);
-//			}
-//
-//			Matrix4x4 worldViewProjectionMatrix = Multiply(worldMatrix, viewProjectionMatrix);
-//
-//			if (numInstance < kNumMaxInstance) {
-//				instancingData_[numInstance].WVP = worldViewProjectionMatrix;
-//				instancingData_[numInstance].World = worldMatrix;
-//				instancingData_[numInstance].color = (*particleIterator).color;
-//				instancingData_[numInstance].color.w = alpha;
-//				++numInstance;
-//			}
-//
-//			++particleIterator;
-//		}
-//
-//		// インスタンス数を更新
-//		particleGroup.instanceCount = numInstance;
-//
-//		// 死んだパーティクルを削除する処理をループの外で行う
-//		particleGroup.particleList.remove_if([](const Particle& p) {
-//			return p.currentTime >= p.lifeTime;
-//			});
-//	}
-//}
-
 void ParticleManager::Update()
 {
 	Matrix4x4 cameraMatrix = MakeAffineMatrix({1.0f, 1.0f, 1.0f}, camera_->GetRotate(), camera_->GetTranslate());

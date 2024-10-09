@@ -1,19 +1,18 @@
 #pragma once
 #include "WindowManager.h"
 #include "DirectXManager.h"
-#include <memory>
 #include <mutex>
 class ImGuiManager
 {
 private:
-	static std::unique_ptr<ImGuiManager> instance;
+	static ImGuiManager* instance;
 	static std::once_flag initInstanceFlag;
 
+	ImGuiManager() = default;
+	~ImGuiManager() = default;
 	ImGuiManager(ImGuiManager&) = default;
 	ImGuiManager& operator=(ImGuiManager&) = default;
 public:
-	ImGuiManager() = default;
-	~ImGuiManager() = default;
 	// シングルトンインスタンスの取得
 	static ImGuiManager* GetInstance();
 	// 初期化

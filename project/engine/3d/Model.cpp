@@ -12,7 +12,6 @@ void Model::Initialize(ModelLoader* modelManager, const std::string& directoryPa
 	modelData_ = LoadObjFile(directoryPath, fileName);
 
 	CreateVertexResource();
-	CreateMaterialResource();
 
 	// .objの参照しているテクスチャファイルの読み込み
 	TextureManager::GetInstance()->LoadTexture(modelData_.material.textureFilePath);
@@ -24,8 +23,6 @@ void Model::Draw()
 {
 	// VertexBufferViewを設定
 	modelLoader_->GetDxManager()->GetCommandList()->IASetVertexBuffers(0, 1, &vertexBufferView_);
-	// マテリアルCBufferの場所を指定
-	modelLoader_->GetDxManager()->GetCommandList()->SetGraphicsRootConstantBufferView(0, materialResource_->GetGPUVirtualAddress());
 	// SRVのDescriptorTableの先頭を設定。
 	modelLoader_->GetDxManager()->GetCommandList()->SetGraphicsRootDescriptorTable(2, TextureManager::GetInstance()->GetSrvHandleGPU(modelData_.material.textureFilePath));
 	// ドローコール
@@ -45,17 +42,7 @@ void Model::CreateVertexResource()
 	std::memcpy(vertexData_, modelData_.vertices.data(), sizeof(VertexData) * modelData_.vertices.size());
 }
 
-void Model::CreateMaterialResource()
-{
-	// マテリアル用のリソースを作る。今回はFcolor1つ分のサイズを用意する
-	materialResource_ = modelLoader_->GetDxManager()->CreateBufferResource(sizeof(Material));
-	// 書き込むためのアドレスを取得
-	materialResource_->Map(0, nullptr, reinterpret_cast<void**>(&materialData_));
-	// 白を入れる
-	materialData_->color = { 1.0f, 1.0f, 1.0f, 1.0f };
-	materialData_->enableLighting = true;
-	materialData_->uvTransform = MakeIdentity4x4();
-}
+
 
 Model::MaterialData Model::LoadMaterialTemplateFile(const std::string& directoryPath, const std::string& filename)
 {

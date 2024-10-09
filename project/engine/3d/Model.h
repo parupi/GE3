@@ -14,7 +14,7 @@ public: // メンバ関数
 	void Draw();
 private:
 	void CreateVertexResource();
-	void CreateMaterialResource();
+	
 
 private: // 構造体
 
@@ -22,13 +22,6 @@ private: // 構造体
 		Vector4 position;
 		Vector2 texcoord;
 		Vector3 normal;
-	};
-
-	struct Material {
-		Vector4 color;
-		bool enableLighting;
-		float padding[3];
-		Matrix4x4 uvTransform;
 	};
 
 	struct Color {
@@ -60,31 +53,29 @@ private:
 	ModelData modelData_;
 
 	Microsoft::WRL::ComPtr<ID3D12Resource> vertexResource_ = nullptr;
-	Microsoft::WRL::ComPtr<ID3D12Resource> materialResource_ = nullptr;
 
 	VertexData* vertexData_ = nullptr;
-	Material* materialData_ = nullptr;
 
 	D3D12_VERTEX_BUFFER_VIEW vertexBufferView_;
 
 private: // 実用化用変数
-	Vector3 position_ = { 0.0f, 0.0f, 0.0f };
-	Vector3 rotation_ = { 0.0f, 0.0f, 0.0f };
-	Vector3 size_ = { 1.0f, 1.0f, 1.0f};
+	//Vector3 position_ = { 0.0f, 0.0f, 0.0f };
+	//Vector3 rotation_ = { 0.0f, 0.0f, 0.0f };
+	//Vector3 size_ = { 1.0f, 1.0f, 1.0f};
 public:
 	// mtlファイルを読む関数
 	static MaterialData LoadMaterialTemplateFile(const std::string& directoryPath, const std::string& filename);
 	// OBJファイルを読む関数
 	static ModelData LoadObjFile(const std::string& directoryPath, const std::string& filename);
 public: // ゲッター // セッター //
-	// 平行移動
-	const Vector3& GetPosition() const { return position_; }
-	void SetPosition(const Vector3& position) { position_ = position; }
-	// 回転
-	const Vector3 GetRotation() const { return rotation_; }
-	void SetRotation(Vector3 rotation) { rotation_ = rotation; }
-	// 拡縮
-	const Vector3& GetSize() const { return size_; }
-	void SetSize(const Vector3& size) { size_ = size; }
+	//// 平行移動
+	//const Vector3& GetPosition() const { return position_; }
+	//void SetPosition(const Vector3& position) { position_ = position; }
+	//// 回転
+	//const Vector3 GetRotation() const { return rotation_; }
+	//void SetRotation(Vector3 rotation) { rotation_ = rotation; }
+	//// 拡縮
+	//const Vector3& GetSize() const { return size_; }
+	//void SetSize(const Vector3& size) { size_ = size; }
 };
 
