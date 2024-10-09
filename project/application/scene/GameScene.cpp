@@ -42,28 +42,32 @@ void GameScene::Initialize()
 	for (int i = 0; i < 2; ++i) {
 
 		// Modelの初期化
-		Model* model = new Model();
-		if (i == 1) {
-			model->Initialize(ModelManager::GetInstance()->GetModelLoader(), "resource", "axis.obj");
-		}
-		else {
-			model->Initialize(ModelManager::GetInstance()->GetModelLoader(), "resource", "plane.obj");
-		}
-		models.push_back(model);
-
-		// Object3dの初期化
+		//Model* model = new Model();
 		Object3d* object = new Object3d();
 		object->Initialize(Object3dManager::GetInstance());
-		object->SetModel(model);
+		if (i == 1) {
+			object->SetModel("axis.obj");
+			//model->Initialize(ModelManager::GetInstance()->GetModelLoader(), "resource", "axis.obj");
+		}
+		else {
+			object->SetModel("plane.obj");
+			//model->Initialize(ModelManager::GetInstance()->GetModelLoader(), "resource", "plane.obj");
+		}
+		//models.push_back(model);
+
+		// Object3dの初期化
+	
+
+		
 		objects.push_back(object);
 	}
 	
 	// それぞれのObject3dに位置や回転を設定
-	models[0]->SetPosition({ -2.0f, 0.0f, 0.0f });
-	models[0]->SetRotation({ 0.0f, 0.0f, 0.0f });
+	objects[0]->SetPosition({ -2.0f, 0.0f, 0.0f });
+	objects[0]->SetRotation({ 0.0f, 0.0f, 0.0f });
 
-	models[1]->SetPosition({ 2.0f, 0.0f, 0.0f });
-	models[1]->SetRotation({ 0.0f, 45.0f, 0.0f });
+	objects[1]->SetPosition({ 2.0f, 0.0f, 0.0f });
+	objects[1]->SetRotation({ 0.0f, 45.0f, 0.0f });
 }
 
 void GameScene::Finalize()

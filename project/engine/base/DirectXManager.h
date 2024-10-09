@@ -11,17 +11,25 @@
 #include <chrono>
 #include <thread>
 #include <vector>
+#include <mutex>
 
 class DirectXManager
 {
-public: // メンバ関数
+private:
+	static DirectXManager* instance;
+	static std::once_flag initInstanceFlag;
+
+	DirectXManager() = default;
+	~DirectXManager() = default;
+	DirectXManager(DirectXManager&) = default;
+	DirectXManager& operator=(DirectXManager&) = default;
+public:
+	// シングルトンインスタンスの取得
+	static DirectXManager* GetInstance();
 	// 初期化
 	void Initialize(WindowManager* winManager);
-	~DirectXManager();
-
-public:
-
-
+	// 終了
+	void Finalize();
 
 private: // メンバ変数
 	// WindowAPI

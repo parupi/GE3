@@ -18,9 +18,9 @@ void Object3d::Initialize(Object3dManager* objectManager)
 
 void Object3d::Update()
 {
-	transform_.scale = model_->GetSize();
-	transform_.rotate = model_->GetRotation();
-	transform_.translate = model_->GetPosition();
+	//transform_.scale = model_->GetSize();
+	//transform_.rotate = model_->GetRotation();
+	//transform_.translate = model_->GetPosition();
 
 	Matrix4x4 worldMatrix = MakeAffineMatrix(transform_.scale, transform_.rotate, transform_.translate);
 	Matrix4x4 worldViewProjectionMatrix;

@@ -43,11 +43,22 @@ private: // メンバ変数
 	DirectionalLight* directionalLightData_ = nullptr;
 
 	Transform transform_;
-public: // ゲッター // セッター // 
+public: // ゲッター // セッター //
+	// 平行移動
+	const Vector3& GetPosition() const { return transform_.translate; }
+	void SetPosition(const Vector3& position) { transform_.translate = position; }
+	// 回転
+	const Vector3 GetRotation() const { return transform_.rotate; }
+	void SetRotation(Vector3 rotation) { transform_.rotate = rotation; }
+	// 拡縮
+	const Vector3& GetSize() const { return transform_.scale; }
+	void SetSize(const Vector3& size) { transform_.scale = size; }
 	// モデル
 	void SetModel(Model* model) { model_ = model; }
 	void SetModel(const std::string& filePath);
 	// カメラ
 	void SetCamera(Camera* camera) { camera_ = camera; }
+
+	
 };
 

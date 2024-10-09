@@ -24,7 +24,6 @@ void ModelManager::LoadModel(const std::string& filePath)
 		// 読み込み済みなら早期return
 		return;
 	}
-
 	// モデルの生成とファイルの読み込み
 	std::unique_ptr<Model> model = std::make_unique<Model>();
 	model->Initialize(modelLoader.get(), "resource", filePath);
