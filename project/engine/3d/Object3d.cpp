@@ -14,28 +14,6 @@ void Object3d::Initialize()
 	CreateMaterialResource();	
 }
 
-void Object3d::Update()
-{
-	
-	//matWorld_ = MakeAffineMatrix(scale_, rotation_, translation_);
-
-	//// 親がいる場合、親のワールド行列を適用
-	//if (parent_ != nullptr) {
-	//	matWorld_ = matWorld_ * parent_->matWorld_;
-	//}
-
-	//Matrix4x4 worldViewProjectionMatrix;
-	//if (camera_) {
-	//	const Matrix4x4& viewProjectionMatrix = camera_->GetViewProjectionMatrix();
-	//	worldViewProjectionMatrix = matWorld_ * viewProjectionMatrix;
-	//}
-	//else {
-	//	worldViewProjectionMatrix = matWorld_;
-	//}
-	//wvpData_->WVP = worldViewProjectionMatrix;
-	//wvpData_->World = matWorld_;
-}
-
 void Object3d::Draw(WorldTransform& worldTransform)
 {
 	camera_ = objectManager_->GetDefaultCamera();
@@ -59,17 +37,6 @@ void Object3d::Draw(WorldTransform& worldTransform)
 	if (model_){
 		model_->Draw();
 	}
-}
-
-void Object3d::CreateWVPResource()
-{
-	//// MVP用のリソースを作る。Matrix4x4 1つ分のサイズを用意する
-	//wvpResource_ = objectManager_->GetDxManager()->CreateBufferResource(sizeof(TransformationMatrix));
-	//// 書き込むためのアドレスを取得
-	//wvpResource_->Map(0, nullptr, reinterpret_cast<void**>(&wvpData_));
-	//// 単位行列を書き込んでおく
-	//wvpData_->World = MakeIdentity4x4();
-	//wvpData_->WVP = MakeIdentity4x4();
 }
 
 void Object3d::CreateDirectionalLightResource()

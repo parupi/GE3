@@ -19,10 +19,8 @@ public: // メンバ関数
 	~Object3d() = default;
 
 	void Initialize();
-	void Update();
 	void Draw(WorldTransform& worldTransform);
 private:
-	void CreateWVPResource();
 	void CreateDirectionalLightResource();
 	void CreateMaterialResource();
 private: // 構造体

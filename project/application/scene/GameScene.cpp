@@ -56,7 +56,6 @@ void GameScene::Update()
 	normalCamera_->SetTranslate(normalCameraPos);
 	bossCamera_->SetTranslate(bossCameraPos);
 
-	object_->Update();
 	worldTransform_.TransferMatrix();
 }
 
