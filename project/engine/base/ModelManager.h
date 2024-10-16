@@ -7,20 +7,19 @@
 class ModelManager
 {
 private:
-	static ModelManager* instance;
+	static std::unique_ptr<ModelManager> instance;
 	static std::once_flag initInstanceFlag;
 
-	ModelManager() = default;
-	~ModelManager() = default;
 	ModelManager(ModelManager&) = default;
 	ModelManager& operator=(ModelManager&) = default;
 public:
+	ModelManager() = default;
+	~ModelManager() = default;
 	// シングルトンインスタンスの取得
 	static ModelManager* GetInstance();
 	// 初期化
 	void Initialize(DirectXManager* dxManager);
-	// 終了
-	void Finalize();
+
 public:
 	// モデルファイル読み込み
 	void LoadModel(const std::string& filePath);

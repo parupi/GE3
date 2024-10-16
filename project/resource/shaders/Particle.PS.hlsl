@@ -3,7 +3,6 @@
 struct Material
 {
     float4 color;
-    int enableLighting;
     float4x4 uvTransform;
 };
 
@@ -16,15 +15,6 @@ struct PixelShaderOutput
 
 Texture2D<float4> gTexture : register(t0);
 SamplerState gSampler : register(s0);
-
-struct DirectionalLight
-{
-    float4 color; //!< ライトの色
-    float3 direction; //!< ライトの向き
-    float intensity; //!< 輝度
-};
-
-ConstantBuffer<DirectionalLight> gDirectionalLight : register(b1);
 
 PixelShaderOutput main(VertexShaderOutput input)
 {

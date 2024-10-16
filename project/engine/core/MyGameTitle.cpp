@@ -5,17 +5,17 @@ void MyGameTitle::Initialize()
 {
 	GuchisFramework::Initialize();
 	// ImGui初期化
-	ImGuiManager::GetInstance()->Initialize(winManager.get(), dxManager);
+	ImGuiManager::GetInstance()->Initialize(winManager.get(), dxManager.get());
 	// 2Dテクスチャマネージャーの初期化
-	TextureManager::GetInstance()->Initialize(dxManager, srvManager.get());
+	TextureManager::GetInstance()->Initialize(dxManager.get(), srvManager.get());
 	// 3Dテクスチャマネージャーの初期化
-	ModelManager::GetInstance()->Initialize(dxManager);
+	ModelManager::GetInstance()->Initialize(dxManager.get());
 	// パーティクルマネージャーの初期化
-	//ParticleManager::GetInstance()->Initialize(directXManager, srvManager);
+	ParticleManager::GetInstance()->Initialize(dxManager.get(), srvManager.get());
 	// スプライト共通部の初期化
-	SpriteManager::GetInstance()->Initialize(dxManager);
+	SpriteManager::GetInstance()->Initialize(dxManager.get());
 	// オブジェクト共通部
-	Object3dManager::GetInstance()->Initialize(dxManager);
+	Object3dManager::GetInstance()->Initialize(dxManager.get());
 
 	// 最初のシーンを生成
 	sceneFactory_ = std::make_unique<SceneFactory>();
@@ -38,7 +38,6 @@ void MyGameTitle::Update()
 {
 	ImGuiManager::GetInstance()->Begin();
 	GuchisFramework::Update();
-
 
 
 	ImGuiManager::GetInstance()->End();

@@ -2,6 +2,7 @@
 #include <function.h>
 #include <TextureManager.h>
 #include <numbers>
+#include <imgui.h>
 
 ParticleManager* ParticleManager::instance = nullptr;
 
@@ -35,11 +36,15 @@ void ParticleManager::Initialize(DirectXManager* dxManager, SrvManager* srvManag
 	CreatePipelineState();
 	// リソースの生成と値の設定
 	CreateParticleResource();
+	CreateMaterialResource();
+
+
 }
+
 
 void ParticleManager::Update()
 {
-	Matrix4x4 cameraMatrix = MakeAffineMatrix({1.0f, 1.0f, 1.0f}, camera_->GetRotate(), camera_->GetTranslate());
+	Matrix4x4 cameraMatrix = MakeAffineMatrix({ 1.0f, 1.0f, 1.0f }, camera_->GetRotate(), camera_->GetTranslate());
 	Matrix4x4 viewMatrix = Inverse(cameraMatrix);
 	Matrix4x4 projectionMatrix = MakePerspectiveFovMatrix(0.45f, float(1280) / float(720), 0.1f, 100.0f);
 	Matrix4x4 viewProjectionMatrix = Multiply(viewMatrix, projectionMatrix);
@@ -51,24 +56,27 @@ void ParticleManager::Update()
 	billboardMatrix.m[3][2] = 0.0f;
 
 	for (auto& [groupName, particleGroup] : particleGroups_) {
-		emitter.frequencyTime += kDeltaTime;
-		if (emitter.frequency <= emitter.frequencyTime) {
-			particles.splice(particles.end(), Emit(groupName, emitter.transform.translate, 3));
-			emitter.frequencyTime -= emitter.frequency;
-		}
+
 
 		uint32_t numInstance = 0;
 
-		for (std::list<Particle>::iterator particleIterator = particles.begin(); particleIterator != particles.end();) {
+		for (auto particleIterator = particleGroup.particleList.begin(); particleIterator != particleGroup.particleList.end();) {
 			if ((*particleIterator).lifeTime <= (*particleIterator).currentTime) {
-				particleIterator = particles.erase(particleIterator);
+				// パーティクルが生存時間を超えたら削除
+				particleIterator = particleGroup.particleList.erase(particleIterator);
 				continue;
 			}
 
+			if (numInstance >= kNumMaxInstance) {
+				break;
+			}
+
+			// パーティクルの更新処理
 			(*particleIterator).transform.translate += (*particleIterator).velocity * kDeltaTime;
 			(*particleIterator).currentTime += kDeltaTime;
 			float alpha = 1.0f - ((*particleIterator).currentTime / (*particleIterator).lifeTime);
 
+			// ワールド行列の計算
 			scaleMatrix = ScaleMatrixFromVector3((*particleIterator).transform.scale);
 			translateMatrix = TranslationMatrixFromVector3((*particleIterator).transform.translate);
 			Matrix4x4 worldMatrix{};
@@ -80,6 +88,7 @@ void ParticleManager::Update()
 			}
 			Matrix4x4 worldViewProjectionMatrix = Multiply(worldMatrix, viewProjectionMatrix);
 
+			// インスタンシングデータの設定
 			if (numInstance < kNumMaxInstance) {
 				instancingData_[numInstance].WVP = worldViewProjectionMatrix;
 				instancingData_[numInstance].World = worldMatrix;
@@ -88,10 +97,23 @@ void ParticleManager::Update()
 				++numInstance;
 			}
 
-			particleGroup.instanceCount = numInstance;
 			++particleIterator;
 		}
+
+		// インスタンス数の更新
+		particleGroup.instanceCount = numInstance;
+
+		// GPU メモリにインスタンスデータを書き込む
+		if (particleGroup.instancingDataPtr) {
+			std::memcpy(particleGroup.instancingDataPtr, instancingData_, sizeof(ParticleForGPU) * numInstance);
+		}
+
+
+
 	}
+	ImGui::Begin("Particle");
+	ImGui::SliderFloat4("color", &instancingData_[numInstance].color.x, 0.0f, 1.0f);
+	ImGui::End();
 }
 
 void ParticleManager::Draw()
@@ -102,16 +124,22 @@ void ParticleManager::Draw()
 	commandList->SetPipelineState(graphicsPipelineState_.Get());
 	commandList->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 	commandList->IASetVertexBuffers(0, 1, &vertexBufferView_);
+
 	// すべてのパーティクルグループを描画
 	for (auto& [groupName, particleGroup] : particleGroups_) {
-		// マテリアルCBufferの場所を指定
-		commandList->SetGraphicsRootConstantBufferView(0, instancingResource_->GetGPUVirtualAddress());
-		// SRVのDescriptorTableを設定
-		commandList->SetGraphicsRootDescriptorTable(1, srvHandleGPU_);
-		// テクスチャのSRVのDescriptorTableを設定
-		commandList->SetGraphicsRootDescriptorTable(2, TextureManager::GetInstance()->GetSrvHandleGPU(particleGroup.materialData.textureFilePath));
-		// パーティクルグループごとのインスタンス数を使って描画
-		commandList->DrawInstanced(6, particleGroup.instanceCount, 0, 0);
+		if (particleGroup.instanceCount > 0) {
+			// マテリアルCBufferの場所を指定
+			commandList->SetGraphicsRootConstantBufferView(0, materialResource_->GetGPUVirtualAddress());
+			// SRVのDescriptorTableを設定
+			commandList->SetGraphicsRootDescriptorTable(1, srvHandleGPU_);
+			// テクスチャのSRVのDescriptorTableを設定
+			   // テクスチャのSRVのDescriptorTableを設定
+			D3D12_GPU_DESCRIPTOR_HANDLE textureHandle = TextureManager::GetInstance()->GetSrvHandleGPU(particleGroup.materialData.textureFilePath);
+			commandList->SetGraphicsRootDescriptorTable(2, textureHandle);
+
+			commandList->DrawInstanced(6, particleGroup.instanceCount, 0, 0);
+
+		}
 	}
 }
 
@@ -128,6 +156,7 @@ void ParticleManager::CreateParticleGroup(const std::string name, const std::str
 
 	// テクスチャを読み込む（未読み込みならロードする）
 	particleGroup.materialData.textureFilePath = textureFilePath;
+	TextureManager::GetInstance()->LoadTexture(particleGroup.materialData.textureFilePath);
 	particleGroup.materialData.textureIndex = TextureManager::GetInstance()->GetTextureIndexByFilePath(textureFilePath);
 
 	// インスタンシング用リソースの生成
@@ -178,7 +207,7 @@ void ParticleManager::CreateRootSignature()
 	descriptionRootSignature.Flags = D3D12_ROOT_SIGNATURE_FLAG_ALLOW_INPUT_ASSEMBLER_INPUT_LAYOUT;
 
 	// RootParameter作成。PixelShaderのMaterialとVertezShaderのTransform
-	D3D12_ROOT_PARAMETER rootParameters[4] = {};
+	D3D12_ROOT_PARAMETER rootParameters[3] = {};
 	rootParameters[0].ParameterType = D3D12_ROOT_PARAMETER_TYPE_CBV;			// CBVを使う
 	rootParameters[0].ShaderVisibility = D3D12_SHADER_VISIBILITY_PIXEL;			// PixelShaderで使う
 	rootParameters[0].Descriptor.ShaderRegister = 0;							// レジスタ番号0とバインド
@@ -191,11 +220,7 @@ void ParticleManager::CreateRootSignature()
 	rootParameters[2].ParameterType = D3D12_ROOT_PARAMETER_TYPE_DESCRIPTOR_TABLE;			// DescriptorTableで使う
 	rootParameters[2].ShaderVisibility = D3D12_SHADER_VISIBILITY_PIXEL;						// PixelShaderで使う
 	rootParameters[2].DescriptorTable.pDescriptorRanges = descriptorRange;					// Tableの中身の配列を指定
-	rootParameters[2].DescriptorTable.NumDescriptorRanges = _countof(descriptorRange);		// Tableで利用する数
-
-	rootParameters[3].ParameterType = D3D12_ROOT_PARAMETER_TYPE_CBV;						// DescriptorTableで使う
-	rootParameters[3].ShaderVisibility = D3D12_SHADER_VISIBILITY_PIXEL;						// PixelShaderで使う
-	rootParameters[3].Descriptor.ShaderRegister = 1;										// レジスタ番号1を使う
+	rootParameters[2].DescriptorTable.NumDescriptorRanges = _countof(descriptorRange);		// Tableで利用する数								// レジスタ番号1を使う
 
 	descriptionRootSignature.pParameters = rootParameters;						// ルートパラメータ配列へのポインタ
 	descriptionRootSignature.NumParameters = _countof(rootParameters);			// 配列の長さ
@@ -251,6 +276,13 @@ void ParticleManager::CreateBlendState()
 {
 	// すべての色要素を書き込む
 	blendDesc_.RenderTarget[0].RenderTargetWriteMask = D3D12_COLOR_WRITE_ENABLE_ALL;
+	blendDesc_.RenderTarget[0].BlendEnable = TRUE;
+	blendDesc_.RenderTarget[0].SrcBlend = D3D12_BLEND_SRC_ALPHA;
+	blendDesc_.RenderTarget[0].BlendOp = D3D12_BLEND_OP_ADD;
+	blendDesc_.RenderTarget[0].DestBlend = D3D12_BLEND_ONE;
+	blendDesc_.RenderTarget[0].SrcBlendAlpha = D3D12_BLEND_ONE;
+	blendDesc_.RenderTarget[0].BlendOpAlpha = D3D12_BLEND_OP_ADD;
+	blendDesc_.RenderTarget[0].DestBlendAlpha = D3D12_BLEND_ZERO;
 }
 
 void ParticleManager::CreateRasterizerState()
@@ -319,8 +351,11 @@ void ParticleManager::CreateParticleResource()
 	instancingResource_->Map(0, nullptr, reinterpret_cast<void**>(&instancingData_));
 	// 単位行列を書き込んでおく
 	for (uint32_t index = 0; index < kNumMaxInstance; ++index) {
+
 		instancingData_[index].WVP = MakeIdentity4x4();
+
 		instancingData_[index].World = MakeIdentity4x4();
+		instancingData_[index].color = { 1.0f, 1.0f, 1.0f, 1.0f };
 	}
 
 	// モデルの読み込み
@@ -333,7 +368,7 @@ void ParticleManager::CreateParticleResource()
 	modelData.vertices.push_back({ .position = {-1.0f, -1.0f, 0.0f, 1.0f}, .texcoord = {1.0f, 1.0f}, .normal = {0.0f, 0.0f, 1.0f} });
 	//modelData.material.textureFilePath = "resource/uvChecker.png";
 	// 頂点リソースを作る
-	Microsoft::WRL::ComPtr<ID3D12Resource> vertexResource = dxManager_->CreateBufferResource(sizeof(VertexData) * modelData.vertices.size());
+	vertexResource = dxManager_->CreateBufferResource(sizeof(VertexData) * modelData.vertices.size());
 	// 頂点バッファビューを作成する
 	vertexBufferView_.BufferLocation = vertexResource->GetGPUVirtualAddress();	// リソースの先頭アドレスから使う
 	vertexBufferView_.SizeInBytes = UINT(sizeof(VertexData) * modelData.vertices.size());		// 使用するリソースのサイズは頂点のサイズ
@@ -344,22 +379,24 @@ void ParticleManager::CreateParticleResource()
 	std::memcpy(vertexData_, modelData.vertices.data(), sizeof(VertexData) * modelData.vertices.size());
 }
 
-void ParticleManager::CreateWVPResource()
+void ParticleManager::CreateMaterialResource()
 {
-	//// WVP用のリソースを作る。Matrix4x4 1つ分のサイズを用意する
-	//wvpResource_ = dxManager_->CreateBufferResource(sizeof(TransformationMatrix));
-	//// データを書き込む
-	//wvpData_ = nullptr;
-	//// 書き込むためのアドレスを取得
-	//wvpResource_->Map(0, nullptr, reinterpret_cast<void**>(&wvpData_));
-	//// 単位行列を書き込んでおく
-	//wvpData_->World = MakeIdentity4x4();
-	//wvpData_->WVP = MakeIdentity4x4();
+	// マテリアル用のリソースを作る。
+	materialResource_ = dxManager_->CreateBufferResource(sizeof(Material));
+	// マテリアルにデータを書き込む
+	materialData_ = nullptr;
+	// 書き込むためのアドレスを取得
+	materialResource_->Map(0, nullptr, reinterpret_cast<void**>(&materialData_));
+	// 白を入れる
+	materialData_->color = { 1.0f, 1.0f, 1.0f, 1.0f };
+	//materialData_->enableLighting = true;
+	materialData_->uvTransform = MakeIdentity4x4();
 }
 
 ParticleManager::Particle ParticleManager::MakeNewParticle(std::mt19937& randomEngine, const Vector3& translate)
 {
 	std::uniform_real_distribution<float> distribution(-1.0f, 1.0f);
+	std::uniform_real_distribution<float> distColor(0.0f, 1.0f);
 	std::uniform_real_distribution<float> distTime(1.0f, 3.0f);
 	Particle particle;
 	particle.transform.scale = { 1.0f, 1.0f, 1.0f };
@@ -367,7 +404,7 @@ ParticleManager::Particle ParticleManager::MakeNewParticle(std::mt19937& randomE
 	Vector3 randomTranslate = { distribution(randomEngine), distribution(randomEngine), distribution(randomEngine) };
 	particle.transform.translate = translate + randomTranslate;
 	particle.velocity = { distribution(randomEngine), distribution(randomEngine), distribution(randomEngine) };
-	particle.color = { distribution(randomEngine) , distribution(randomEngine) , distribution(randomEngine) , 1.0f };
+	particle.color = { distColor(randomEngine) , distColor(randomEngine) , distColor(randomEngine) , 1.0f };
 	particle.lifeTime = distTime(randomEngine);
 	particle.currentTime = 0.0f;
 
@@ -376,9 +413,12 @@ ParticleManager::Particle ParticleManager::MakeNewParticle(std::mt19937& randomE
 
 std::list<ParticleManager::Particle> ParticleManager::Emit(const std::string name, const Vector3& position, uint32_t count)
 {
-	std::list<Particle> particles;
+	ParticleGroup& particleGroup = particleGroups_[name];
+	std::list<Particle> newParticles;
 	for (uint32_t nowCount = 0; nowCount < count; ++nowCount) {
-		particles.push_back(MakeNewParticle(randomEngine, emitter.transform.translate));
+		Particle particle =MakeNewParticle(randomEngine, position);
+		newParticles.push_back(particle);
 	}
-	return particles;
+	particleGroup.particleList.splice(particleGroup.particleList.end(), newParticles);
+	return newParticles;
 }

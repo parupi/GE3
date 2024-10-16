@@ -7,125 +7,54 @@
 void GameScene::Initialize()
 {
 	// カメラの生成
-	camera = std::make_unique<Camera>();
-	Object3dManager::GetInstance()->SetDefaultCamera(camera.get());
+	normalCamera_ = std::make_shared<Camera>();
+	bossCamera_ = std::make_shared<Camera>();
+	cameraManager_.AddCamera(normalCamera_);
+	cameraManager_.AddCamera(bossCamera_);
+	cameraManager_.SetActiveCamera(0);
+	normalCamera_->SetTranslate(Vector3{ 0.0f, 10.0f, -30.0f });
+	bossCamera_->SetTranslate(Vector3{ 0.0f, 0.0f, -100.0f });
 
-	// Textureのロード
-	TextureManager::GetInstance()->LoadTexture("resource/uvChecker.png");
-	TextureManager::GetInstance()->LoadTexture("resource/monsterBall.png");
 	// .objファイルからモデルを読み込む
 	ModelManager::GetInstance()->LoadModel("plane.obj");
-	ModelManager::GetInstance()->LoadModel("axis.obj");
-	// パーティクルのグループを生成
-	//ParticleManager::GetInstance()->CreateParticleGroup("circle", "resource/uvChecker.png");
-	// パーティクルにカメラをセットする
-	//ParticleManager::GetInstance()->SetCamera(camera.get());
-	Audio::GetInstance()->SoundLoadWave("resource/sound/fanfare.wav");
-	Audio::GetInstance()->SoundPlayWave(Audio::GetInstance()->GetSoundData()["resource/sound/fanfare.wav"]);
 
-	// Spriteの初期化
-	for (uint32_t i = 0; i < 2; ++i) {
-		Sprite* sprite = new Sprite();
-		if (i == 1) {
-			sprite->Initialize("resource/monsterBall.png");
-		}
-		else {
-			sprite->Initialize("resource/uvChecker.png");
-		}
-
-		Vector2 initialPosition = Vector2{ 48.0f * i, 0.0f }; // 各スプライトを100ピクセルずつ右にずらして配置
-		sprite->SetPosition(initialPosition);
-
-		sprites.push_back(sprite);
-	}
-
-	for (int i = 0; i < 2; ++i) {
-		// Object3dの初期化
-		Object3d* object = new Object3d();
-		object->Initialize();
-		if (i == 1) {
-			object->SetModel("plane.obj");
-		}
-		else {
-			object->SetModel("axis.obj");
-		}
-
-		objects.push_back(object);
-	}
-	
-	// それぞれのObject3dに位置や回転を設定
-	objects[0]->SetPosition({ -2.0f, 0.0f, 0.0f });
-	objects[0]->SetRotation({ 0.0f, 0.0f, 0.0f });
-
-	objects[1]->SetPosition({ 2.0f, 0.0f, 0.0f });
-	objects[1]->SetRotation({ 0.0f, 45.0f, 0.0f });
+	object_ = new Object3d();
+	object_->Initialize();
+	object_->SetModel("plane.obj");
 }
 
 void GameScene::Finalize()
 {
-	for (Sprite* sprite : sprites) {
-		delete sprite;
-	}
-	for (Object3d* object : objects) {
-		delete object;
-		object = nullptr;
-	}
-	//for (Model* model : models) {
-	//	delete model;
-	//	model = nullptr;
-	//}
+
 }
 
 void GameScene::Update()
 {
-	camera->Update();
+	cameraManager_.Update();
 
+	Vector3 normalCameraPos = normalCamera_->GetTranslate();
+	Vector3 bossCameraPos = bossCamera_->GetTranslate();
 
+	ImGui::Begin("Camera Manager");
+	ImGui::DragFloat3("normalPos", &normalCameraPos.x, 0.01f);
+	ImGui::DragFloat3("bossPos", &bossCameraPos.x, 0.01f);
 
-	ImGui::Begin("obj");
-	ImGui::SliderFloat4("obj1", &color1.x, 0.0f, 1.0f);
-	ImGui::SliderFloat4("obj2", &color2.x, 0.0f, 1.0f);
+	if (ImGui::Button("Set Camera 1"))
+	{
+		cameraManager_.SetActiveCamera(0);
+	}
+	if (ImGui::Button("Set Camera 2"))
+	{
+		cameraManager_.SetActiveCamera(1);
+	}
 	ImGui::End();
 
-	objects[0]->SetColor(color1);
-	objects[1]->SetColor(color2);
+	normalCameraPos += {0.0f, 0.0f, 0.01f};
 
-	// ゲームの処理
-	for (auto& object : objects) {
-		object->Update();
-	}
+	normalCamera_->SetTranslate(normalCameraPos);
+	bossCamera_->SetTranslate(bossCameraPos);
 
-	
-	for (Sprite* sprite : sprites) {
-		// 平行移動用処理
-		//Vector2 position = sprite->GetPosition();
-		//position += Vector2{ 1.0f, 1.0f };
-		//sprite->SetPosition(position);
-		// 回転
-		//float rotation = sprite->GetRotation();
-		//rotation += 0.01f;
-		//sprite->SetRotation(rotation);
-		// 拡縮
-		Vector2 size = sprite->GetSize();
-		size.x = 50.0f;
-		size.y = 50.0f;
-		sprite->SetSize(size);
-		// 色
-		//Vector4 color = sprite->GetColor();
-		//color.x += 0.01f;
-		//if (color.x > 1.0f) {
-		//	color.x -= 1.0f;
-		//}
-		//sprite->SetColor(color);
-		//sprite->SetIsFlipX(true);
-		//sprite->SetIsFlipY(true);
-		sprite->Update();
-	}
-
-
-	// パーティクルのアップデート
-	//ParticleManager::GetInstance()->Update();
-
+	object_->Update();
 }
 
 void GameScene::Draw()
@@ -133,18 +62,5 @@ void GameScene::Draw()
 	// 3Dオブジェクト描画前処理
 	Object3dManager::GetInstance()->DrawSet();
 
-	for (auto& object : objects) {
-		object->Draw();
-	}
-
-	// スプライト描画前処理
-	SpriteManager::GetInstance()->DrawSet();
-
-	for (Sprite* sprite : sprites) {
-		sprite->Draw();
-	}
-
-	// パーティクルの描画
-//ParticleManager::GetInstance()->Draw();
-
+	object_->Draw();
 }

@@ -12,28 +12,32 @@ void Object3d::Initialize()
 	CreateDirectionalLightResource();
 	CreateMaterialResource();
 
-	transform_ = { {1.0f,1.0f,1.0f},{0.0f,0.0f,0.0f},{0.0f,0.0f,0.0f} };
+	//transform_ = { {1.0f,1.0f,1.0f},{0.0f,0.0f,0.0f},{0.0f,0.0f,0.0f} };
 	
-	camera_ = objectManager_->GetDefaultCamera();
+	
 }
 
 void Object3d::Update()
 {
-	//transform_.scale = model_->GetSize();
-	//transform_.rotate = model_->GetRotation();
-	//transform_.translate = model_->GetPosition();
+	camera_ = objectManager_->GetDefaultCamera();
+	matWorld_ = MakeAffineMatrix(scale_, rotation_, translation_);
 
-	Matrix4x4 worldMatrix = MakeAffineMatrix(transform_.scale, transform_.rotate, transform_.translate);
+	// 親がいる場合、親のワールド行列を適用
+	if (parent_ != nullptr) {
+		matWorld_ = matWorld_ * parent_->matWorld_;
+	}
+
+	//Matrix4x4 worldMatrix = MakeAffineMatrix(transform_.scale, transform_.rotate, transform_.translate);
 	Matrix4x4 worldViewProjectionMatrix;
 	if (camera_) {
 		const Matrix4x4& viewProjectionMatrix = camera_->GetViewProjectionMatrix();
-		worldViewProjectionMatrix = worldMatrix * viewProjectionMatrix;
+		worldViewProjectionMatrix = matWorld_ * viewProjectionMatrix;
 	}
 	else {
-		worldViewProjectionMatrix = worldMatrix;
+		worldViewProjectionMatrix = matWorld_;
 	}
 	wvpData_->WVP = worldViewProjectionMatrix;
-	wvpData_->World = worldMatrix;
+	wvpData_->World = matWorld_;
 }
 
 void Object3d::Draw()
@@ -80,7 +84,7 @@ void Object3d::CreateMaterialResource()
 	// 書き込むためのアドレスを取得
 	materialResource_->Map(0, nullptr, reinterpret_cast<void**>(&materialData_));
 	// 白を入れる
-	materialData_->color = { 1.0f, 1.0f, 1.0f, 0.0f };
+	materialData_->color = { 1.0f, 1.0f, 1.0f, 1.0f };
 	materialData_->enableLighting = true;
 	materialData_->uvTransform = MakeIdentity4x4();
 }

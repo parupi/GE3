@@ -6,11 +6,11 @@ void GuchisFramework::Initialize()
 	winManager = std::make_unique<WindowManager>();
 	winManager->Initialize();
 	// DirectXの初期化
-	dxManager = DirectXManager::GetInstance();
+	dxManager = std::make_unique<DirectXManager>();
 	dxManager->Initialize(winManager.get());
 	// SRVマネージャーの初期化
 	srvManager = std::make_unique<SrvManager>();
-	srvManager->Initialize(dxManager);
+	srvManager->Initialize(dxManager.get());
 	// 入力の初期化
 	Input::GetInstance()->Initialize(winManager.get());
 	// Audioの初期化
@@ -21,7 +21,6 @@ void GuchisFramework::Finalize()
 {
 	SceneManager::GetInstance()->Finalize();
 	Input::GetInstance()->Finalize();
-	dxManager->Finalize();
 	winManager->Finalize();
 }
 

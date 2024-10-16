@@ -34,6 +34,7 @@ public:
 
 	// カメラをセットする
 	void SetCamera(Camera* camera) { camera_ = camera; }
+
 private: // 構造体
 
 	struct Color {
@@ -76,12 +77,12 @@ private: // 構造体
 		ParticleForGPU* instancingDataPtr;  // インスタンシングデータを書き込むためのポインタ
 	};
 
-	struct Emitter {
-		Transform transform; //!< エミッタのTransform
-		uint32_t count; //!< 発生数
-		float frequency; //!< 発生頻度
-		float frequencyTime; //!< 頻度用時刻
-	};
+	//struct Emitter {
+	//	Transform transform; //!< エミッタのTransform
+	//	uint32_t count; //!< 発生数
+	//	float frequency; //!< 発生頻度
+	//	float frequencyTime; //!< 頻度用時刻
+	//};
 
 	struct TransformationMatrix {
 		Matrix4x4 WVP;
@@ -99,6 +100,11 @@ private: // 構造体
 		MaterialData material;
 	};
 
+	struct Material {
+		Vector4 color;
+		Matrix4x4 uvTransform;
+		float padding[3];
+	};
 private:
 
 	void CreateRootSignature();
@@ -110,11 +116,15 @@ private:
 	// パーティクル用のリソースの生成
 	void CreateParticleResource();
 	// WVP用のリソースを生成 
-	void CreateWVPResource();
+	void CreateMaterialResource();
 	// パーティクルを生成する関数
 	Particle MakeNewParticle(std::mt19937& randomEngine, const Vector3& translate);
+
+public:
+
 	// nameで指定した名前のパーティクルグループにパーティクルを発生させる関数
 	std::list<Particle> Emit(const std::string name, const Vector3& position, uint32_t count);
+
 private:
 	// ルートシグネチャ
 	Microsoft::WRL::ComPtr<ID3D12RootSignature> rootSignature_ = nullptr;
@@ -143,7 +153,9 @@ private:
 	const uint32_t kNumMaxInstance = 128;	// 最大インスタンス数
 	// パーティクル用リソースの宣言
 	Microsoft::WRL::ComPtr<ID3D12Resource> instancingResource_;
+	Microsoft::WRL::ComPtr<ID3D12Resource> materialResource_;
 	ParticleForGPU* instancingData_ = nullptr;
+	Material* materialData_;
 	VertexData* vertexData_ = nullptr;
 
 	D3D12_CPU_DESCRIPTOR_HANDLE srvHandleCPU_;
@@ -157,7 +169,9 @@ private:
 	Matrix4x4 scaleMatrix;
 	Matrix4x4 translateMatrix;
 
-	Emitter emitter{};
+
 	std::list<Particle> particles;
 	uint32_t numInstance = 0;
+
+	Microsoft::WRL::ComPtr<ID3D12Resource> vertexResource;
 };

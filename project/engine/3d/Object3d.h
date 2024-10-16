@@ -14,6 +14,8 @@ class Object3dManager;
 class Object3d
 {
 public: // メンバ関数
+	Object3d() = default;
+	~Object3d() = default;
 	void Initialize();
 	void Update();
 	void Draw();
@@ -39,7 +41,6 @@ private: // 構造体
 		float padding[3];
 		Matrix4x4 uvTransform;
 	};
-
 private: // メンバ変数
 	Object3dManager* objectManager_ = nullptr;
 	Model* model_ = nullptr;
@@ -53,25 +54,42 @@ private: // メンバ変数
 	DirectionalLight* directionalLightData_ = nullptr;
 	Material* materialData_ = nullptr;
 
-	Transform transform_;
-public: // ゲッター // セッター //
-	// 平行移動
-	const Vector3& GetPosition() const { return transform_.translate; }
-	void SetPosition(const Vector3& position) { transform_.translate = position; }
-	// 回転
-	const Vector3 GetRotation() const { return transform_.rotate; }
-	void SetRotation(Vector3 rotation) { transform_.rotate = rotation; }
-	// 拡縮
-	const Vector3& GetSize() const { return transform_.scale; }
-	void SetSize(const Vector3& size) { transform_.scale = size; }
+	// コピー禁止
+	Object3d(const Object3d&) = delete;
+	Object3d& operator=(const Object3d&) = delete;
+public: // 汎用化変数
+	// ローカルスケール
+	Vector3 scale_ = { 1, 1, 1 };
+	// X,Y,Z軸回りのローカル回転角
+	Vector3 rotation_ = { 0, 0, 0 };
+	// ローカル座標
+	Vector3 translation_ = { 0, 0, 0 };
+	// ローカル → ワールド変換行列
+	Matrix4x4 matWorld_;
+	// 親となるワールド変換へのポインタ
+	const Object3d* parent_ = nullptr;
+public: // ゲッター // セッター // 
 	// モデル
 	void SetModel(Model* model) { model_ = model; }
 	void SetModel(const std::string& filePath);
 	// カメラ
 	void SetCamera(Camera* camera) { camera_ = camera; }
+
+	// 平行移動
+	const Vector3& GetTranslate() const { return translation_; }
+	void SetTranslate(const Vector3& translation) { translation_ = translation; }
+	// 回転
+	const Vector3 GetRotation() const { return rotation_; }
+	void SetRotation(Vector3 rotation) { rotation_ = rotation; }
+	// 拡縮
+	const Vector3& GetScale() const { return scale_; }
+	void SetScale(const Vector3& size) { scale_ = size; }
 	// 色
 	const Vector4& GetColor() const { return materialData_->color; }
 	void SetColor(const Vector4& color) { materialData_->color = color; }
-	
+	// Lighting
+	const bool& GetIsLighting() const { return materialData_->enableLighting; }
+	void SetIsLighting(const bool isLighting) { materialData_->enableLighting = isLighting; }
 };
 
+static_assert(!std::is_copy_assignable_v<Object3d>);

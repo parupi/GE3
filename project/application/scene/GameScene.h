@@ -7,6 +7,7 @@
 #include <BaseScene.h>
 #include <memory>
 #include <Audio.h>
+#include <CameraManager.h>
 class GameScene : public BaseScene
 {
 public:
@@ -20,10 +21,11 @@ public:
 	void Draw() override;
 
 private:
-	std::unique_ptr<Camera> camera = nullptr;
+	CameraManager cameraManager_;
+	std::shared_ptr<Camera> normalCamera_;
+	std::shared_ptr<Camera> bossCamera_;
 
-	std::vector<Object3d*> objects;
-	//std::vector<Model*> models;
+	Object3d* object_;
 	std::vector<Sprite*> sprites;
 
 	Vector4 color1 = { 1.0f, 1.0f, 1.0f, 1.0f };

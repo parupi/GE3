@@ -34,7 +34,7 @@ protected:
 	std::unique_ptr<D3DResourceLeakChecker> leakCheck;
 
 	std::unique_ptr<WindowManager> winManager = nullptr;
-	DirectXManager* dxManager = nullptr;
+	std::unique_ptr<DirectXManager> dxManager = nullptr;
 	std::unique_ptr<SrvManager> srvManager = nullptr;
 	std::unique_ptr<AbstractSceneFactory> sceneFactory_ = nullptr;
 };
