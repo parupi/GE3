@@ -12,6 +12,17 @@
 
 using namespace Microsoft::WRL;
 
+DirectXManager* DirectXManager::instance = nullptr;
+std::once_flag DirectXManager::initInstanceFlag;
+
+DirectXManager* DirectXManager::GetInstance()
+{
+	std::call_once(initInstanceFlag, []() {
+		instance = new DirectXManager();
+		});
+	return instance;
+}
+
 void DirectXManager::Initialize(WindowManager* winManager)
 {
 	assert(winManager);
@@ -36,13 +47,15 @@ void DirectXManager::Initialize(WindowManager* winManager)
 
 }
 
-DirectXManager::~DirectXManager()
+void DirectXManager::Finalize()
 {
 	if (fenceEvent_) {
 		CloseHandle(fenceEvent_);
 	}
-}
 
+	delete instance;
+	instance = nullptr;
+}
 
 ComPtr<ID3D12DescriptorHeap> DirectXManager::CreateDescriptorHeap(ComPtr<ID3D12Device> device, D3D12_DESCRIPTOR_HEAP_TYPE heapType, UINT numDescriptors, bool shaderVisible)
 {

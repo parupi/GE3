@@ -21,11 +21,13 @@ void GameScene::Initialize()
 	object_ = new Object3d();
 	object_->Initialize();
 	object_->SetModel("plane.obj");
+
+	worldTransform_.Initialize();
 }
 
 void GameScene::Finalize()
 {
-
+	
 }
 
 void GameScene::Update()
@@ -55,6 +57,7 @@ void GameScene::Update()
 	bossCamera_->SetTranslate(bossCameraPos);
 
 	object_->Update();
+	worldTransform_.TransferMatrix();
 }
 
 void GameScene::Draw()
@@ -62,5 +65,5 @@ void GameScene::Draw()
 	// 3Dオブジェクト描画前処理
 	Object3dManager::GetInstance()->DrawSet();
 
-	object_->Draw();
+	object_->Draw(worldTransform_);
 }

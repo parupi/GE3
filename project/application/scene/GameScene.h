@@ -8,6 +8,7 @@
 #include <memory>
 #include <Audio.h>
 #include <CameraManager.h>
+#include <WorldTransform.h>
 class GameScene : public BaseScene
 {
 public:
@@ -21,6 +22,8 @@ public:
 	void Draw() override;
 
 private:
+	WorldTransform worldTransform_;
+
 	CameraManager cameraManager_;
 	std::shared_ptr<Camera> normalCamera_;
 	std::shared_ptr<Camera> bossCamera_;
