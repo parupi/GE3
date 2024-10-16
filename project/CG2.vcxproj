@@ -139,6 +139,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="engine\scene\SceneManager.cpp" />
     <ClCompile Include="engine\scene\SceneFactory.cpp" />
     <ClCompile Include="engine\base\ParticleEmitter.cpp" />
+    <ClCompile Include="engine\3d\WorldTransform.cpp" />
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="resource\shaders\Object3d.PS.hlsl">
@@ -202,6 +203,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="engine\scene\SceneManager.h" />
     <ClInclude Include="engine\scene\SceneFactory.h" />
     <ClInclude Include="engine\base\ParticleEmitter.h" />
+    <ClInclude Include="engine\3d\WorldTransform.h" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="externals\imgui\LICENSE.txt" />
