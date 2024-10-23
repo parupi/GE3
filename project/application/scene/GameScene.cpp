@@ -21,6 +21,8 @@ void GameScene::Initialize()
 	object_ = new Object3d();
 	object_->Initialize();
 	object_->SetModel("plane.obj");
+
+
 }
 
 void GameScene::Finalize()
@@ -54,7 +56,7 @@ void GameScene::Update()
 	normalCamera_->SetTranslate(normalCameraPos);
 	bossCamera_->SetTranslate(bossCameraPos);
 
-	object_->Update();
+	//object_->Update();
 }
 
 void GameScene::Draw()
@@ -62,5 +64,5 @@ void GameScene::Draw()
 	// 3Dオブジェクト描画前処理
 	Object3dManager::GetInstance()->DrawSet();
 
-	object_->Draw();
+	//object_->Draw();
 }

@@ -29,7 +29,10 @@ float Dot(const Vector3& v1, const Vector3& v2);
 float Length(const Vector3& v);
 
 // 正規化
+float Normalize(float value);
 Vector3 Normalize(const Vector3& v);
+
+float Lerp(float a, float b, float t);
 
 // 平行移動行列
 Matrix4x4 MakeTranslateMatrix(const Vector3& translate);
@@ -39,6 +42,7 @@ Matrix4x4 MakeScaleMatrix(const Vector3& scale);
 
 // 座標変換
 //Vector3 Transform(const Vector3& vector, const Matrix4x4& matrix);
+Vector3 Transformm_(const Vector3& vector, const Matrix4x4& matrix);
 
 // 行列の加法
 Matrix4x4 Add(const Matrix4x4& m1, const Matrix4x4& m2);

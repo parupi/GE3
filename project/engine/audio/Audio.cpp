@@ -24,7 +24,7 @@ void Audio::Initialize()
 
 void Audio::SoundLoadWave(const char* filename)
 {
-	HRESULT result;
+	//HRESULT result;
 	
 	// ファイル入力streamのインスタンス
 	std::ifstream file;

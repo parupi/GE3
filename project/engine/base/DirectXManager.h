@@ -14,14 +14,11 @@
 
 class DirectXManager
 {
-public: // メンバ関数
+public:
 	// 初期化
 	void Initialize(WindowManager* winManager);
-	~DirectXManager();
-
-public:
-
-
+	// 終了
+	void Finalize();
 
 private: // メンバ変数
 	// WindowAPI

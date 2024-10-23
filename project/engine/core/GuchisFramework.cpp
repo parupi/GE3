@@ -22,6 +22,7 @@ void GuchisFramework::Finalize()
 	SceneManager::GetInstance()->Finalize();
 	Input::GetInstance()->Finalize();
 	winManager->Finalize();
+	dxManager->Finalize();
 }
 
 void GuchisFramework::Update()

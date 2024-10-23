@@ -9,6 +9,9 @@ public: // メンバ関数
 	// 更新
 	void Update();
 
+	// フォローカメラ
+	void FollowCamera(const Vector3& target);
+
 private:
 	Transform transform_;
 	Matrix4x4 worldMatrix_;
@@ -23,6 +26,10 @@ private:
 	float nearClip_;
 	// ファークリップ距離
 	float farClip_;
+
+	Vector3 followCameraOffsetPosition_ = Vector3(0.0f, 30.0f, -50.0f);
+
+	Vector3 followCameraOffsetRotare_ = Vector3(0.51f, 0.0f, 0.0f);
 
 public: // ゲッター // セッター //
 	// 回転

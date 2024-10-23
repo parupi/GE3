@@ -36,13 +36,12 @@ void DirectXManager::Initialize(WindowManager* winManager)
 
 }
 
-DirectXManager::~DirectXManager()
+void DirectXManager::Finalize()
 {
 	if (fenceEvent_) {
 		CloseHandle(fenceEvent_);
 	}
 }
-
 
 ComPtr<ID3D12DescriptorHeap> DirectXManager::CreateDescriptorHeap(ComPtr<ID3D12Device> device, D3D12_DESCRIPTOR_HEAP_TYPE heapType, UINT numDescriptors, bool shaderVisible)
 {
@@ -280,16 +279,6 @@ Microsoft::WRL::ComPtr<ID3D12Resource> DirectXManager::CreateBufferResource(size
 
 	return resource;
 }
-
-//D3D12_CPU_DESCRIPTOR_HANDLE DirectXManager::GetSRVCPUDescriptorHandle(uint32_t index)
-//{
-//	return GetCPUDescriptorHandle(srvHeap_, descriptorSizeSRV_, index);
-//}
-//
-//D3D12_GPU_DESCRIPTOR_HANDLE DirectXManager::GetSRVGPUDescriptorHandle(uint32_t index)
-//{
-//	return GetGPUDescriptorHandle(srvHeap_, descriptorSizeSRV_, index);
-//}
 
 void DirectXManager::InitializeDXGIDevice()
 {

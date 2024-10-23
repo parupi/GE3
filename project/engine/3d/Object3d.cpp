@@ -1,80 +1,42 @@
 #include "Object3d.h"
 #include "Object3dManager.h"
-
 #include "TextureManager.h"
 #include "imgui.h"
+#include <WorldTransform.h>
+#include <numbers>
 
 void Object3d::Initialize()
 {
 	objectManager_ = Object3dManager::GetInstance();
 
-	CreateWVPResource();
-	CreateDirectionalLightResource();
-	CreateMaterialResource();
-
-	//transform_ = { {1.0f,1.0f,1.0f},{0.0f,0.0f,0.0f},{0.0f,0.0f,0.0f} };
-	
-	
+	CreateMaterialResource();	
+	CreateCameraResource();
 }
 
-void Object3d::Update()
+void Object3d::Draw(WorldTransform& worldTransform)
 {
 	camera_ = objectManager_->GetDefaultCamera();
-	matWorld_ = MakeAffineMatrix(scale_, rotation_, translation_);
-
-	// 親がいる場合、親のワールド行列を適用
-	if (parent_ != nullptr) {
-		matWorld_ = matWorld_ * parent_->matWorld_;
-	}
-
-	//Matrix4x4 worldMatrix = MakeAffineMatrix(transform_.scale, transform_.rotate, transform_.translate);
+	cameraData_->worldPosition = camera_->GetTranslate();
 	Matrix4x4 worldViewProjectionMatrix;
 	if (camera_) {
 		const Matrix4x4& viewProjectionMatrix = camera_->GetViewProjectionMatrix();
-		worldViewProjectionMatrix = matWorld_ * viewProjectionMatrix;
+		worldViewProjectionMatrix = worldTransform.GetMatWorld() * viewProjectionMatrix;
 	}
 	else {
-		worldViewProjectionMatrix = matWorld_;
+		worldViewProjectionMatrix = worldTransform.GetMatWorld();
 	}
-	wvpData_->WVP = worldViewProjectionMatrix;
-	wvpData_->World = matWorld_;
-}
+	worldTransform.SetMapWVP(worldViewProjectionMatrix);
 
-void Object3d::Draw()
-{
 	// wvp用のCBufferの場所を設定
-	objectManager_->GetDxManager()->GetCommandList()->SetGraphicsRootConstantBufferView(1, wvpResource_->GetGPUVirtualAddress());
-	// directionalLightの場所を指定
-	objectManager_->GetDxManager()->GetCommandList()->SetGraphicsRootConstantBufferView(3, directionalLightResource_->GetGPUVirtualAddress());
+	objectManager_->GetDxManager()->GetCommandList()->SetGraphicsRootConstantBufferView(1, worldTransform.GetConstBuffer()->GetGPUVirtualAddress());
+	// cameraの場所を指定
+	objectManager_->GetDxManager()->GetCommandList()->SetGraphicsRootConstantBufferView(4, cameraResource_->GetGPUVirtualAddress());
 	// マテリアルCBufferの場所を指定
 	objectManager_->GetDxManager()->GetCommandList()->SetGraphicsRootConstantBufferView(0, materialResource_->GetGPUVirtualAddress());
 	// 3Dモデルが割り当てられていれば描画する
 	if (model_){
 		model_->Draw();
 	}
-}
-
-void Object3d::CreateWVPResource()
-{
-	// MVP用のリソースを作る。Matrix4x4 1つ分のサイズを用意する
-	wvpResource_ = objectManager_->GetDxManager()->CreateBufferResource(sizeof(TransformationMatrix));
-	// 書き込むためのアドレスを取得
-	wvpResource_->Map(0, nullptr, reinterpret_cast<void**>(&wvpData_));
-	// 単位行列を書き込んでおく
-	wvpData_->World = MakeIdentity4x4();
-	wvpData_->WVP = MakeIdentity4x4();
-}
-
-void Object3d::CreateDirectionalLightResource()
-{
-	// 平行光源用のリソースを作る
-	directionalLightResource_ = objectManager_->GetDxManager()->CreateBufferResource(sizeof(DirectionalLight));
-	// 書き込むためのアドレスを取得
-	directionalLightResource_->Map(0, nullptr, reinterpret_cast<void**>(&directionalLightData_));
-	// 今回は白を書き込んで置く
-	directionalLightData_->color = { 1.0f, 1.0f, 1.0f, 1.0f };
-	directionalLightData_->direction = { 0.0f, -1.0f, 0.0f };
-	directionalLightData_->intensity = 1.0f;
 }
 
 void Object3d::CreateMaterialResource()
@@ -87,6 +49,17 @@ void Object3d::CreateMaterialResource()
 	materialData_->color = { 1.0f, 1.0f, 1.0f, 1.0f };
 	materialData_->enableLighting = true;
 	materialData_->uvTransform = MakeIdentity4x4();
+	materialData_->shininess = 20.0f;
+}
+
+void Object3d::CreateCameraResource()
+{
+	// カメラ用のリソースを作る
+	cameraResource_ = objectManager_->GetDxManager()->CreateBufferResource(sizeof(CameraForGPU));
+	// 書き込むためのアドレスを取得
+	cameraResource_->Map(0, nullptr, reinterpret_cast<void**>(&cameraData_));
+	// 初期値を入れる
+	cameraData_->worldPosition = { 1.0f, 1.0f, 1.0f };
 }
 
 void Object3d::SetModel(const std::string& filePath)

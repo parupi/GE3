@@ -111,9 +111,9 @@ void ParticleManager::Update()
 
 
 	}
-	ImGui::Begin("Particle");
-	ImGui::SliderFloat4("color", &instancingData_[numInstance].color.x, 0.0f, 1.0f);
-	ImGui::End();
+	//ImGui::Begin("Particle");
+	//ImGui::SliderFloat4("color", &instancingData_[numInstance].color.x, 0.0f, 1.0f);
+	//ImGui::End();
 }
 
 void ParticleManager::Draw()

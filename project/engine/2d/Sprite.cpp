@@ -100,6 +100,7 @@ void Sprite::CreateTransformationResource()
 	// 単位行列を書き込んでおく
 	transformationMatrixData_->World = MakeIdentity4x4();
 	transformationMatrixData_->WVP = MakeIdentity4x4();
+	transformationMatrixData_->WorldInverseTranspose = MakeIdentity4x4();
 }
 
 void Sprite::SetSpriteData()
