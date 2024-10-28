@@ -30,7 +30,7 @@ void Object3d::Draw(WorldTransform& worldTransform)
 	// wvp用のCBufferの場所を設定
 	objectManager_->GetDxManager()->GetCommandList()->SetGraphicsRootConstantBufferView(1, worldTransform.GetConstBuffer()->GetGPUVirtualAddress());
 	// cameraの場所を指定
-	objectManager_->GetDxManager()->GetCommandList()->SetGraphicsRootConstantBufferView(4, cameraResource_->GetGPUVirtualAddress());
+	objectManager_->GetDxManager()->GetCommandList()->SetGraphicsRootConstantBufferView(3, cameraResource_->GetGPUVirtualAddress());
 	// マテリアルCBufferの場所を指定
 	objectManager_->GetDxManager()->GetCommandList()->SetGraphicsRootConstantBufferView(0, materialResource_->GetGPUVirtualAddress());
 	// 3Dモデルが割り当てられていれば描画する

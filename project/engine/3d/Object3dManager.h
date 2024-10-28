@@ -5,14 +5,15 @@
 #include <mutex>
 class Object3dManager
 {
-	static std::unique_ptr<Object3dManager> instance;
+private:
+	static Object3dManager* instance;
 	static std::once_flag initInstanceFlag;
 
+	Object3dManager() = default;
+	~Object3dManager() = default;
 	Object3dManager(Object3dManager&) = default;
 	Object3dManager& operator=(Object3dManager&) = default;
 public:
-	Object3dManager() = default;
-	~Object3dManager() = default;
 	// シングルトンインスタンスの取得
 	static Object3dManager* GetInstance();
 	// 初期化

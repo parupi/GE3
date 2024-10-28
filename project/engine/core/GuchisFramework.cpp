@@ -12,23 +12,24 @@ void GuchisFramework::Initialize()
 	srvManager = std::make_unique<SrvManager>();
 	srvManager->Initialize(dxManager.get());
 	// 入力の初期化
-	Input::GetInstance()->Initialize(winManager.get());
+	Input::GetInstance()->Initialize();
 	// Audioの初期化
 	Audio::GetInstance()->Initialize();
 }
 
 void GuchisFramework::Finalize()
 {
-	SceneManager::GetInstance()->Finalize();
 	Input::GetInstance()->Finalize();
+	Audio::GetInstance()->Finalize();
+	SceneManager::GetInstance()->Finalize();
 	winManager->Finalize();
 	dxManager->Finalize();
 }
 
 void GuchisFramework::Update()
 {
-	SceneManager::GetInstance()->Update();
 	Input::GetInstance()->Update();
+	SceneManager::GetInstance()->Update();
 }
 
 void GuchisFramework::Run()

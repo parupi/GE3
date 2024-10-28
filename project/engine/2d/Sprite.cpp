@@ -1,6 +1,8 @@
 #include "Sprite.h"
 #include "function.h"
+#ifdef _DEBUG
 #include <imgui.h>
+#endif // _DEBUG
 
 Sprite::~Sprite() {
 
@@ -165,5 +167,4 @@ void Sprite::AdjustTextureSize()
 	textureSize_.y = static_cast<float>(metadata.height);
 	// 画像サイズをテクスチャサイズに合わせる
 	size_ = textureSize_;
-
 }

@@ -23,6 +23,9 @@ void MyGameTitle::Initialize()
 	SceneManager::GetInstance()->SetSceneFactory(sceneFactory_.get());
 	// シーンマネージャーに最初のシーンをセット
 	SceneManager::GetInstance()->ChangeScene("TITLE");
+
+	// インスタンス生成
+	GlobalVariables::GetInstance();
 }
 
 void MyGameTitle::Finalize()
