@@ -24,6 +24,12 @@ void Object3dManager::Initialize(DirectXManager* directXManager)
 	CreatePipelineState();
 }
 
+void Object3dManager::Finalize()
+{
+	delete instance;
+	instance = nullptr;
+}
+
 void Object3dManager::DrawSet()
 {
 	dxManager_->GetCommandList()->SetGraphicsRootSignature(rootSignature_.Get());

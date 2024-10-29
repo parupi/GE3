@@ -27,7 +27,6 @@ void LightManager::BindLightsToShader()
 	commandList->SetGraphicsRootConstantBufferView(10, spotLightResource1_->GetGPUVirtualAddress());
 	commandList->SetGraphicsRootConstantBufferView(11, spotLightResource2_->GetGPUVirtualAddress());
 	commandList->SetGraphicsRootConstantBufferView(12, spotLightResource3_->GetGPUVirtualAddress());
-
 }
 
 void LightManager::CreateDirLightResource()

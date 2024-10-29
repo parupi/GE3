@@ -18,6 +18,8 @@ public:
 	static Object3dManager* GetInstance();
 	// 初期化
 	void Initialize(DirectXManager* directXManager);
+	// 終了
+	void Finalize();
 	// 描画前処理
 	void DrawSet();
 private:

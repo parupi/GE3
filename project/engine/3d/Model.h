@@ -15,13 +15,11 @@ public: // メンバ関数
 private:
 	void CreateVertexResource();
 private: // 構造体
-
 	struct VertexData {
 		Vector4 position;
 		Vector2 texcoord;
 		Vector3 normal;
 	};
-
 
 	struct Color {
 		float r, g, b;
@@ -44,7 +42,6 @@ private: // 構造体
 		std::vector<VertexData> vertices;
 		MaterialData material;
 	};
-
 
 private:
 	ModelLoader* modelLoader_ = nullptr;

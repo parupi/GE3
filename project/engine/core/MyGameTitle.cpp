@@ -30,8 +30,9 @@ void MyGameTitle::Initialize()
 
 void MyGameTitle::Finalize()
 {
-	//ParticleManager::GetInstance()->Finalize();
+	ParticleManager::GetInstance()->Finalize();
 	SpriteManager::GetInstance()->Finalize();
+	Object3dManager::GetInstance()->Finalize();
 
 	ImGuiManager::GetInstance()->Finalize();
 	GuchisFramework::Finalize();

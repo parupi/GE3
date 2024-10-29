@@ -5,6 +5,8 @@
 #include <imgui.h>
 
 ParticleManager* ParticleManager::instance = nullptr;
+std::random_device seedGenerator;
+std::mt19937 randomEngine(seedGenerator());
 
 ParticleManager* ParticleManager::GetInstance()
 {
@@ -25,8 +27,7 @@ void ParticleManager::Initialize(DirectXManager* dxManager, SrvManager* srvManag
 	dxManager_ = dxManager;
 	srvManager_ = srvManager;
 	// ランダムエンジンの初期化
-	std::random_device seedGenerator;
-	std::mt19937 randomEngine(seedGenerator());
+
 	// PSO関連
 	CreateRootSignature();
 	inputLayoutDesc_ = CreateInputElementDesc();
@@ -37,8 +38,6 @@ void ParticleManager::Initialize(DirectXManager* dxManager, SrvManager* srvManag
 	// リソースの生成と値の設定
 	CreateParticleResource();
 	CreateMaterialResource();
-
-
 }
 
 
@@ -131,14 +130,12 @@ void ParticleManager::Draw()
 			// マテリアルCBufferの場所を指定
 			commandList->SetGraphicsRootConstantBufferView(0, materialResource_->GetGPUVirtualAddress());
 			// SRVのDescriptorTableを設定
-			commandList->SetGraphicsRootDescriptorTable(1, srvHandleGPU_);
+			srvManager_->SetGraphicsRootDescriptorTable(1, particleGroup.srvIndex);
 			// テクスチャのSRVのDescriptorTableを設定
 			   // テクスチャのSRVのDescriptorTableを設定
-			D3D12_GPU_DESCRIPTOR_HANDLE textureHandle = TextureManager::GetInstance()->GetSrvHandleGPU(particleGroup.materialData.textureFilePath);
-			commandList->SetGraphicsRootDescriptorTable(2, textureHandle);
-
+			srvManager_->SetGraphicsRootDescriptorTable(2, TextureManager::GetInstance()->GetTextureIndexByFilePath(particleGroup.materialData.textureFilePath));
+			
 			commandList->DrawInstanced(6, particleGroup.instanceCount, 0, 0);
-
 		}
 	}
 }
@@ -168,20 +165,11 @@ void ParticleManager::CreateParticleGroup(const std::string name, const std::str
 	// インスタンシングデータを書き込むためのポインタを取得
 	particleGroup.instancingResource->Map(0, nullptr, reinterpret_cast<void**>(&particleGroup.instancingDataPtr));
 
-	// SRV生成
-	D3D12_SHADER_RESOURCE_VIEW_DESC srvDesc{};
-	srvDesc.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
-	srvDesc.Format = DXGI_FORMAT_UNKNOWN;  // ParticleForGPU のフォーマットに応じて適切に設定
-	srvDesc.ViewDimension = D3D12_SRV_DIMENSION_BUFFER;
-	srvDesc.Buffer.FirstElement = 0;
-	srvDesc.Buffer.NumElements = kNumMaxInstance;
-	srvDesc.Buffer.StructureByteStride = sizeof(TransformationMatrix);
-	srvDesc.Buffer.Flags = D3D12_BUFFER_SRV_FLAG_NONE;
 	// SRVを作成するDescriptorの場所を決める
-	srvHandleCPU_ = srvManager_->GetCPUDescriptorHandle(particleGroup.srvIndex);
-	srvHandleGPU_ = srvManager_->GetGPUDescriptorHandle(particleGroup.srvIndex);
+	particleGroup.srvIndex = srvManager_->Allocate() + 1;
+
 	// SRVの生成
-	dxManager_->GetDevice()->CreateShaderResourceView(particleGroup.instancingResource.Get(), &srvDesc, srvHandleCPU_);
+	srvManager_->CreateSRVforStructuredBuffer(particleGroup.srvIndex, particleGroup.instancingResource.Get(), kNumMaxInstance, sizeof(ParticleForGPU));
 
 	// インスタンス数を初期化
 	particleGroup.instanceCount = 0;
@@ -330,7 +318,7 @@ void ParticleManager::CreatePipelineState()
 	// Depthの機能を有効化する
 	depthStencilDesc.DepthEnable = true;
 	// 書き込みします
-	depthStencilDesc.DepthWriteMask = D3D12_DEPTH_WRITE_MASK_ALL;
+	depthStencilDesc.DepthWriteMask = D3D12_DEPTH_WRITE_MASK_ZERO;
 	// 比較関数はLessEqual。つまり、近ければ描画される
 	depthStencilDesc.DepthFunc = D3D12_COMPARISON_FUNC_LESS_EQUAL;
 
@@ -389,7 +377,7 @@ void ParticleManager::CreateMaterialResource()
 	materialResource_->Map(0, nullptr, reinterpret_cast<void**>(&materialData_));
 	// 白を入れる
 	materialData_->color = { 1.0f, 1.0f, 1.0f, 1.0f };
-	//materialData_->enableLighting = true;
+	materialData_->enableLighting = true;
 	materialData_->uvTransform = MakeIdentity4x4();
 }
 

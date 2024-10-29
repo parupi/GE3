@@ -9,6 +9,9 @@ void ParticleEmitter::Initialize(std::string name)
 
 void ParticleEmitter::Update(Vector3 Position, uint32_t count)
 {
+	emitter.transform.translate = Position;
+	emitter.count = count;
+
 	emitter.frequencyTime += kDeltaTime;
 	if (emitter.frequency <= emitter.frequencyTime) {
 		// パーティクルを生成してグループに追加
