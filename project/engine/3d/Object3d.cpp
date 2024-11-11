@@ -17,25 +17,14 @@ void Object3d::Draw(WorldTransform& worldTransform)
 {
 	camera_ = objectManager_->GetDefaultCamera();
 	cameraData_->worldPosition = camera_->GetTranslate();
-	Matrix4x4 worldViewProjectionMatrix;
-	if (camera_) {
-		const Matrix4x4& viewProjectionMatrix = camera_->GetViewProjectionMatrix();
-		worldViewProjectionMatrix = worldTransform.GetMatWorld() * viewProjectionMatrix;
-	}
-	else {
-		worldViewProjectionMatrix = worldTransform.GetMatWorld();
-	}
-	worldTransform.SetMapWVP(worldViewProjectionMatrix);
 
-	// wvp用のCBufferの場所を設定
-	objectManager_->GetDxManager()->GetCommandList()->SetGraphicsRootConstantBufferView(1, worldTransform.GetConstBuffer()->GetGPUVirtualAddress());
 	// cameraの場所を指定
 	objectManager_->GetDxManager()->GetCommandList()->SetGraphicsRootConstantBufferView(3, cameraResource_->GetGPUVirtualAddress());
 	// マテリアルCBufferの場所を指定
 	objectManager_->GetDxManager()->GetCommandList()->SetGraphicsRootConstantBufferView(0, materialResource_->GetGPUVirtualAddress());
 	// 3Dモデルが割り当てられていれば描画する
 	if (model_){
-		model_->Draw();
+		model_->Draw(worldTransform, camera_);
 	}
 }
 

@@ -56,6 +56,7 @@ void Audio::SoundLoadWave(const char* filename)
 	// 今回はサウンドのディレクトリが1つのため
 	std::string directory = "resource/sound/";
 	directory += filename;
+	directory += ".wav";
 	file.open(directory, std::ios_base::binary);
 	assert(file.is_open());
 
@@ -133,8 +134,9 @@ void Audio::SoundLoadWave(const char* filename)
 	//return soundData;
 }
 
-void Audio::SoundUnload(SoundData* soundData)
+void Audio::SoundUnload(const char* filename)
 {
+	SoundData* soundData = &soundDataMap[filename];
 	// バッファのメモリを解放
 	delete[] soundData->pBuffer;
 
@@ -143,9 +145,11 @@ void Audio::SoundUnload(SoundData* soundData)
 	soundData->wfex = {};
 }
 
-int Audio::SoundPlayWave(const SoundData& soundData, const bool isLoop)
+int Audio::SoundPlayWave(const char* filename, const bool isLoop)
 {
 	HRESULT result;
+
+	SoundData& soundData = soundDataMap[filename];
 
 	// 今回使うサウンドデータ
 	int sourceNum = -1;
@@ -169,9 +173,6 @@ int Audio::SoundPlayWave(const SoundData& soundData, const bool isLoop)
 
 	// 再生する波形データの設定
 	XAUDIO2_BUFFER buf = SetBuffer(isLoop, soundData);
-	/*buf.pAudioData = soundData.pBuffer;
-	buf.AudioBytes = soundData.bufferSize;
-	buf.Flags = XAUDIO2_END_OF_STREAM;*/
 
 	// 波形データの再生
 	result = pSourceVoices_[sourceNum]->SubmitSourceBuffer(&buf);

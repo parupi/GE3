@@ -53,6 +53,7 @@ public:
 	/// </summary>
 	/// <param name="wvp">WVP行列</param>
 	void SetMapWVP(const Matrix4x4& wvp) { constMap->WVP = wvp; }
+	void SetMapWorld(const Matrix4x4& world) { constMap->World = world; }
 	const Matrix4x4& GetMatWorld() { return matWorld_; }
 
 private:

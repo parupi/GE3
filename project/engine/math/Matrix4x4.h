@@ -1,95 +1,66 @@
 #pragma once
 #include <stdexcept>
+#include <initializer_list>
+#include <cmath>
+
+struct Vector3;
+struct Quaternion;
 
 /// <summary>
 /// 4x4行列
 /// </summary>
 struct Matrix4x4 final {
-	float m[4][4];
+    float m[4][4];
 
-	// デフォルトコンストラクタ
-	Matrix4x4() : m{ {0.0f} } {}
+    // デフォルトコンストラクタ
+    Matrix4x4();
 
-	// イニシャライザリストを受け取るコンストラクタ
-	Matrix4x4(std::initializer_list<float> list) {
-		if (list.size() != 16) {
-			throw std::invalid_argument("Matrix4x4 initializer list must contain exactly 16 elements.");
-		}
-		auto it = list.begin();
-		for (int i = 0; i < 4; ++i) {
-			for (int j = 0; j < 4; ++j) {
-				m[i][j] = *it++;
-			}
-		}
-	}
-	// 行列の加算
-	Matrix4x4 operator+(const Matrix4x4& other) const {
-		Matrix4x4 result;
-		for (int i = 0; i < 4; ++i)
-			for (int j = 0; j < 4; ++j)
-				result.m[i][j] = m[i][j] + other.m[i][j];
-		return result;
-	}
+    // イニシャライザリストを受け取るコンストラクタ
+    Matrix4x4(std::initializer_list<float> list);
 
-	// 行列の減算
-	Matrix4x4 operator-(const Matrix4x4& other) const {
-		Matrix4x4 result;
-		for (int i = 0; i < 4; ++i)
-			for (int j = 0; j < 4; ++j)
-				result.m[i][j] = m[i][j] - other.m[i][j];
-		return result;
-	}
+    // 行列の加算
+    Matrix4x4 operator+(const Matrix4x4& other) const;
+    // 行列の減算
+    Matrix4x4 operator-(const Matrix4x4& other) const;
+    // 行列の乗算
+    Matrix4x4 operator*(const Matrix4x4& other) const;
+    // スカラー倍
+    Matrix4x4 operator*(float scalar) const;
 
-	// 行列の乗算
-	Matrix4x4 operator*(const Matrix4x4& other) const {
-		Matrix4x4 result;
-		for (int i = 0; i < 4; ++i) {
-			for (int j = 0; j < 4; ++j) {
-				result.m[i][j] = 0.0f;
-				for (int k = 0; k < 4; ++k) {
-					result.m[i][j] += m[i][k] * other.m[k][j];
-				}
-			}
-		}
-		return result;
-	}
-
-	// スカラー倍
-	Matrix4x4 operator*(float scalar) const {
-		Matrix4x4 result;
-		for (int i = 0; i < 4; ++i)
-			for (int j = 0; j < 4; ++j)
-				result.m[i][j] = m[i][j] * scalar;
-		return result;
-	}
-
-	// 加算代入
-	Matrix4x4& operator+=(const Matrix4x4& other) {
-		for (int i = 0; i < 4; ++i)
-			for (int j = 0; j < 4; ++j)
-				m[i][j] += other.m[i][j];
-		return *this;
-	}
-
-	// 減算代入
-	Matrix4x4& operator-=(const Matrix4x4& other) {
-		for (int i = 0; i < 4; ++i)
-			for (int j = 0; j < 4; ++j)
-				m[i][j] -= other.m[i][j];
-		return *this;
-	}
-
-	// 乗算代入
-	Matrix4x4& operator*=(const Matrix4x4& other) {
-		*this = *this * other;
-		return *this;
-	}
-
-	// スカラー倍代入
-	Matrix4x4& operator*=(float scalar) {
-		for (int i = 0; i < 4; ++i)
-			for (int j = 0; j < 4; ++j)
-				m[i][j] *= scalar;
-		return *this;
-	}
+    // 加算代入
+    Matrix4x4& operator+=(const Matrix4x4& other);
+    // 減算代入
+    Matrix4x4& operator-=(const Matrix4x4& other);
+    // 乗算代入
+    Matrix4x4& operator*=(const Matrix4x4& other);
+    // スカラー倍代入
+    Matrix4x4& operator*=(float scalar);
 };
+
+// 行列の逆行列
+Matrix4x4 Inverse(const Matrix4x4& m);
+
+// 行列の転置
+Matrix4x4 Transpose(const Matrix4x4& m);
+
+// 単位行列を作成
+Matrix4x4 MakeIdentity4x4();
+
+// X軸回転行列を作成
+Matrix4x4 MakeRotateXMatrix(float radian);
+
+// Y軸回転行列を作成
+Matrix4x4 MakeRotateYMatrix(float radian);
+
+// Z軸回転行列を作成
+Matrix4x4 MakeRotateZMatrix(float radian);
+
+// 3x3行列式を計算するヘルパー関数
+float Determinant3x3(float a, float b, float c, float d, float e, float f, float g, float h, float i);
+
+// 4x4行列の行列式を計算する関数
+float Determinant(const Matrix4x4& m);
+
+Matrix4x4 MakeRotateMatrix(const Quaternion& quaternion);
+
+void PrintOnImGui(const Matrix4x4& matrix, const char* label = "Matrix");

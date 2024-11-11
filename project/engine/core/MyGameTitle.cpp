@@ -9,7 +9,7 @@ void MyGameTitle::Initialize()
 	// 2Dテクスチャマネージャーの初期化
 	TextureManager::GetInstance()->Initialize(dxManager.get(), srvManager.get());
 	// 3Dテクスチャマネージャーの初期化
-	ModelManager::GetInstance()->Initialize(dxManager.get());
+	ModelManager::GetInstance()->Initialize(dxManager.get(), srvManager.get());
 	// パーティクルマネージャーの初期化
 	ParticleManager::GetInstance()->Initialize(dxManager.get(), srvManager.get());
 	// スプライト共通部の初期化
