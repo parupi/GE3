@@ -269,3 +269,149 @@ Matrix4x4 TranslationMatrixFromVector3(const Vector3& translate)
 
 	return translationMatrix;
 }
+
+Vector3 CatmullRomPosition(const std::vector<Vector3>& points, float t) {
+	assert(points.size() >= 4 && "制御点は4点以上必要です");
+
+	// 区間数は制御点の数-3
+	size_t division = points.size() - 3;
+	// 1区間の長さ
+	float areaWidth = 1.0f / division;
+
+	// 区間内の始点を0.0f, 終点を1.0fとした時の現在位置
+	float t_2 = std::fmod(t, areaWidth) * division;
+	// 加減(0.0f)と上限(1.0f)の範囲に収める
+	t_2 = std::clamp(t_2, 0.0f, 1.0f);
+
+	// 区間番号を計算し、範囲内に収める
+	size_t index = std::min(static_cast<size_t>(t / areaWidth), division);
+
+	// 4点分のインデックス
+	size_t index0 = index;
+	size_t index1 = index + 1;
+	size_t index2 = index + 2;
+	size_t index3 = index + 3;
+
+	// 最初の区間のp0はp1を重複使用する
+	if (index == 0) {
+		index0 = 0;
+	}
+	// 最後の区間のp3はp2を重複使用する
+	if (index3 >= points.size()) {
+		index3 = points.size() - 1;
+	}
+
+	// 4点の座標
+	const Vector3& p0 = points[index0];
+	const Vector3& p1 = points[index1];
+	const Vector3& p2 = points[index2];
+	const Vector3& p3 = points[index3];
+
+	return CatmullRomInterpolation(p0, p1, p2, p3, t_2);
+}
+
+Vector3 CatmullRomInterpolation(const Vector3& p0, const Vector3& p1, const Vector3& p2, const Vector3& p3, float t) {
+	const float s = 0.5f;
+
+	float t2 = t * t;
+	float t3 = t2 * t;
+
+	Vector3 e3 = p0 * -s + p1 * 3.0f * s - p2 * 3.0f * s + p3 * s;
+	Vector3 e2 = p0 * 2.0f * s - p1 * 5.0f * s + p2 * 4.0f * s - p3 * s;
+	Vector3 e1 = p0 * -s + p2 * s;
+	Vector3 e0 = p1 * 2.0f * s;
+
+
+	return e3 * t3 + e2 * t2 + e1 * t + e0;
+}
+Matrix4x4 MakeRotationAxisAngle(const Vector3& axis, float angle)
+{
+	// 回転軸ベクトルを正規化
+	Vector3 normalizedAxis = Normalize(axis);
+	float x = normalizedAxis.x;
+	float y = normalizedAxis.y;
+	float z = normalizedAxis.z;
+
+	// 三角関数を事前に計算
+	float cosTheta = std::cos(angle);
+	float sinTheta = std::sin(angle);
+	float oneMinusCosTheta = 1.0f - cosTheta;
+
+	// 回転行列を生成
+	Matrix4x4 rotationMatrix;
+	rotationMatrix.m[0][0] = cosTheta + x * x * oneMinusCosTheta;
+	rotationMatrix.m[0][1] = x * y * oneMinusCosTheta + z * sinTheta;
+	rotationMatrix.m[0][2] = x * z * oneMinusCosTheta - y * sinTheta;
+	rotationMatrix.m[0][3] = 0.0f;
+
+	rotationMatrix.m[1][0] = x * y * oneMinusCosTheta - z * sinTheta;
+	rotationMatrix.m[1][1] = cosTheta + y * y * oneMinusCosTheta;
+	rotationMatrix.m[1][2] = y * z * oneMinusCosTheta + x * sinTheta;
+	rotationMatrix.m[1][3] = 0.0f;
+
+	rotationMatrix.m[2][0] = z * x * oneMinusCosTheta + y * sinTheta;
+	rotationMatrix.m[2][1] = z * y * oneMinusCosTheta - x * sinTheta;
+	rotationMatrix.m[2][2] = cosTheta + z * z * oneMinusCosTheta;
+	rotationMatrix.m[2][3] = 0.0f;
+
+	rotationMatrix.m[3][0] = 0.0f;
+	rotationMatrix.m[3][1] = 0.0f;
+	rotationMatrix.m[3][2] = 0.0f;
+	rotationMatrix.m[3][3] = 1.0f;
+
+	return rotationMatrix;
+}
+
+Matrix4x4 MakeLookAtMatrix(const Vector3& eye, const Vector3& target, const Vector3& up)
+{
+	// カメラの「前方向」ベクトル (Z軸)
+	Vector3 zAxis = Normalize(target - eye);
+
+	// カメラの「右方向」ベクトル (X軸)
+	Vector3 xAxis = Normalize(Cross(up, zAxis));
+
+	// カメラの「上方向」ベクトル (Y軸)
+	Vector3 yAxis = Cross(zAxis, xAxis);
+
+	// ビュー行列を生成
+	Matrix4x4 viewMatrix;
+
+	// 各軸ベクトルを行列の回転成分に設定
+	viewMatrix.m[0][0] = xAxis.x; viewMatrix.m[0][1] = yAxis.x; viewMatrix.m[0][2] = zAxis.x; viewMatrix.m[0][3] = 0.0f;
+	viewMatrix.m[1][0] = xAxis.y; viewMatrix.m[1][1] = yAxis.y; viewMatrix.m[1][2] = zAxis.y; viewMatrix.m[1][3] = 0.0f;
+	viewMatrix.m[2][0] = xAxis.z; viewMatrix.m[2][1] = yAxis.z; viewMatrix.m[2][2] = zAxis.z; viewMatrix.m[2][3] = 0.0f;
+
+	// カメラの位置を使って平行移動成分を設定
+	viewMatrix.m[3][0] = -Dot(xAxis, eye);
+	viewMatrix.m[3][1] = -Dot(yAxis, eye);
+	viewMatrix.m[3][2] = -Dot(zAxis, eye);
+	viewMatrix.m[3][3] = 1.0f;
+
+	return viewMatrix;
+}
+
+Vector3 CalculateCameraRotationFromDirection(const Vector3& direction, float fixedRoll)
+{
+	Vector3 rotation; // 結果として得るピッチ、ヨー、ロール
+
+	// ピッチ（X軸回転）を計算: YZ平面の方向から求める
+	rotation.x = std::atan2(direction.y, std::sqrt(direction.x * direction.x + direction.z * direction.z));
+
+	// ヨー（Y軸回転）を計算: XZ平面の方向から求める
+	rotation.y = std::atan2(direction.x, direction.z);
+
+	// ロール（Z軸回転）は固定または任意に設定
+	rotation.z = fixedRoll;
+
+	return rotation;
+}
+
+void MatrixPrintImGui(const Matrix4x4& matrix, const char* label) {
+	ImGui::Begin("Matrix");
+	ImGui::Text("%s:", label);
+	for (int row = 0; row < 4; ++row) {
+		ImGui::Text("%.3f  %.3f  %.3f  %.3f",
+			matrix.m[row][0], matrix.m[row][1], matrix.m[row][2], matrix.m[row][3]);
+	}
+	ImGui::End();
+}

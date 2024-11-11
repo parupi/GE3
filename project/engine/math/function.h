@@ -3,7 +3,9 @@
 #include "assert.h"
 #include "cmath"
 #include <Matrix4x4.h>
-
+#include <vector>
+#include <algorithm>
+#include <imgui.h>
 static const int kColumnWidth = 60;
 static const int kRowHeight = 20;
 
@@ -101,3 +103,15 @@ Vector3 ExtractTranslation(const Matrix4x4& matrix);
 Matrix4x4 ScaleMatrixFromVector3(const Vector3& scale);
 
 Matrix4x4 TranslationMatrixFromVector3(const Vector3& translate);
+
+Vector3 CatmullRomPosition(const std::vector<Vector3>& points, float t);
+
+Vector3 CatmullRomInterpolation(const Vector3& p0, const Vector3& p1, const Vector3& p2, const Vector3& p3, float t);
+
+Matrix4x4 MakeRotationAxisAngle(const Vector3& axis, float angle);
+
+Matrix4x4 MakeLookAtMatrix(const Vector3& eye, const Vector3& target, const Vector3& up);
+
+Vector3 CalculateCameraRotationFromDirection(const Vector3& direction, float fixedRoll = 0.0f);
+
+void MatrixPrintImGui(const Matrix4x4& matrix, const char* label = "Matrix4x4");

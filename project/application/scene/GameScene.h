@@ -8,6 +8,8 @@
 #include <memory>
 #include <Audio.h>
 #include <CameraManager.h>
+#include <RailManager.h>
+#include <LightManager.h>
 class GameScene : public BaseScene
 {
 public:
@@ -21,15 +23,10 @@ public:
 	void Draw() override;
 
 private:
-	CameraManager cameraManager_;
-	std::shared_ptr<Camera> normalCamera_;
-	std::shared_ptr<Camera> bossCamera_;
 
-	Object3d* object_;
-	std::vector<Sprite*> sprites;
 
-	Vector4 color1 = { 1.0f, 1.0f, 1.0f, 1.0f };
-	Vector4 color2 = { 1.0f, 1.0f, 1.0f, 1.0f };
-	uint32_t soundHandle = 0u;
+	std::unique_ptr<RailManager> railManager_;
+	std::unique_ptr<LightManager> lightManager_;
+
 };
 
