@@ -82,14 +82,14 @@ public:
 	// 音声読み込み
 	void SoundLoadWave(const char* filename);
 	// 音声データ解放
-	void SoundUnload(SoundData* soundData);
+	void SoundUnload(const char* filename);
 	/**
 	 * @brief 音源の再生
 	 * @param soundData 音源データ
 	 * @param isLoop ループするか　default : false
 	 * @return int BGMのリソース番号
 	 */
-	int SoundPlayWave(const SoundData& soundData, const bool isLoop = false);
+	int SoundPlayWave(const char* filename, const bool isLoop = false);
 	// 終了
 	void Finalize();
 

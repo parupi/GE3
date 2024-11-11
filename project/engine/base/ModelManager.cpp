@@ -1,36 +1,35 @@
 #include "ModelManager.h"
 
-std::unique_ptr<ModelManager> ModelManager::instance = nullptr;
+ModelManager* ModelManager::instance = nullptr;
 std::once_flag ModelManager::initInstanceFlag;
 
 ModelManager* ModelManager::GetInstance()
 {
 	std::call_once(initInstanceFlag, []() {
-		instance = std::make_unique<ModelManager>();
+		instance = new ModelManager();
 		});
-	return instance.get();
+	return instance;
 }
 
-void ModelManager::Initialize(DirectXManager* dxManager)
+void ModelManager::Initialize(DirectXManager* dxManager, SrvManager* srvManager)
 {
 	modelLoader = std::make_unique<ModelLoader>();
-	modelLoader->Initialize(dxManager);
+	modelLoader->Initialize(dxManager, srvManager);
 }
 
-void ModelManager::LoadModel(const std::string& filePath)
+void ModelManager::LoadModel(const std::string& directoryPath, const std::string& fileName)
 {
 	// 読み込み済みモデルを検索
-	if (models.contains(filePath)) {
+	if (models.contains(fileName)) {
 		// 読み込み済みなら早期return
 		return;
 	}
 
-	// モデルの生成とファイルの読み込み
 	std::unique_ptr<Model> model = std::make_unique<Model>();
-	model->Initialize(modelLoader.get(), "resource", filePath);
+	model->Initialize(modelLoader.get(), directoryPath, fileName);
 
 	// モデルをmapコンテナに格納する
-	models.insert(std::make_pair(filePath, std::move(model)));
+	models.insert(std::make_pair(fileName, std::move(model)));
 }
 
 Model* ModelManager::FindModel(const std::string& filePath)

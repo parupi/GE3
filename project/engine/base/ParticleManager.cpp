@@ -46,10 +46,10 @@ void ParticleManager::Update()
 	Matrix4x4 cameraMatrix = MakeAffineMatrix({ 1.0f, 1.0f, 1.0f }, camera_->GetRotate(), camera_->GetTranslate());
 	Matrix4x4 viewMatrix = Inverse(cameraMatrix);
 	Matrix4x4 projectionMatrix = MakePerspectiveFovMatrix(0.45f, float(1280) / float(720), 0.1f, 100.0f);
-	Matrix4x4 viewProjectionMatrix = Multiply(viewMatrix, projectionMatrix);
+	Matrix4x4 viewProjectionMatrix = viewMatrix * projectionMatrix;
 
 	Matrix4x4 backToFrontMatrix = MakeRotateYMatrix(std::numbers::pi_v<float>);
-	Matrix4x4 billboardMatrix = Multiply(backToFrontMatrix, cameraMatrix);
+	Matrix4x4 billboardMatrix = backToFrontMatrix * cameraMatrix;
 	billboardMatrix.m[3][0] = 0.0f;
 	billboardMatrix.m[3][1] = 0.0f;
 	billboardMatrix.m[3][2] = 0.0f;
@@ -76,16 +76,16 @@ void ParticleManager::Update()
 			float alpha = 1.0f - ((*particleIterator).currentTime / (*particleIterator).lifeTime);
 
 			// ワールド行列の計算
-			scaleMatrix = ScaleMatrixFromVector3((*particleIterator).transform.scale);
-			translateMatrix = TranslationMatrixFromVector3((*particleIterator).transform.translate);
+			scaleMatrix = MakeScaleMatrix((*particleIterator).transform.scale);
+			translateMatrix = MakeTranslateMatrix((*particleIterator).transform.translate);
 			Matrix4x4 worldMatrix{};
 			if (isBillboard) {
-				worldMatrix = Multiply(Multiply(scaleMatrix, billboardMatrix), translateMatrix);
+				worldMatrix = scaleMatrix * billboardMatrix * translateMatrix;
 			}
 			else {
 				worldMatrix = MakeAffineMatrix((*particleIterator).transform.scale, (*particleIterator).transform.rotate, (*particleIterator).transform.translate);
 			}
-			Matrix4x4 worldViewProjectionMatrix = Multiply(worldMatrix, viewProjectionMatrix);
+			Matrix4x4 worldViewProjectionMatrix = worldMatrix * viewProjectionMatrix;
 
 			// インスタンシングデータの設定
 			if (numInstance < kNumMaxInstance) {
@@ -106,13 +106,7 @@ void ParticleManager::Update()
 		if (particleGroup.instancingDataPtr) {
 			std::memcpy(particleGroup.instancingDataPtr, instancingData_, sizeof(ParticleForGPU) * numInstance);
 		}
-
-
-
 	}
-	//ImGui::Begin("Particle");
-	//ImGui::SliderFloat4("color", &instancingData_[numInstance].color.x, 0.0f, 1.0f);
-	//ImGui::End();
 }
 
 void ParticleManager::Draw()
@@ -160,7 +154,7 @@ void ParticleManager::CreateParticleGroup(const std::string name, const std::str
 	particleGroup.instancingResource = dxManager_->CreateBufferResource(sizeof(ParticleForGPU) * kNumMaxInstance);
 
 	// インスタンシング用にSRVを確保してSRVインデックスを記録
-	particleGroup.srvIndex = srvManager_->Allocate();
+	//particleGroup.srvIndex = srvManager_->Allocate();
 
 	// インスタンシングデータを書き込むためのポインタを取得
 	particleGroup.instancingResource->Map(0, nullptr, reinterpret_cast<void**>(&particleGroup.instancingDataPtr));

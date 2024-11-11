@@ -3,6 +3,7 @@
 #include "assert.h"
 #include "cmath"
 #include <Matrix4x4.h>
+#include <imgui.h>
 
 static const int kColumnWidth = 60;
 static const int kRowHeight = 20;
@@ -13,24 +14,15 @@ struct Transform {
 	Vector3 translate;
 };
 
-// 加算
-Vector3 Add(const Vector3& v1, const Vector3& v2);
-
-// 減算
-Vector3 Subtract(const Vector3& v1, const Vector3& v2);
-
-// スカラー倍
-Vector3 Multiply(float scalar, const Vector3& v);
-
-// 内積
-float Dot(const Vector3& v1, const Vector3& v2);
-
-// 長さ（ノルム）
-float Length(const Vector3& v);
+//// 内積
+//float Dot(const Vector3& v1, const Vector3& v2);
+//
+//// 長さ（ノルム）
+//float Length(const Vector3& v);
+//Vector3 Normalize(const Vector3& v);
 
 // 正規化
 float Normalize(float value);
-Vector3 Normalize(const Vector3& v);
 
 float Lerp(float a, float b, float t);
 
@@ -43,31 +35,6 @@ Matrix4x4 MakeScaleMatrix(const Vector3& scale);
 // 座標変換
 //Vector3 Transform(const Vector3& vector, const Matrix4x4& matrix);
 Vector3 Transformm_(const Vector3& vector, const Matrix4x4& matrix);
-
-// 行列の加法
-Matrix4x4 Add(const Matrix4x4& m1, const Matrix4x4& m2);
-
-// 行列の減法
-Matrix4x4 Subtract(const Matrix4x4& m1, const Matrix4x4& m2);
-
-// 行列の積
-Matrix4x4 Multiply(const Matrix4x4& m1, const Matrix4x4& m2);
-
-// 逆行列
-Matrix4x4 Inverse(const Matrix4x4& m);
-
-// 転置行列
-Matrix4x4 Transpose(const Matrix4x4& m);
-
-// 単位行列の作成
-Matrix4x4 MakeIdentity4x4();
-
-// X軸回転行列
-Matrix4x4 MakeRotateXMatrix(float radian);
-// Y軸回転行列							
-Matrix4x4 MakeRotateYMatrix(float radian);
-// Z軸回転行列							
-Matrix4x4 MakeRotateZMatrix(float radian);
 
 Matrix4x4 MakeRotateXYZMatrix(Vector3 rotate);
 
@@ -98,6 +65,10 @@ Vector3 TransformNormal(const Vector3& v, const Matrix4x4& m);
 
 Vector3 ExtractTranslation(const Matrix4x4& matrix);
 
-Matrix4x4 ScaleMatrixFromVector3(const Vector3& scale);
+//Matrix4x4 ScaleMatrixFromVector3(const Vector3& scale);
+//
+//Matrix4x4 TranslationMatrixFromVector3(const Vector3& translate);
 
-Matrix4x4 TranslationMatrixFromVector3(const Vector3& translate);
+//Matrix4x4 MakeRotaeAxisAngle(const Vector3& axis, float angle);
+
+Matrix4x4 DirectionToDirection(const Vector3& from, const Vector3& to);
