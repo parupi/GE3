@@ -15,6 +15,7 @@
 class DirectXManager
 {
 public:
+
 	// 初期化
 	void Initialize(WindowManager* winManager);
 	// 終了

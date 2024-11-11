@@ -8,7 +8,6 @@
 void Object3d::Initialize()
 {
 	objectManager_ = Object3dManager::GetInstance();
-
 	CreateMaterialResource();	
 	CreateCameraResource();
 }
@@ -38,6 +37,7 @@ void Object3d::Draw(WorldTransform& worldTransform)
 		model_->Draw();
 	}
 }
+
 
 void Object3d::CreateMaterialResource()
 {

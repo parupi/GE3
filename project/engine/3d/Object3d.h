@@ -25,7 +25,6 @@ private:
 	void CreateCameraResource();
 private: // 構造体
 
-
 	struct Material {
 		Vector4 color;
 		bool enableLighting;
@@ -72,11 +71,9 @@ private: // メンバ変数
 	Model* model_ = nullptr;
 	Camera* camera_ = nullptr;
 
-	
 	Microsoft::WRL::ComPtr<ID3D12Resource> materialResource_ = nullptr;
 	Microsoft::WRL::ComPtr<ID3D12Resource> cameraResource_ = nullptr;
 
-	
 	Material* materialData_ = nullptr;
 	CameraForGPU* cameraData_ = nullptr;
 

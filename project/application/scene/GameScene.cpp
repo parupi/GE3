@@ -24,6 +24,7 @@ void GameScene::Initialize()
 void GameScene::Finalize()
 {
 	railManager_->Finalize();
+
 }
 
 void GameScene::Update()
@@ -31,6 +32,7 @@ void GameScene::Update()
 
 
 	railManager_->Update();
+	worldTransform_.TransferMatrix();
 }
 
 void GameScene::Draw()
