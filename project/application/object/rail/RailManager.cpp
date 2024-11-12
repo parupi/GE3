@@ -11,18 +11,6 @@ void RailManager::Initialize()
 
 void RailManager::Update()
 {
-	//ImGui::Begin("controlPoint");
-	//ImGui::DragFloat3("controlPoint0", &controlPoints_[0].x, 0.01f);
-	//ImGui::DragFloat3("controlPoint1", &controlPoints_[1].x, 0.01f);
-	//ImGui::DragFloat3("controlPoint2", &controlPoints_[2].x, 0.01f);
-	//ImGui::DragFloat3("controlPoint3", &controlPoints_[3].x, 0.01f);
-	//ImGui::DragFloat3("controlPoint4", &controlPoints_[4].x, 0.01f);
-	//ImGui::DragFloat3("controlPoint5", &controlPoints_[5].x, 0.01f);
-	//ImGui::DragFloat3("controlPoint6", &controlPoints_[6].x, 0.01f);
-	//ImGui::DragFloat3("controlPoint7", &controlPoints_[7].x, 0.01f);
-	////ImGui::DragFloat3("controlPoint8", &controlPoints_[8].x, 0.01f);
-	//ImGui::End();
-
 	// 線分で描画する用の頂点リスト
 	std::vector<Vector3> pointsUpdating;
 	std::vector<Vector3> startPos; // 各セグメントの始点を格納
@@ -45,9 +33,7 @@ void RailManager::Update()
 
 	// カメラの位置と向きを更新
 	playerMove += playerSpeed;
-	if (playerMove >= 1.0f) {
-		playerMove = 0.0f;
-	}
+
 
 	// プレイヤーの位置（カメラの後ろ、例として2.0fの距離分）
 	playerTranslate = Normalize(cameraTranslate);

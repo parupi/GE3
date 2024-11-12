@@ -11,6 +11,8 @@
 #include "RailManager.h"
 #include "LightManager.h"
 #include "Player.h"
+#include "EnemyManager.h"
+#include "Sphere.h"
 class GameScene : public BaseScene
 {
 public:
@@ -22,6 +24,9 @@ public:
 	void Update() override;
 	// 描画
 	void Draw() override;
+private:
+	// 衝突判定と応答
+	void CheckAllCollision();
 
 private:
 	CameraManager cameraManager_;
@@ -31,7 +36,13 @@ private:
 
 	RailManager* railManager_;
 	Player* player_;
-
+	EnemyManager* enemyManager_;
+	
 	LightManager* lightManager_;
+
+	// 天球
+	Sphere* sphere_ = nullptr;
+
+	float score = 0.0f;
 };
 

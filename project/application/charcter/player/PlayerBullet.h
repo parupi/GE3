@@ -14,6 +14,8 @@ public:
 	void Update();
 	// 描画
 	void Draw();
+	// 衝突を検出したら呼び出されるコールバック関数
+	void OoCollision();
 private:
 	WorldTransform transform_;
 	std::unique_ptr<Object3d> object_;
@@ -21,7 +23,7 @@ private:
 	// 速度
 	Vector3 velocity_;
 	// 寿命<frm>
-	static const int32_t kLifeTime = 60 * 5;
+	static const int32_t kLifeTime = 60 * 4;
 	// デスタイマー
 	int32_t deathTimer_ = kLifeTime;
 	// デスフラグ
@@ -30,5 +32,6 @@ private:
 public:
 	// 消滅フラグを取得
 	bool GetIsDead() const { return isDead_; }
+	Vector3 GetWorldPosition() const;
 };
 
