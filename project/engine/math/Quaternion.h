@@ -42,6 +42,7 @@ Quaternion Normalize(const Quaternion& q);
 Quaternion Inverse(const Quaternion& q);
 // クォータニオンの生成
 Quaternion MakeRotateAxisAngleQuaternion(const Vector3& axis, float angle);
+Quaternion CreateCameraRotationQuaternion(const Vector3& eulerAngles);
 // 球面線形補間
 Quaternion Slerp(Quaternion q0, Quaternion q1, float t);
 // 内積

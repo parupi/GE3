@@ -11,7 +11,7 @@ void GameScene::Initialize()
 	railCamera_ = std::make_shared<Camera>();
 	cameraManager_.AddCamera(normalCamera_);
 	cameraManager_.AddCamera(railCamera_);
-	cameraManager_.SetActiveCamera(0);
+	cameraManager_.SetActiveCamera(1);
 	normalCamera_->SetTranslate(Vector3{ 0.0f, 10.0f, -30.0f });
 	railCamera_->SetTranslate(Vector3{ 0.0f, 0.0f, -100.0f });
 
@@ -35,9 +35,11 @@ void GameScene::Initialize()
 
 void GameScene::Finalize()
 {
+	railManager_->Finalize();
 	delete railManager_;
-	delete lightManager_;
+	player_->Finalize();
 	delete player_;
+	delete lightManager_;
 }
 
 void GameScene::Update()
@@ -51,6 +53,9 @@ void GameScene::Update()
 	railCameraTransform_.translation_ = railManager_->GetCameraTranslate();
 	railCameraTransform_.rotation_ = railManager_->GetCameraRotate();
 	railCameraTransform_.TransferMatrix();
+
+	player_->SetOffset(railManager_->GetOffset());
+	player_->SetCameraRotate(railManager_->GetCameraRotate());
 	player_->Update();
 
 	Vector3 normalCameraPos = normalCamera_->GetTranslate();
@@ -80,5 +85,8 @@ void GameScene::Draw()
 	lightManager_->BindLightsToShader();
 	
 	railManager_->Draw();
-	//player_->Draw();
+	player_->Draw();
+
+	SpriteManager::GetInstance()->DrawSet();
+	player_->DrawUI();
 }

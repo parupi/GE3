@@ -31,19 +31,23 @@ private:
 
 	Vector3 followCameraOffsetRotare_ = Vector3(0.51f, 0.0f, 0.0f);
 
+	// 行列の更新
+	void UpdateViewMatrix();
+	void UpdateProjectionMatrix();
+
 public: // ゲッター // セッター //
-	// 回転
 	void SetRotate(const Vector3& rotate) { transform_.rotate = rotate; }
-	const Vector3& GetRotate() { return transform_.rotate; }
-	// 拡縮
+	const Vector3& GetRotate() const { return transform_.rotate; }
+
 	void SetTranslate(const Vector3& translate) { transform_.translate = translate; }
-	const Vector3& GetTranslate() { return transform_.translate; }
+	const Vector3& GetTranslate() const { return transform_.translate; }
 
-	void SetFovY(const float& horizontalFOV) { horizontalFOV_ = horizontalFOV; }
-	void SetAspectRate(const float& aspectRatio) { aspectRatio_ = aspectRatio; }
-	void SetNearClip(const float& nearClip) { nearClip_ = nearClip; }
-	void SetFarClip(const float& farClip) { farClip_ = farClip; }
+	void SetFovY(const float& horizontalFOV) { horizontalFOV_ = horizontalFOV; UpdateProjectionMatrix(); }
+	void SetAspectRate(const float& aspectRatio) { aspectRatio_ = aspectRatio; UpdateProjectionMatrix(); }
+	void SetNearClip(const float& nearClip) { nearClip_ = nearClip; UpdateProjectionMatrix(); }
+	void SetFarClip(const float& farClip) { farClip_ = farClip; UpdateProjectionMatrix(); }
 
+	// 行列の取得関数
 	const Matrix4x4& GetWorldMatrix() const { return worldMatrix_; }
 	const Matrix4x4& GetViewMatrix() const { return viewMatrix_; }
 	const Matrix4x4& GetProjectionMatrix() const { return projectionMatrix_; }

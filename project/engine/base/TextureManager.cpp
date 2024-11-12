@@ -25,7 +25,6 @@ void TextureManager::Initialize(DirectXManager* dxManager, SrvManager* srvManage
 
 void TextureManager::LoadTexture(const std::string& filePath)
 {
-
 	if (textureData_.contains(filePath)) {
 		// 読み込み済みなら早期return
 		return;

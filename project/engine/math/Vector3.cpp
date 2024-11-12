@@ -1,6 +1,7 @@
 #include "Vector3.h"
 #include <imgui.h>
 #include <Quaternion.h>
+#include <Camera.h>
 
 // ベクトルの加算
 Vector3 Vector3::operator+(const Vector3& other) const {

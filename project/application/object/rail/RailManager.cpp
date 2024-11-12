@@ -11,17 +11,17 @@ void RailManager::Initialize()
 
 void RailManager::Update()
 {
-	ImGui::Begin("controlPoint");
-	ImGui::DragFloat3("controlPoint0", &controlPoints_[0].x, 0.01f);
-	ImGui::DragFloat3("controlPoint1", &controlPoints_[1].x, 0.01f);
-	ImGui::DragFloat3("controlPoint2", &controlPoints_[2].x, 0.01f);
-	ImGui::DragFloat3("controlPoint3", &controlPoints_[3].x, 0.01f);
-	ImGui::DragFloat3("controlPoint4", &controlPoints_[4].x, 0.01f);
-	ImGui::DragFloat3("controlPoint5", &controlPoints_[5].x, 0.01f);
-	ImGui::DragFloat3("controlPoint6", &controlPoints_[6].x, 0.01f);
-	ImGui::DragFloat3("controlPoint7", &controlPoints_[7].x, 0.01f);
-	//ImGui::DragFloat3("controlPoint8", &controlPoints_[8].x, 0.01f);
-	ImGui::End();
+	//ImGui::Begin("controlPoint");
+	//ImGui::DragFloat3("controlPoint0", &controlPoints_[0].x, 0.01f);
+	//ImGui::DragFloat3("controlPoint1", &controlPoints_[1].x, 0.01f);
+	//ImGui::DragFloat3("controlPoint2", &controlPoints_[2].x, 0.01f);
+	//ImGui::DragFloat3("controlPoint3", &controlPoints_[3].x, 0.01f);
+	//ImGui::DragFloat3("controlPoint4", &controlPoints_[4].x, 0.01f);
+	//ImGui::DragFloat3("controlPoint5", &controlPoints_[5].x, 0.01f);
+	//ImGui::DragFloat3("controlPoint6", &controlPoints_[6].x, 0.01f);
+	//ImGui::DragFloat3("controlPoint7", &controlPoints_[7].x, 0.01f);
+	////ImGui::DragFloat3("controlPoint8", &controlPoints_[8].x, 0.01f);
+	//ImGui::End();
 
 	// 線分で描画する用の頂点リスト
 	std::vector<Vector3> pointsUpdating;
@@ -40,7 +40,6 @@ void RailManager::Update()
 		// 先頭から2点ずつ取り出す
 		startPos.push_back(pointsUpdating[i]);
 		endPos.push_back(pointsUpdating[i + 1]);
-		lineVector = pointsUpdating[i + 1] - pointsUpdating[i];
 	}
 	CreateRail(startPos, endPos);
 
@@ -50,6 +49,9 @@ void RailManager::Update()
 		playerMove = 0.0f;
 	}
 
+	// プレイヤーの位置（カメラの後ろ、例として2.0fの距離分）
+	playerTranslate = Normalize(cameraTranslate);
+
 	// 現在のカメラ位置をCatmull-Romスプラインで取得
 	cameraTranslate = CatmullRomPosition(controlPoints_, playerMove);
 	// 少し先の位置を計算し、カメラの進行方向ベクトルを求める
@@ -58,6 +60,7 @@ void RailManager::Update()
 
 	// カメラの進行方向を計算し、正規化
 	Vector3 direction = Normalize(nextPos - cameraTranslate);
+
 	// 進行方向に垂直な上方向を計算（常にY軸上方向を基準にする）
 	Vector3 up(0.0f, 1.0f, 0.0f);
 	Vector3 offsetUp = Cross(direction, Cross(up, direction)); // 進行方向と上ベクトルから垂直上方向を計算
@@ -70,9 +73,10 @@ void RailManager::Update()
 	// クォータニオンをオイラー角に変換し、微調整を追加
 	Vector3 eulerRotation = ToEulerAngles(rotationQuat);
 
-	eulerRotation.y += 1.56f;
+	eulerRotation.y += 1.57f;
 	cameraRotate = eulerRotation;
-	cameraTranslate += {0.0f, 0.5f, 0.0f};
+
+
 
 	for (size_t i = 0; i < kRailNum; i++) {
 		rails_[i]->Update();
@@ -83,6 +87,13 @@ void RailManager::Draw()
 {
 	for (size_t i = 0; i < kRailNum; i++) {
 		rails_[i]->Draw();
+	}
+}
+
+void RailManager::Finalize()
+{
+	for (size_t i = 0; i < kRailNum; i++) {
+		delete rails_[i];
 	}
 }
 
@@ -98,7 +109,7 @@ void RailManager::CreateRail(const std::vector<Vector3>& startPoses, const std::
 
 		// 始点と終点の距離からスケールを計算
 		float length = Length(endPos - startPos);
-		rails_[i]->SetScale({ length/2.0f, 1.0f, 1.0f });
+		rails_[i]->SetScale({ length / 2.0f, 1.0f, 1.0f });
 
 		// クォータニオンで回転の計算（始点から終点への回転を計算）
 		Quaternion rotationQuat;
