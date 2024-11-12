@@ -64,6 +64,16 @@ bool Vector3::operator!=(const Vector3& other) const {
     return !(*this == other);
 }
 
+// ベクトルの符号反転
+Vector3 Vector3::operator-() const {
+    return Vector3(-x, -y, -z);
+}
+
+// スカラーとベクトルの乗算（非メンバ関数）
+Vector3 operator*(float scalar, const Vector3& vec) {
+    return Vector3(scalar * vec.x, scalar * vec.y, scalar * vec.z);
+}
+
 // ヘルパー関数
 float Dot(const Vector3& v1, const Vector3& v2) {
     return v1.x * v2.x + v1.y * v2.y + v1.z * v2.z;
@@ -75,6 +85,9 @@ float Length(const Vector3& v) {
 
 Vector3 Normalize(const Vector3& v) {
     float len = Length(v);
+    if (len == 0.0f) {
+        return Vector3(0.0f, 0.0f, 0.0f); // 長さが0なら元のゼロベクトルを返す
+    }
     return { v.x / len, v.y / len, v.z / len };
 }
 

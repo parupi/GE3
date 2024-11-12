@@ -4,6 +4,8 @@
 #include <imgui.h>
 #include <Matrix4x4.h>
 #include <Vector3.h>
+#include <function.h>
+#include <numbers>
 // コンストラクタ
 Quaternion::Quaternion(float x, float y, float z, float w) : x(x), y(y), z(z), w(w) {}
 
@@ -140,6 +142,82 @@ float Dot(const Quaternion& q0, const Quaternion& q1)
 {
     return { q0.x * q1.x + q0.y * q1.y + q0.z * q1.z + q0.w * q1.w };
 }
+
+Quaternion QuaternionFromAxes(const Vector3& x, const Vector3& y, const Vector3& z)
+{
+    Quaternion q;
+    float trace = x.x + y.y + z.z;
+    if (trace > 0.0f) {
+        float s = sqrtf(trace + 1.0f) * 2.0f;
+        q.w = 0.25f * s;
+        q.x = (y.z - z.y) / s;
+        q.y = (z.x - x.z) / s;
+        q.z = (x.y - y.x) / s;
+    }
+    else if ((x.x > y.y) && (x.x > z.z)) {
+        float s = sqrtf(1.0f + x.x - y.y - z.z) * 2.0f;
+        q.w = (y.z - z.y) / s;
+        q.x = 0.25f * s;
+        q.y = (y.x + x.y) / s;
+        q.z = (z.x + x.z) / s;
+    }
+    else if (y.y > z.z) {
+        float s = sqrtf(1.0f + y.y - x.x - z.z) * 2.0f;
+        q.w = (z.x - x.z) / s;
+        q.x = (y.x + x.y) / s;
+        q.y = 0.25f * s;
+        q.z = (z.y + y.z) / s;
+    }
+    else {
+        float s = sqrtf(1.0f + z.z - x.x - y.y) * 2.0f;
+        q.w = (x.y - y.x) / s;
+        q.x = (z.x + x.z) / s;
+        q.y = (z.y + y.z) / s;
+        q.z = 0.25f * s;
+    }
+    return q;
+}
+
+Quaternion SetFromTo(const Vector3& from, const Vector3& to)
+{
+    Vector3 f = Normalize(from); // 正規化したfromベクトル
+    Vector3 t = Normalize(to);   // 正規化したtoベクトル
+
+    Vector3 cross = Cross(f, t);    // fromとtoのクロス積
+    float dot = Dot(f, t);          // fromとtoの内積
+
+    // 回転角をクォータニオンに変換
+    float w = sqrt((1.0f + dot) * 0.5f); // 回転のスカラー成分
+    float s = 0.5f / w;
+
+    float x = cross.x * s;
+    float y = cross.y * s;
+    float z = cross.z * s;
+
+    return { x, y, z, w };
+}
+
+Vector3 ToEulerAngles(const Quaternion& quat)
+{
+    Vector3 angles;
+
+    // ピッチ（X軸）
+    float sinPitch = 2.0f * (quat.w * quat.x + quat.y * quat.z);
+    float cosPitch = 1.0f - 2.0f * (quat.x * quat.x + quat.y * quat.y);
+    angles.x = atan2(sinPitch, cosPitch);
+
+    // ヨー（Y軸）
+    float sinYaw = 2.0f * (quat.w * quat.y - quat.z * quat.x);
+    angles.y = fabs(sinYaw) >= 1.0f ? copysign(std::numbers::pi_v<float> / 2, sinYaw) : asin(sinYaw); // 特別なケース
+
+    // ロール（Z軸）
+    float sinRoll = 2.0f * (quat.w * quat.z + quat.x * quat.y);
+    float cosRoll = 1.0f - 2.0f * (quat.y * quat.y + quat.z * quat.z);
+    angles.z = atan2(sinRoll, cosRoll);
+
+    return angles;
+}
+
 
 // ImGuiを使ったクォータニオンの描画
 void PrintOnImGui(const Quaternion& q, const char* label) {

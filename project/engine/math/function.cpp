@@ -27,7 +27,7 @@ Matrix4x4 MakeScaleMatrix(const Vector3& scale) { return {scale.x, 0, 0, 0, 0, s
 //	return result;
 //}
 
-Vector3 Transformm_(const Vector3& vector, const Matrix4x4& matrix) {
+Vector3 TransformFunc(const Vector3& vector, const Matrix4x4& matrix) {
 	Vector3 result;
 	result.x = vector.x * matrix.m[0][0] + vector.y * matrix.m[1][0] + vector.z * matrix.m[2][0] + 1.0f * matrix.m[3][0];
 	result.y = vector.x * matrix.m[0][1] + vector.y * matrix.m[1][1] + vector.z * matrix.m[2][1] + 1.0f * matrix.m[3][1];
@@ -207,71 +207,6 @@ Vector3 ExtractTranslation(const Matrix4x4& matrix) {
 	return translation;
 }
 
-//Matrix4x4 ScaleMatrixFromVector3(const Vector3& scale)
-//{
-//	Matrix4x4 scaleMatrix = {};
-//	scaleMatrix.m[0][0] = scale.x;  // X方向のスケール
-//	scaleMatrix.m[1][1] = scale.y;  // Y方向のスケール
-//	scaleMatrix.m[2][2] = scale.z;  // Z方向のスケール
-//	scaleMatrix.m[3][3] = 1.0f;     // W成分は1.0
-//
-//	return scaleMatrix;
-//}
-//
-//Matrix4x4 TranslationMatrixFromVector3(const Vector3& translate)
-//{
-//	Matrix4x4 translationMatrix = {};
-//	translationMatrix.m[0][0] = 1.0f;  // 単位行列の成分
-//	translationMatrix.m[1][1] = 1.0f;  // 単位行列の成分
-//	translationMatrix.m[2][2] = 1.0f;  // 単位行列の成分
-//	translationMatrix.m[3][3] = 1.0f;  // 単位行列の成分
-//
-//	translationMatrix.m[3][0] = translate.x;  // X方向の移動
-//	translationMatrix.m[3][1] = translate.y;  // Y方向の移動
-//	translationMatrix.m[3][2] = translate.z;  // Z方向の移動
-//
-//	return translationMatrix;
-//}
-
-//Matrix4x4 MakeRotateAxisAngle(const Vector3& axis, float angle)
-//{
-//	// 回転軸ベクトルを正規化
-//	Vector3 normalizedAxis = Normalize(axis);
-//	float x = normalizedAxis.x;
-//	float y = normalizedAxis.y;
-//	float z = normalizedAxis.z;
-//
-//	// 三角関数を事前に計算
-//	float cosTheta = std::cos(angle);
-//	float sinTheta = std::sin(angle);
-//	float oneMinusCosTheta = 1.0f - cosTheta;
-//
-//	// 回転行列を生成
-//	Matrix4x4 rotationMatrix;
-//	rotationMatrix.m[0][0] = cosTheta + x * x * oneMinusCosTheta;
-//	rotationMatrix.m[0][1] = x * y * oneMinusCosTheta + z * sinTheta;
-//	rotationMatrix.m[0][2] = x * z * oneMinusCosTheta - y * sinTheta;
-//	rotationMatrix.m[0][3] = 0.0f;
-//
-//	rotationMatrix.m[1][0] = x * y * oneMinusCosTheta - z * sinTheta;
-//	rotationMatrix.m[1][1] = cosTheta + y * y * oneMinusCosTheta;
-//	rotationMatrix.m[1][2] = y * z * oneMinusCosTheta + x * sinTheta;
-//	rotationMatrix.m[1][3] = 0.0f;
-//
-//	rotationMatrix.m[2][0] = z * x * oneMinusCosTheta + y * sinTheta;
-//	rotationMatrix.m[2][1] = z * y * oneMinusCosTheta - x * sinTheta;
-//	rotationMatrix.m[2][2] = cosTheta + z * z * oneMinusCosTheta;
-//	rotationMatrix.m[2][3] = 0.0f;
-//
-//	rotationMatrix.m[3][0] = 0.0f;
-//	rotationMatrix.m[3][1] = 0.0f;
-//	rotationMatrix.m[3][2] = 0.0f;
-//	rotationMatrix.m[3][3] = 1.0f;
-//
-//	return rotationMatrix;
-//}
-
-
 
 Matrix4x4 DirectionToDirection(const Vector3& from, const Vector3& to)
 {
@@ -284,12 +219,12 @@ Matrix4x4 DirectionToDirection(const Vector3& from, const Vector3& to)
 	float cosAngle = Dot(fromNorm, toNorm);       // 内積は cos(角度) と等しい
 
 	// 特殊ケース: ベクトルがほぼ一致する場合（回転不要）
-	if (sinAngle < 1e-6f) {
+	if (cosAngle > 1e-6f) {
 		return MakeIdentity4x4();
 	}
 
 	// 特殊ケース: 180度の回転（ベクトルが正反対の場合）
-	if (cosAngle < -1.0f + 1e-6f) {
+	else if (cosAngle < -1.0f + 1e-6f) {
 		// 例えば (1,0,0) を (0,1,0) にマッピングするような任意の軸が必要
 		axis = std::abs(fromNorm.x) > 0.9f ? Vector3{ 0, 1, 0 } : Vector3{ 1, 0, 0 };
 		axis = Normalize(Cross(fromNorm, axis));
@@ -328,3 +263,61 @@ Matrix4x4 DirectionToDirection(const Vector3& from, const Vector3& to)
 
 	return rotationMatrix;
 }
+
+
+Vector3 CatmullRomPosition(const std::vector<Vector3>& points, float t) {
+	assert(points.size() >= 4 && "制御点は4点以上必要です");
+
+	// 区間数は制御点の数-1
+	size_t division = points.size() - 1;
+	// 1区間の長さ
+	float areaWidth = 1.0f / division;
+
+	// 区間内の始点を0.0f, 終点を1.0fとした時の現在位置
+	float t_2 = std::fmod(t, areaWidth) * division;
+	// 加減(0.0f)と上限(1.0f)の範囲に収める
+	t_2 = std::clamp(t_2, 0.0f, 1.0f);
+
+	// 区間番号を計算し、範囲内に収める
+	size_t index = static_cast<size_t>(t / areaWidth);
+	// 上限を超えないように抑える
+	index =	std::min(index, points.size() - 2);
+
+	// 4点分のインデックス
+	size_t index0 = index - 1;
+	size_t index1 = index;
+	size_t index2 = index + 1;
+	size_t index3 = index + 2;
+
+	// 最初の区間のp0はp1を重複使用する
+	if (index == 0) {
+		index0 = index1;
+	}
+	// 最後の区間のp3はp2を重複使用する
+	if (index3 >= points.size()) {
+		index3 = index2;
+	}
+
+	// 4点の座標
+	const Vector3& p0 = points[index0];
+	const Vector3& p1 = points[index1];
+	const Vector3& p2 = points[index2];
+	const Vector3& p3 = points[index3];
+
+	return CatmullRomInterpolation(p0, p1, p2, p3, t_2);
+}
+
+Vector3 CatmullRomInterpolation(const Vector3& p0, const Vector3& p1, const Vector3& p2, const Vector3& p3, float t) {
+	const float s = 0.5f;
+
+	float t2 = t * t;
+	float t3 = t2 * t;
+
+	Vector3 e3 = -p0 + 3 * p1 - 3 * p2 + p3;
+	Vector3 e2 = 2 * p0 - 5 * p1 + 4 * p2 - p3;
+	Vector3 e1 = -p0 + p2;
+	Vector3 e0 = 2 * p1;
+
+
+	return s * (e3 * t3 + e2 * t2 + e1 * t + e0);
+};

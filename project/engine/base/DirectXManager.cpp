@@ -539,11 +539,6 @@ void DirectXManager::BeginDraw()
 	// 深度ビューのクリア
 	ClearDepthStencilView();
 
-
-
-	// ImGuiの描画コマンドを積む
-	//RenderImGui();
-
 	// ビューポートとシザーレクトの設定
 	SetViewportAndScissorRect();
 }
