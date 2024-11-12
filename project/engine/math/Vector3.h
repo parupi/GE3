@@ -41,6 +41,7 @@ float Dot(const Vector3& v1, const Vector3& v2);
 float Length(const Vector3& v);
 Vector3 Normalize(const Vector3& v);
 Vector3 RotateVector(const Vector3& vector, const Quaternion& quaternion);
-
+// マウスの画面座標からワールド座標への変換
+Vector3 ScreenToWorld(int mouseX, int mouseY);
 // ImGuiを使ったVector3の描画
 void PrintOnImGui(const Vector3& v, const char* label = "Vector3");

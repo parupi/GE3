@@ -55,12 +55,9 @@ Matrix4x4 MakeRotateYMatrix(float radian);
 // Z軸回転行列を作成
 Matrix4x4 MakeRotateZMatrix(float radian);
 
-// 3x3行列式を計算するヘルパー関数
-float Determinant3x3(float a, float b, float c, float d, float e, float f, float g, float h, float i);
-
-// 4x4行列の行列式を計算する関数
-float Determinant(const Matrix4x4& m);
+Matrix4x4 CreateViewMatrix(const Vector3& cameraPosition, const Vector3& cameraRotation);
 
 Matrix4x4 MakeRotateMatrix(const Quaternion& quaternion);
+Matrix4x4 CreateProjectionMatrix(float fov, float aspectRatio, float nearClip, float farClip);
 
 void PrintOnImGui(const Matrix4x4& matrix, const char* label = "Matrix");

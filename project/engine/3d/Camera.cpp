@@ -33,3 +33,15 @@ void Camera::FollowCamera(const Vector3& target)
 	viewMatrix_ = Inverse(worldMatrix_);
 
 }
+
+void Camera::UpdateViewMatrix()
+{
+	// transform_の位置と回転からビュー行列を計算
+	viewMatrix_ = LookAt(transform_.translate, transform_.translate + Vector3(0, 0, 1), Vector3(0, 1, 0));
+}
+
+void Camera::UpdateProjectionMatrix()
+{
+	// 視野角、アスペクト比、ニアクリップ、ファークリップを基にプロジェクション行列を計算
+	projectionMatrix_ = CreateProjectionMatrix(horizontalFOV_, aspectRatio_, nearClip_, farClip_);
+}

@@ -112,6 +112,17 @@ Quaternion MakeRotateAxisAngleQuaternion(const Vector3& axis, float angle) {
     );
 }
 
+Quaternion CreateCameraRotationQuaternion(const Vector3& eulerAngles) {
+    // 各軸に対する回転クォータニオンを作成
+    Quaternion qPitch = MakeRotateAxisAngleQuaternion(Vector3(1.0f, 0.0f, 0.0f), eulerAngles.x); // X軸 (ピッチ)
+    Quaternion qYaw = MakeRotateAxisAngleQuaternion(Vector3(0.0f, 1.0f, 0.0f), eulerAngles.y); // Y軸 (ヨー)
+    Quaternion qRoll = MakeRotateAxisAngleQuaternion(Vector3(0.0f, 0.0f, 1.0f), eulerAngles.z); // Z軸 (ロール)
+
+    // 合成して最終的な回転クォータニオンを取得
+    // 順序は Yaw -> Pitch -> Roll とする（カメラの回転に一般的な順序）
+    return qYaw * qPitch * qRoll;
+}
+
 Quaternion Slerp(Quaternion q0, Quaternion q1, float t)
 {
     float dot = Dot(q0, q1);

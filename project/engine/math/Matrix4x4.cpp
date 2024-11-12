@@ -1,6 +1,8 @@
 #include "Matrix4x4.h"
 #include <imgui.h>
 #include <Quaternion.h>
+#include <Vector3.h>
+#include <function.h>
 
 // デフォルトコンストラクタ
 Matrix4x4::Matrix4x4() : m{ {0.0f} } {}
@@ -226,6 +228,46 @@ Matrix4x4 MakeRotateYMatrix(float radian) {
 // Z軸回転行列
 Matrix4x4 MakeRotateZMatrix(float radian) {
     return { cosf(radian), sinf(radian), 0, 0, -sinf(radian), cosf(radian), 0, 0, 0, 0, 1, 0, 0, 0, 0, 1 };
+}
+
+Matrix4x4 CreateViewMatrix(const Vector3& cameraPosition, const Vector3& cameraRotation)
+{
+    // カメラのオイラー角（ピッチ、ヨー、ロール）をクォータニオンに変換
+    Quaternion rotationQuat = CreateCameraRotationQuaternion(cameraRotation);
+
+    // クォータニオンを使って、カメラの前方向、上方向、右方向を計算
+    Vector3 forward = RotateVector(Vector3(0.0f, 0.0f, -1.0f), rotationQuat); // -Z方向が前方向
+    Vector3 up = RotateVector(Vector3(0.0f, 1.0f, 0.0f), rotationQuat);       // Y方向が上方向
+    Vector3 right = Cross(up, forward);                                       // 右方向は上と前の外積
+
+    // ビュー行列の計算
+    Matrix4x4 matView;
+    matView.m[0][0] = right.x;
+    matView.m[1][0] = right.y;
+    matView.m[2][0] = right.z;
+    matView.m[0][1] = up.x;
+    matView.m[1][1] = up.y;
+    matView.m[2][1] = up.z;
+    matView.m[0][2] = -forward.x;
+    matView.m[1][2] = -forward.y;
+    matView.m[2][2] = -forward.z;
+    matView.m[3][0] = -Dot(right, cameraPosition);
+    matView.m[3][1] = -Dot(up, cameraPosition);
+    matView.m[3][2] = Dot(forward, cameraPosition);
+    matView.m[3][3] = 1.0f;
+    return matView;
+}
+
+Matrix4x4 CreateProjectionMatrix(float fov, float aspectRatio, float nearClip, float farClip) {
+    float f = 1.0f / tanf(fov * 0.5f);
+
+    Matrix4x4 matProjection = {};
+    matProjection.m[0][0] = f / aspectRatio;
+    matProjection.m[1][1] = f;
+    matProjection.m[2][2] = (farClip + nearClip) / (nearClip - farClip);
+    matProjection.m[2][3] = -1.0f;
+    matProjection.m[3][2] = (2.0f * farClip * nearClip) / (nearClip - farClip);
+    return matProjection;
 }
 
 void PrintOnImGui(const Matrix4x4& matrix, const char* label) {
