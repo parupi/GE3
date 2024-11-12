@@ -62,7 +62,7 @@
       <AdditionalOptions>/utf-8 %(AdditionalOptions)</AdditionalOptions>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
-      <AdditionalIncludeDirectories>$(ProjectDir)engine\base;$(ProjectDir)engine\2d;$(ProjectDir)engine\3d;$(ProjectDir)engine\input;$(ProjectDir)engine\audio;$(ProjectDir)engine\scene;$(ProjectDir)engine\math;$(ProjectDir)externals\DirectXTex;$(ProjectDir)externals\imgui;$(ProjectDir)externals\nlohmann;$(ProjectDir)engine\debuger;$(ProjectDir)application\scene;$(ProjectDir)engine\core;$(ProjectDir)application\player;$(ProjectDir)application\Enemy;$(ProjectDir)externals\assimp\include;$(ProjectDir)application\charcter\player;$(ProjectDir)application\object\rail</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir)externals\imgui;$(ProjectDir)engine\debuger;$(ProjectDir)application\scene;$(ProjectDir)engine\core;$(ProjectDir)application\player;$(ProjectDir)application\Enemy;$(ProjectDir)externals\assimp\include;$(ProjectDir)application\charcter\player;$(ProjectDir)application\object\rail;$(ProjectDir)engine\2d;$(ProjectDir)engine\3d;$(ProjectDir)engine\input;$(ProjectDir)externals\DirectXTex;$(ProjectDir)engine\audio;$(ProjectDir)engine\scene;$(ProjectDir)engine\math;$(ProjectDir)engine\base;$(ProjectDir)externals\nlohmann;$(ProjectDir)application\charcter\enemy;$(ProjectDir)sphere;$(ProjectDir)application\object\sphere</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -88,7 +88,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
       <TreatWarningAsError>true</TreatWarningAsError>
-      <AdditionalIncludeDirectories>$(ProjectDir)engine\base;$(ProjectDir)engine\2d;$(ProjectDir)engine\3d;$(ProjectDir)engine\input;$(ProjectDir)engine\audio;$(ProjectDir)engine\scene;$(ProjectDir)engine\math;$(ProjectDir)externals\DirectXTex;$(ProjectDir)externals\imgui;$(ProjectDir)externals\nlohmann;$(ProjectDir)engine\debug;$(ProjectDir)application\scene;$(ProjectDir)engine\core;$(ProjectDir)application\player;$(ProjectDir)application\Enemy;$(ProjectDir)externals\assimp\include;$(ProjectDir)application\charcter\player;$(ProjectDir)application\object\rail</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir)externals\imgui;$(ProjectDir)engine\debug;$(ProjectDir)application\scene;$(ProjectDir)engine\core;$(ProjectDir)application\player;$(ProjectDir)application\Enemy;$(ProjectDir)externals\assimp\include;$(ProjectDir)application\charcter\player;$(ProjectDir)application\object\rail;$(ProjectDir)engine\2d;$(ProjectDir)engine\3d;$(ProjectDir)engine\input;$(ProjectDir)externals\DirectXTex;$(ProjectDir)engine\audio;$(ProjectDir)engine\scene;$(ProjectDir)engine\math;$(ProjectDir)engine\base;$(ProjectDir)externals\nlohmann;$(ProjectDir)application\charcter\enemy;$(ProjectDir)sphere;$(ProjectDir)application\object\sphere</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -105,6 +105,8 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="application\charcter\enemy\Enemy.cpp" />
+    <ClCompile Include="application\charcter\enemy\EnemyManager.cpp" />
     <ClCompile Include="engine\3d\CameraManager.cpp" />
     <ClCompile Include="engine\3d\LightManager.cpp" />
     <ClCompile Include="engine\3d\WorldTransform.cpp" />
@@ -153,6 +155,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="application\object\rail\RailManager.cpp" />
     <ClCompile Include="application\charcter\player\Player.cpp" />
     <ClCompile Include="application\charcter\player\PlayerBullet.cpp" />
+    <ClCompile Include="application\object\sphere\Sphere.cpp" />
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="resource\shaders\Object3d.PS.hlsl">
@@ -173,6 +176,8 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     </FxCompile>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="application\charcter\enemy\Enemy.h" />
+    <ClInclude Include="application\charcter\enemy\EnemyManager.h" />
     <ClInclude Include="engine\3d\CameraManager.h" />
     <ClInclude Include="engine\3d\LightManager.h" />
     <ClInclude Include="engine\3d\WorldTransform.h" />
@@ -224,6 +229,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="application\object\rail\RailManager.h" />
     <ClInclude Include="application\charcter\player\Player.h" />
     <ClInclude Include="application\charcter\player\PlayerBullet.h" />
+    <ClInclude Include="application\object\sphere\Sphere.h" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="externals\imgui\LICENSE.txt" />

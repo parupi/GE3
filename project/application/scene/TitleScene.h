@@ -3,6 +3,7 @@
 #include <BaseScene.h>
 #include "SceneManager.h"
 #include <memory>
+#include <Sprite.h>
 class TitleScene : public BaseScene
 {
 public:
@@ -17,5 +18,7 @@ public:
 
 private:
 	std::unique_ptr<Camera> camera_ = nullptr;
+
+	Sprite* titleBGSprite_;
 };
 
