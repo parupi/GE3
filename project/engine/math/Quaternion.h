@@ -46,6 +46,11 @@ Quaternion MakeRotateAxisAngleQuaternion(const Vector3& axis, float angle);
 Quaternion Slerp(Quaternion q0, Quaternion q1, float t);
 // 内積
 float Dot(const Quaternion& q0, const Quaternion& q1);
+// 3つの回転軸からQuaternionを求める
+Quaternion QuaternionFromAxes(const Vector3& x, const Vector3& y, const Vector3& z);
+
+Quaternion SetFromTo(const Vector3& from, const Vector3& to);
+Vector3 ToEulerAngles(const Quaternion& quat);
 
 // ImGuiを使ったクォータニオンの描画
 void PrintOnImGui(const Quaternion& q, const char* label = "Quaternion");

@@ -4,6 +4,8 @@
 #include "cmath"
 #include <Matrix4x4.h>
 #include <imgui.h>
+#include <vector>
+#include <algorithm>
 
 static const int kColumnWidth = 60;
 static const int kRowHeight = 20;
@@ -34,7 +36,7 @@ Matrix4x4 MakeScaleMatrix(const Vector3& scale);
 
 // 座標変換
 //Vector3 Transform(const Vector3& vector, const Matrix4x4& matrix);
-Vector3 Transformm_(const Vector3& vector, const Matrix4x4& matrix);
+Vector3 TransformFunc(const Vector3& vector, const Matrix4x4& matrix);
 
 Matrix4x4 MakeRotateXYZMatrix(Vector3 rotate);
 
@@ -71,4 +73,8 @@ Vector3 ExtractTranslation(const Matrix4x4& matrix);
 
 //Matrix4x4 MakeRotaeAxisAngle(const Vector3& axis, float angle);
 
+// ある方向からある方向へ向けるための回転行列を作成する関数
 Matrix4x4 DirectionToDirection(const Vector3& from, const Vector3& to);
+
+Vector3 CatmullRomPosition(const std::vector<Vector3>& points, float t);
+Vector3 CatmullRomInterpolation(const Vector3& p0, const Vector3& p1, const Vector3& p2, const Vector3& p3, float t);

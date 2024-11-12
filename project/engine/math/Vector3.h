@@ -30,7 +30,11 @@ struct Vector3 final {
     bool operator==(const Vector3& other) const;
     // ベクトルの非等価比較
     bool operator!=(const Vector3& other) const;
+    // ベクトルの符号反転
+    Vector3 operator-() const;
 };
+// スカラーとベクトルの乗算
+Vector3 operator*(float scalar, const Vector3& vec);
 
 // ヘルパー関数
 float Dot(const Vector3& v1, const Vector3& v2);

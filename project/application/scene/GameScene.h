@@ -8,6 +8,9 @@
 #include <memory>
 #include <Audio.h>
 #include <CameraManager.h>
+#include "RailManager.h"
+#include "LightManager.h"
+#include "Player.h"
 class GameScene : public BaseScene
 {
 public:
@@ -23,13 +26,12 @@ public:
 private:
 	CameraManager cameraManager_;
 	std::shared_ptr<Camera> normalCamera_;
-	std::shared_ptr<Camera> bossCamera_;
+	std::shared_ptr<Camera> railCamera_;
+	WorldTransform railCameraTransform_;
 
-	Object3d* object_;
-	std::vector<Sprite*> sprites;
+	RailManager* railManager_;
+	Player* player_;
 
-	Vector4 color1 = { 1.0f, 1.0f, 1.0f, 1.0f };
-	Vector4 color2 = { 1.0f, 1.0f, 1.0f, 1.0f };
-	uint32_t soundHandle = 0u;
+	LightManager* lightManager_;
 };
 
