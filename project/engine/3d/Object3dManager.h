@@ -24,10 +24,11 @@ public:
 	void DrawSet();
 private:
 	void CreateRootSignature();
-	D3D12_INPUT_LAYOUT_DESC CreateInputElementDesc();
+	void CreateInputElementDesc();
 	void CreateBlendState();
 	void CreateRasterizerState();
 	void LoadShader();
+	void CreateDepthStencilState();
 	void CreatePipelineState();
 private:
 	// DirectXのポインタ
@@ -40,6 +41,7 @@ private:
 	// PSO
 	Microsoft::WRL::ComPtr<ID3D12PipelineState> graphicsPipelineState_ = nullptr;
 
+	D3D12_INPUT_ELEMENT_DESC inputElementDescs_[3] = {};
 	D3D12_INPUT_LAYOUT_DESC inputLayoutDesc_{};
 	// BlendState
 	D3D12_BLEND_DESC blendDesc_{};

@@ -6,14 +6,15 @@
 class SpriteManager
 {
 public:
-	static std::unique_ptr<SpriteManager> instance;
+	static SpriteManager* instance;
 	static std::once_flag initInstanceFlag;
 
+	SpriteManager() = default;
+	~SpriteManager() = default;
 	SpriteManager(SpriteManager&) = default;
 	SpriteManager& operator=(SpriteManager&) = default;
 public:
-	SpriteManager() = default;
-	~SpriteManager() = default;
+
 	// シングルトンインスタンスの取得
 	static SpriteManager* GetInstance();
 	// 初期化
@@ -25,10 +26,11 @@ public:
 
 private:
 	void CreateRootSignature();
-	D3D12_INPUT_LAYOUT_DESC CreateInputElementDesc();
+	void CreateInputElementDesc();
 	void CreateBlendState();
 	void CreateRasterizerState();
 	void LoadShader();
+	void CreateDepthStencilState();
 	void CreatePipelineState();
 private:
 	// DirectXのポインタ
@@ -37,11 +39,14 @@ private:
 	Microsoft::WRL::ComPtr<ID3D12RootSignature> rootSignature_ = nullptr;
 	// PSO
 	Microsoft::WRL::ComPtr<ID3D12PipelineState> graphicsPipelineState_ = nullptr;
-
+	// InputLayout
+	D3D12_INPUT_ELEMENT_DESC inputElementDescs_[3] = {};
 	D3D12_INPUT_LAYOUT_DESC inputLayoutDesc_{};
 	// BlendState
 	D3D12_BLEND_DESC blendDesc_{};
 	D3D12_RASTERIZER_DESC rasterizerDesc_{};
+
+	D3D12_DEPTH_STENCIL_DESC depthStencilDesc_{};
 
 	Microsoft::WRL::ComPtr<IDxcBlob> vertexShaderBlob_ = nullptr;
 	Microsoft::WRL::ComPtr<IDxcBlob> pixelShaderBlob_ = nullptr;
