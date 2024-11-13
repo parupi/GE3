@@ -37,19 +37,19 @@ void GameScene::Update()
 	Vector3 normalCameraPos = normalCamera_->GetTranslate();
 	Vector3 bossCameraPos = bossCamera_->GetTranslate();
 
-	ImGui::Begin("Camera Manager");
-	ImGui::DragFloat3("normalPos", &normalCameraPos.x, 0.01f);
-	ImGui::DragFloat3("bossPos", &bossCameraPos.x, 0.01f);
+	//ImGui::Begin("Camera Manager");
+	//ImGui::DragFloat3("normalPos", &normalCameraPos.x, 0.01f);
+	//ImGui::DragFloat3("bossPos", &bossCameraPos.x, 0.01f);
 
-	if (ImGui::Button("Set Camera 1"))
-	{
-		cameraManager_.SetActiveCamera(0);
-	}
-	if (ImGui::Button("Set Camera 2"))
-	{
-		cameraManager_.SetActiveCamera(1);
-	}
-	ImGui::End();
+	//if (ImGui::Button("Set Camera 1"))
+	//{
+	//	cameraManager_.SetActiveCamera(0);
+	//}
+	//if (ImGui::Button("Set Camera 2"))
+	//{
+	//	cameraManager_.SetActiveCamera(1);
+	//}
+	//ImGui::End();
 
 	normalCameraPos += {0.0f, 0.0f, 0.01f};
 
