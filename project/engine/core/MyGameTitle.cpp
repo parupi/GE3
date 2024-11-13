@@ -5,7 +5,7 @@ void MyGameTitle::Initialize()
 {
 	GuchisFramework::Initialize();
 	// ImGui初期化
-	ImGuiManager::GetInstance()->Initialize(winManager.get(), dxManager.get());
+	//ImGuiManager::GetInstance()->Initialize(winManager.get(), dxManager.get());
 	// 2Dテクスチャマネージャーの初期化
 	TextureManager::GetInstance()->Initialize(dxManager.get(), srvManager.get());
 	// 3Dテクスチャマネージャーの初期化
@@ -25,7 +25,7 @@ void MyGameTitle::Initialize()
 	SceneManager::GetInstance()->ChangeScene("TITLE");
 
 	// インスタンス生成
-	GlobalVariables::GetInstance();
+	//GlobalVariables::GetInstance();
 }
 
 void MyGameTitle::Finalize()
@@ -34,17 +34,17 @@ void MyGameTitle::Finalize()
 	SpriteManager::GetInstance()->Finalize();
 	Object3dManager::GetInstance()->Finalize();
 
-	ImGuiManager::GetInstance()->Finalize();
+	//ImGuiManager::GetInstance()->Finalize();
 	GuchisFramework::Finalize();
 }
 
 void MyGameTitle::Update()
 {
-	ImGuiManager::GetInstance()->Begin();
+	//ImGuiManager::GetInstance()->Begin();
 	GuchisFramework::Update();
 
 
-	ImGuiManager::GetInstance()->End();
+	//ImGuiManager::GetInstance()->End();
 }
 
 void MyGameTitle::Draw()
@@ -54,7 +54,7 @@ void MyGameTitle::Draw()
 
 	SceneManager::GetInstance()->Draw();
 
-	ImGuiManager::GetInstance()->Draw();
+	//ImGuiManager::GetInstance()->Draw();
 
 	dxManager->EndDraw();
 }
