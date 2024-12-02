@@ -2,7 +2,7 @@ name: DebugBuild
 on:
   push:
     branches:
-      - main
+      - master
 env: 
   # リポジトリのルートディレクトリを起点としたソリューションファイルのパス
   SOLUTION_FILE_PATH: project/CG2.sln
