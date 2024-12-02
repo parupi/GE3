@@ -15,8 +15,6 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
-        with:
-          path: C:\project
 
       - name: Add MSBuild toPATH
         uses: microsoft/setup-msbuild@v2
