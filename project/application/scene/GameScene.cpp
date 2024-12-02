@@ -65,4 +65,5 @@ void GameScene::Draw()
 	Object3dManager::GetInstance()->DrawSet();
 
 	//object_->Draw();
+
 }
