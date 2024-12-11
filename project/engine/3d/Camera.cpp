@@ -10,7 +10,9 @@ Camera::Camera()
 	, worldMatrix_(MakeAffineMatrix(transform_.scale, transform_.rotate, transform_.translate))
 	, viewMatrix_(Inverse(worldMatrix_))
 	, projectionMatrix_(MakePerspectiveFovMatrix(horizontalFOV_, aspectRatio_, nearClip_, farClip_))
-{}
+{
+	
+}
 
 void Camera::Update()
 {

@@ -1,5 +1,6 @@
 #include "CameraManager.h"
 #include <Object3dManager.h>
+#include "ParticleResources.h"
 
 CameraManager::CameraManager() : activeCameraIndex_(0) // 初期カメラのインデックスを0とする
 {
@@ -30,6 +31,7 @@ void CameraManager::SetActiveCamera(int index)
 	{
 		activeCameraIndex_ = index;
 		Object3dManager::GetInstance()->SetDefaultCamera(cameras_[activeCameraIndex_].get());
+		ParticleResources::GetInstance()->SetCamera(cameras_[activeCameraIndex_].get());
 	}
 }
 

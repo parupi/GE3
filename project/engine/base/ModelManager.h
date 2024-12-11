@@ -24,7 +24,8 @@ public:
 	static ModelManager* GetInstance();
 	// 初期化
 	void Initialize(DirectXManager* dxManager, SrvManager* srvManager);
-
+	// 終了
+	void Finalize();
 public:
 	// モデルファイル読み込み
 	void LoadModel(const std::string& directoryPath, const std::string& filePath);

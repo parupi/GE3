@@ -7,25 +7,27 @@
 #include "function.h"
 #include <fstream>
 #include "Model.h"
-#include "ModelManager.h"
 #include <Camera.h>
 class Object3dManager;
 class WorldTransform;
+
+//class Animator;
+//class Skeleton;
 
 class Object3d
 {
 public: // メンバ関数
 	Object3d() = default;
-	~Object3d() = default;
+	~Object3d();
 
-	void Initialize();
+	void Initialize(const std::string& filePath);
+	// アニメーション用アップデート
+	void AnimationUpdate();
 	void Draw(WorldTransform& worldTransform);
 private:
 	void CreateMaterialResource();
 	void CreateCameraResource();
 private: // 構造体
-
-
 	struct Material {
 		Vector4 color;
 		bool enableLighting;
@@ -39,39 +41,11 @@ private: // 構造体
 		Vector3 worldPosition;
 	};
 
-	//struct DirectionalLight {
-	//	Vector4 color;		//!< ライトの色
-	//	Vector3 direction;	//!< ライトの向き
-	//	float intensity;	//!< 輝度
-	//};
-
-	//// pointLight
-	//struct PointLight {
-	//	Vector4 color; //!<ライトの色
-	//	Vector3 position; //!<ライトの位置
-	//	float intensity; //!< 輝度
-	//	float radius; //!< ライトの届く最大距離
-	//	float decay; //!< 減衰率
-	//	float padding[2];
-	//};
-
-	//// spotLight
-	//struct SpotLight {
-	//	Vector4 color; //!< ライトの色
-	//	Vector3 position; //!< ライトの位置
-	//	float intensity; //!< 輝度
-	//	Vector3 direction; //!< ライトの向き
-	//	float distance; //!< ライトの届く最大距離
-	//	float decay; //!< 減衰率
-	//	float cosAngle; //!< スポットライトの余弦
-	//	float padding[2];
-	//};
-
 private: // メンバ変数
 	Object3dManager* objectManager_ = nullptr;
 	Model* model_ = nullptr;
 	Camera* camera_ = nullptr;
-
+	//Animator* animator_ = nullptr;
 	
 	Microsoft::WRL::ComPtr<ID3D12Resource> materialResource_ = nullptr;
 	Microsoft::WRL::ComPtr<ID3D12Resource> cameraResource_ = nullptr;
@@ -88,6 +62,8 @@ public: // ゲッター // セッター //
 	// モデル
 	void SetModel(Model* model) { model_ = model; }
 	void SetModel(const std::string& filePath);
+	Model* GetModel() { return model_; }
+	//Animator* GetAnimator() { return animator_; }
 	// カメラ
 	void SetCamera(Camera* camera) { camera_ = camera; }
 	// 色
@@ -98,4 +74,4 @@ public: // ゲッター // セッター //
 	void SetIsLighting(const bool isLighting) { materialData_->enableLighting = isLighting; }
 };
 
-static_assert(!std::is_copy_assignable_v<Object3d>);
+//static_assert(!std::is_copy_assignable_v<Object3d>);

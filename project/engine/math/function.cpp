@@ -8,26 +8,11 @@ float Normalize(float value) {
 	return 0.0f; // 0の時はそのまま0を返す
 }
 
+// 線形補間 (Linear Interpolation)
 float Lerp(float a, float b, float t) { return (1.0f - t) * a + t * b; }
 
-Matrix4x4 MakeTranslateMatrix(const Vector3& translate) { return {1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, translate.x, translate.y, translate.z, 1}; }
 
-Matrix4x4 MakeScaleMatrix(const Vector3& scale) { return {scale.x, 0, 0, 0, 0, scale.y, 0, 0, 0, 0, scale.z, 0, 0, 0, 0, 1}; }
-
-//Vector3 Transform(const Vector3& vector, const Matrix4x4& matrix) {
-//	Vector3 result;
-//	result.x = vector.x * matrix.m[0][0] + vector.y * matrix.m[1][0] + vector.z * matrix.m[2][0] + 1.0f * matrix.m[3][0];
-//	result.y = vector.x * matrix.m[0][1] + vector.y * matrix.m[1][1] + vector.z * matrix.m[2][1] + 1.0f * matrix.m[3][1];
-//	result.z = vector.x * matrix.m[0][2] + vector.y * matrix.m[1][2] + vector.z * matrix.m[2][2] + 1.0f * matrix.m[3][2];
-//	float w = vector.x * matrix.m[0][3] + vector.y * matrix.m[1][3] + vector.z * matrix.m[2][3] + 1.0f * matrix.m[3][3];
-//	assert(w != 0.0f);
-//	result.x /= w;
-//	result.y /= w;
-//	result.z /= w;
-//	return result;
-//}
-
-Vector3 Transformm_(const Vector3& vector, const Matrix4x4& matrix) {
+Vector3 Transform(const Vector3& vector, const Matrix4x4& matrix) {
 	Vector3 result;
 	result.x = vector.x * matrix.m[0][0] + vector.y * matrix.m[1][0] + vector.z * matrix.m[2][0] + 1.0f * matrix.m[3][0];
 	result.y = vector.x * matrix.m[0][1] + vector.y * matrix.m[1][1] + vector.z * matrix.m[2][1] + 1.0f * matrix.m[3][1];
@@ -40,113 +25,7 @@ Vector3 Transformm_(const Vector3& vector, const Matrix4x4& matrix) {
 	return result;
 }
 
-//Matrix4x4 Inverse(const Matrix4x4& m) {
-//	float A =
-//	    m.m[0][0] * m.m[1][1] * m.m[2][2] * m.m[3][3] + m.m[0][0] * m.m[1][2] * m.m[2][3] * m.m[3][1] + m.m[0][0] * m.m[1][3] * m.m[2][1] * m.m[3][2] - m.m[0][0] * m.m[1][3] * m.m[2][2] * m.m[3][1] -
-//	    m.m[0][0] * m.m[1][2] * m.m[2][1] * m.m[3][3] - m.m[0][0] * m.m[1][1] * m.m[2][3] * m.m[3][2] - m.m[0][1] * m.m[1][0] * m.m[2][2] * m.m[3][3] - m.m[0][2] * m.m[1][0] * m.m[2][3] * m.m[3][1] -
-//	    m.m[0][3] * m.m[1][0] * m.m[2][1] * m.m[3][2] + m.m[0][3] * m.m[1][0] * m.m[2][2] * m.m[3][1] + m.m[0][2] * m.m[1][0] * m.m[2][1] * m.m[3][3] + m.m[0][1] * m.m[1][0] * m.m[2][3] * m.m[3][2] +
-//	    m.m[0][1] * m.m[1][2] * m.m[2][0] * m.m[3][3] + m.m[0][2] * m.m[1][3] * m.m[2][0] * m.m[3][1] + m.m[0][3] * m.m[1][1] * m.m[2][0] * m.m[3][2] - m.m[0][3] * m.m[1][2] * m.m[2][0] * m.m[3][1] -
-//	    m.m[0][2] * m.m[1][1] * m.m[2][0] * m.m[3][3] - m.m[0][1] * m.m[1][3] * m.m[2][0] * m.m[3][2] - m.m[0][1] * m.m[1][2] * m.m[2][3] * m.m[3][0] - m.m[0][2] * m.m[1][3] * m.m[2][1] * m.m[3][0] -
-//	    m.m[0][3] * m.m[1][1] * m.m[2][2] * m.m[3][0] + m.m[0][3] * m.m[1][2] * m.m[2][1] * m.m[3][0] + m.m[0][2] * m.m[1][1] * m.m[2][3] * m.m[3][0] + m.m[0][1] * m.m[1][3] * m.m[2][2] * m.m[3][0];
-//
-//	return {
-//	    (m.m[1][1] * m.m[2][2] * m.m[3][3] + m.m[1][2] * m.m[2][3] * m.m[3][1] + m.m[1][3] * m.m[2][1] * m.m[3][2] - m.m[1][3] * m.m[2][2] * m.m[3][1] - m.m[1][2] * m.m[2][1] * m.m[3][3] -
-//	     m.m[1][1] * m.m[2][3] * m.m[3][2]) /
-//	        A,
-//
-//	    (-m.m[0][1] * m.m[2][2] * m.m[3][3] - m.m[0][2] * m.m[2][3] * m.m[3][1] - m.m[0][3] * m.m[2][1] * m.m[3][2] + m.m[0][3] * m.m[2][2] * m.m[3][1] + m.m[0][2] * m.m[2][1] * m.m[3][3] +
-//	     m.m[0][1] * m.m[2][3] * m.m[3][2]) /
-//	        A,
-//
-//	    (m.m[0][1] * m.m[1][2] * m.m[3][3] + m.m[0][2] * m.m[1][3] * m.m[3][1] + m.m[0][3] * m.m[1][1] * m.m[3][2] - m.m[0][3] * m.m[1][2] * m.m[3][1] - m.m[0][2] * m.m[1][1] * m.m[3][3] -
-//	     m.m[0][1] * m.m[1][3] * m.m[3][2]) /
-//	        A,
-//
-//	    (-m.m[0][1] * m.m[1][2] * m.m[2][3] - m.m[0][2] * m.m[1][3] * m.m[2][1] - m.m[0][3] * m.m[1][1] * m.m[2][2] + m.m[0][3] * m.m[1][2] * m.m[2][1] + m.m[0][2] * m.m[1][1] * m.m[2][3] +
-//	     m.m[0][1] * m.m[1][3] * m.m[2][2]) /
-//	        A,
-//
-//	    (-m.m[1][0] * m.m[2][2] * m.m[3][3] - m.m[1][2] * m.m[2][3] * m.m[3][0] - m.m[1][3] * m.m[2][0] * m.m[3][2] + m.m[1][3] * m.m[2][2] * m.m[3][0] + m.m[1][2] * m.m[2][0] * m.m[3][3] +
-//	     m.m[1][0] * m.m[2][3] * m.m[3][2]) /
-//	        A,
-//
-//	    (m.m[0][0] * m.m[2][2] * m.m[3][3] + m.m[0][2] * m.m[2][3] * m.m[3][0] + m.m[0][3] * m.m[2][0] * m.m[3][2] - m.m[0][3] * m.m[2][2] * m.m[3][0] - m.m[0][2] * m.m[2][0] * m.m[3][3] -
-//	     m.m[0][0] * m.m[2][3] * m.m[3][2]) /
-//	        A,
-//
-//	    (-m.m[0][0] * m.m[1][2] * m.m[3][3] - m.m[0][2] * m.m[1][3] * m.m[3][0] - m.m[0][3] * m.m[1][0] * m.m[3][2] + m.m[0][3] * m.m[1][2] * m.m[3][0] + m.m[0][2] * m.m[1][0] * m.m[3][3] +
-//	     m.m[0][0] * m.m[1][3] * m.m[3][2]) /
-//	        A,
-//
-//	    (m.m[0][0] * m.m[1][2] * m.m[2][3] + m.m[0][2] * m.m[1][3] * m.m[2][0] + m.m[0][3] * m.m[1][0] * m.m[2][2] - m.m[0][3] * m.m[1][2] * m.m[2][0] - m.m[0][1] * m.m[1][0] * m.m[2][3] -
-//	     m.m[0][0] * m.m[1][3] * m.m[2][2]) /
-//	        A,
-//
-//	    (m.m[1][0] * m.m[2][1] * m.m[3][3] + m.m[1][1] * m.m[2][3] * m.m[3][0] + m.m[1][3] * m.m[2][0] * m.m[3][1] - m.m[1][3] * m.m[2][1] * m.m[3][0] - m.m[1][1] * m.m[2][0] * m.m[3][3] -
-//	     m.m[1][0] * m.m[2][3] * m.m[3][1]) /
-//	        A,
-//
-//	    (-m.m[0][0] * m.m[2][1] * m.m[3][3] - m.m[0][1] * m.m[2][3] * m.m[3][0] - m.m[0][3] * m.m[2][0] * m.m[3][1] + m.m[0][3] * m.m[2][1] * m.m[3][0] + m.m[0][1] * m.m[2][0] * m.m[3][3] +
-//	     m.m[0][0] * m.m[2][3] * m.m[3][1]) /
-//	        A,
-//
-//	    (m.m[0][0] * m.m[1][1] * m.m[3][3] + m.m[0][1] * m.m[1][3] * m.m[3][0] + m.m[0][3] * m.m[1][0] * m.m[3][1] - m.m[0][3] * m.m[1][1] * m.m[3][0] - m.m[0][1] * m.m[1][0] * m.m[3][3] -
-//	     m.m[0][0] * m.m[1][3] * m.m[3][1]) /
-//	        A,
-//
-//	    (-m.m[0][0] * m.m[1][1] * m.m[2][3] - m.m[0][1] * m.m[1][3] * m.m[2][0] - m.m[0][3] * m.m[1][0] * m.m[2][1] + m.m[0][3] * m.m[1][1] * m.m[2][0] + m.m[0][1] * m.m[1][0] * m.m[2][3] +
-//	     m.m[0][0] * m.m[1][3] * m.m[2][1]) /
-//	        A,
-//
-//	    (-m.m[1][0] * m.m[2][1] * m.m[3][2] - m.m[1][1] * m.m[2][2] * m.m[3][0] - m.m[1][2] * m.m[2][0] * m.m[3][1] + m.m[1][2] * m.m[2][1] * m.m[3][0] + m.m[1][1] * m.m[2][0] * m.m[3][2] +
-//	     m.m[1][0] * m.m[2][2] * m.m[3][1]) /
-//	        A,
-//
-//	    (m.m[0][0] * m.m[2][1] * m.m[3][2] + m.m[0][1] * m.m[2][2] * m.m[3][0] + m.m[0][2] * m.m[2][0] * m.m[3][1] - m.m[0][2] * m.m[2][1] * m.m[3][0] - m.m[0][1] * m.m[2][0] * m.m[3][2] -
-//	     m.m[0][0] * m.m[2][2] * m.m[3][1]) /
-//	        A,
-//
-//	    (-m.m[0][0] * m.m[1][1] * m.m[3][2] - m.m[0][1] * m.m[1][2] * m.m[3][0] - m.m[0][2] * m.m[1][0] * m.m[3][1] + m.m[0][2] * m.m[1][1] * m.m[3][0] + m.m[0][1] * m.m[1][0] * m.m[3][2] +
-//	     m.m[0][0] * m.m[1][2] * m.m[3][1]) /
-//	        A,
-//
-//	    (m.m[0][0] * m.m[1][1] * m.m[2][2] + m.m[0][1] * m.m[1][2] * m.m[2][0] + m.m[0][2] * m.m[1][0] * m.m[2][1] - m.m[0][2] * m.m[1][1] * m.m[2][0] - m.m[0][1] * m.m[1][0] * m.m[2][2] -
-//	     m.m[0][0] * m.m[1][2] * m.m[2][1]) /
-//	        A
-//
-//	};
-//}
-//
-//Matrix4x4 Transpose(const Matrix4x4& m) {
-//	return {m.m[0][0], m.m[1][0], m.m[2][0], m.m[3][0], m.m[0][1], m.m[1][1], m.m[2][1], m.m[3][1], m.m[0][2], m.m[1][2], m.m[2][2], m.m[3][2], m.m[0][3], m.m[1][3], m.m[2][3], m.m[3][3]};
-//}
-//
-//Matrix4x4 MakeIdentity4x4() { return {1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1}; }
-//
-//Matrix4x4 MakeRotateXMatrix(float radian) { return {1, 0, 0, 0, 0, std::cosf(radian), std::sinf(radian), 0, 0, std::sinf(-radian), std::cosf(radian), 0, 0, 0, 0, 1}; };
-//
-//Matrix4x4 MakeRotateYMatrix(float radian) { return {std::cosf(radian), 0, std::sinf(-radian), 0, 0, 1, 0, 0, std::sinf(radian), 0, std::cosf(radian), 0, 0, 0, 0, 1}; };
-//
-//Matrix4x4 MakeRotateZMatrix(float radian) { return {std::cosf(radian), std::sinf(radian), 0, 0, std::sinf(-radian), std::cosf(radian), 0, 0, 0, 0, 1, 0, 0, 0, 0, 1}; };
 
-Matrix4x4 MakeRotateXYZMatrix(Vector3 rotate) {
-	Matrix4x4 rotateXMatrix = MakeRotateXMatrix(rotate.x);
-	Matrix4x4 rotateYMatrix = MakeRotateYMatrix(rotate.y);
-	Matrix4x4 rotateZMatrix = MakeRotateZMatrix(rotate.z);
-	Matrix4x4 rotateMatrix = (rotateYMatrix * rotateXMatrix * rotateZMatrix);
-	return rotateMatrix;
-}
-
-Matrix4x4 MakeAffineMatrix(const Vector3& scale, const Vector3& rotate, const Vector3& translate) {
-	Matrix4x4 scaleMatrix = MakeScaleMatrix(scale);
-	Matrix4x4 rotateXMatrix = MakeRotateXMatrix(rotate.x);
-	Matrix4x4 rotateYMatrix = MakeRotateYMatrix(rotate.y);
-	Matrix4x4 rotateZMatrix = MakeRotateZMatrix(rotate.z);
-	Matrix4x4 translateMatrix = MakeTranslateMatrix(translate);
-	Matrix4x4 rotateMatrix = rotateXMatrix * rotateYMatrix * rotateZMatrix;
-
-	return {scaleMatrix * rotateMatrix * translateMatrix};
-}
 
 float cotf(float theta) { return 1.0f / std::tanf(theta); }
 
@@ -206,72 +85,6 @@ Vector3 ExtractTranslation(const Matrix4x4& matrix) {
 	translation.z = matrix.m[3][2];
 	return translation;
 }
-
-//Matrix4x4 ScaleMatrixFromVector3(const Vector3& scale)
-//{
-//	Matrix4x4 scaleMatrix = {};
-//	scaleMatrix.m[0][0] = scale.x;  // X方向のスケール
-//	scaleMatrix.m[1][1] = scale.y;  // Y方向のスケール
-//	scaleMatrix.m[2][2] = scale.z;  // Z方向のスケール
-//	scaleMatrix.m[3][3] = 1.0f;     // W成分は1.0
-//
-//	return scaleMatrix;
-//}
-//
-//Matrix4x4 TranslationMatrixFromVector3(const Vector3& translate)
-//{
-//	Matrix4x4 translationMatrix = {};
-//	translationMatrix.m[0][0] = 1.0f;  // 単位行列の成分
-//	translationMatrix.m[1][1] = 1.0f;  // 単位行列の成分
-//	translationMatrix.m[2][2] = 1.0f;  // 単位行列の成分
-//	translationMatrix.m[3][3] = 1.0f;  // 単位行列の成分
-//
-//	translationMatrix.m[3][0] = translate.x;  // X方向の移動
-//	translationMatrix.m[3][1] = translate.y;  // Y方向の移動
-//	translationMatrix.m[3][2] = translate.z;  // Z方向の移動
-//
-//	return translationMatrix;
-//}
-
-//Matrix4x4 MakeRotateAxisAngle(const Vector3& axis, float angle)
-//{
-//	// 回転軸ベクトルを正規化
-//	Vector3 normalizedAxis = Normalize(axis);
-//	float x = normalizedAxis.x;
-//	float y = normalizedAxis.y;
-//	float z = normalizedAxis.z;
-//
-//	// 三角関数を事前に計算
-//	float cosTheta = std::cos(angle);
-//	float sinTheta = std::sin(angle);
-//	float oneMinusCosTheta = 1.0f - cosTheta;
-//
-//	// 回転行列を生成
-//	Matrix4x4 rotationMatrix;
-//	rotationMatrix.m[0][0] = cosTheta + x * x * oneMinusCosTheta;
-//	rotationMatrix.m[0][1] = x * y * oneMinusCosTheta + z * sinTheta;
-//	rotationMatrix.m[0][2] = x * z * oneMinusCosTheta - y * sinTheta;
-//	rotationMatrix.m[0][3] = 0.0f;
-//
-//	rotationMatrix.m[1][0] = x * y * oneMinusCosTheta - z * sinTheta;
-//	rotationMatrix.m[1][1] = cosTheta + y * y * oneMinusCosTheta;
-//	rotationMatrix.m[1][2] = y * z * oneMinusCosTheta + x * sinTheta;
-//	rotationMatrix.m[1][3] = 0.0f;
-//
-//	rotationMatrix.m[2][0] = z * x * oneMinusCosTheta + y * sinTheta;
-//	rotationMatrix.m[2][1] = z * y * oneMinusCosTheta - x * sinTheta;
-//	rotationMatrix.m[2][2] = cosTheta + z * z * oneMinusCosTheta;
-//	rotationMatrix.m[2][3] = 0.0f;
-//
-//	rotationMatrix.m[3][0] = 0.0f;
-//	rotationMatrix.m[3][1] = 0.0f;
-//	rotationMatrix.m[3][2] = 0.0f;
-//	rotationMatrix.m[3][3] = 1.0f;
-//
-//	return rotationMatrix;
-//}
-
-
 
 Matrix4x4 DirectionToDirection(const Vector3& from, const Vector3& to)
 {

@@ -4,40 +4,26 @@
 #include <numbers>
 #include <imgui.h>
 
-ParticleManager* ParticleManager::instance = nullptr;
 std::random_device seedGenerator;
 std::mt19937 randomEngine(seedGenerator());
 
-ParticleManager* ParticleManager::GetInstance()
-{
-	if (instance == nullptr) {
-		instance = new ParticleManager();
-	}
-	return instance;
-}
-
 void ParticleManager::Finalize()
 {
-	delete instance;
-	instance = nullptr;
+
 }
 
-void ParticleManager::Initialize(DirectXManager* dxManager, SrvManager* srvManager)
+void ParticleManager::Initialize()
 {
-	dxManager_ = dxManager;
-	srvManager_ = srvManager;
-	// ランダムエンジンの初期化
+	dxManager_ = ParticleResources::GetInstance()->GetDxManager();
+	srvManager_ = ParticleResources::GetInstance()->GetSrvManager();
+	camera_ = ParticleResources::GetInstance()->GetCamera();
 
-	// PSO関連
-	CreateRootSignature();
-	inputLayoutDesc_ = CreateInputElementDesc();
-	CreateBlendState();
-	CreateRasterizerState();
-	LoadShader();
-	CreatePipelineState();
 	// リソースの生成と値の設定
 	CreateParticleResource();
 	CreateMaterialResource();
+
+	// jsonファイルの読み込み
+	global_->LoadFiles();
 }
 
 
@@ -55,8 +41,6 @@ void ParticleManager::Update()
 	billboardMatrix.m[3][2] = 0.0f;
 
 	for (auto& [groupName, particleGroup] : particleGroups_) {
-
-
 		uint32_t numInstance = 0;
 
 		for (auto particleIterator = particleGroup.particleList.begin(); particleIterator != particleGroup.particleList.end();) {
@@ -71,9 +55,27 @@ void ParticleManager::Update()
 			}
 
 			// パーティクルの更新処理
-			(*particleIterator).transform.translate += (*particleIterator).velocity * kDeltaTime;
-			(*particleIterator).currentTime += kDeltaTime;
-			float alpha = 1.0f - ((*particleIterator).currentTime / (*particleIterator).lifeTime);
+			float alpha{};
+			if (groupName == "snow") {
+				if ((*particleIterator).transform.translate.y <= 0) {
+					(*particleIterator).currentTime += kDeltaTime;
+					alpha = 1.0f - ((*particleIterator).currentTime / (*particleIterator).lifeTime);
+				}
+				else {
+					(*particleIterator).transform.translate += (*particleIterator).velocity * kDeltaTime;
+					alpha = 1.0f;
+				}
+			}
+			else {
+				if ((*particleIterator).transform.translate.y >= -15.0f) {
+					(*particleIterator).transform.translate += (*particleIterator).velocity * kDeltaTime;
+					(*particleIterator).transform.rotate += {0.1f, 0.1f, 0.1f};
+					alpha = alpha_[groupName];
+				}
+				else {
+					(*particleIterator).currentTime += kDeltaTime;
+				}
+			}
 
 			// ワールド行列の計算
 			scaleMatrix = MakeScaleMatrix((*particleIterator).transform.scale);
@@ -106,6 +108,8 @@ void ParticleManager::Update()
 		if (particleGroup.instancingDataPtr) {
 			std::memcpy(particleGroup.instancingDataPtr, instancingData_, sizeof(ParticleForGPU) * numInstance);
 		}
+
+		particleParams_[groupName] = LoadParticleParameters(global_, groupName);
 	}
 }
 
@@ -113,9 +117,6 @@ void ParticleManager::Draw()
 {
 	// グラフィックスパイプラインの設定
 	auto commandList = dxManager_->GetCommandList();
-	commandList->SetGraphicsRootSignature(rootSignature_.Get());
-	commandList->SetPipelineState(graphicsPipelineState_.Get());
-	commandList->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 	commandList->IASetVertexBuffers(0, 1, &vertexBufferView_);
 
 	// すべてのパーティクルグループを描画
@@ -128,7 +129,7 @@ void ParticleManager::Draw()
 			// テクスチャのSRVのDescriptorTableを設定
 			   // テクスチャのSRVのDescriptorTableを設定
 			srvManager_->SetGraphicsRootDescriptorTable(2, TextureManager::GetInstance()->GetTextureIndexByFilePath(particleGroup.materialData.textureFilePath));
-			
+
 			commandList->DrawInstanced(6, particleGroup.instanceCount, 0, 0);
 		}
 	}
@@ -167,162 +168,29 @@ void ParticleManager::CreateParticleGroup(const std::string name, const std::str
 
 	// インスタンス数を初期化
 	particleGroup.instanceCount = 0;
-}
 
-void ParticleManager::CreateRootSignature()
-{
-	// Particle用のRootSignature
-	D3D12_DESCRIPTOR_RANGE descriptorRangeForInstancing[1] = {};
-	descriptorRangeForInstancing[0].BaseShaderRegister = 0;		// 0から始まる
-	descriptorRangeForInstancing[0].NumDescriptors = 1;			// 数は1つ
-	descriptorRangeForInstancing[0].RangeType = D3D12_DESCRIPTOR_RANGE_TYPE_SRV;	// SRVを使う
-	descriptorRangeForInstancing[0].OffsetInDescriptorsFromTableStart = D3D12_DESCRIPTOR_RANGE_OFFSET_APPEND;
+	// パーティクルグループごとにグローバルバリアースを作る
+	global_->AddItem(name, "minTranslate", Vector3{});
+	global_->AddItem(name, "maxTranslate", Vector3{});
 
-	D3D12_DESCRIPTOR_RANGE descriptorRange[1] = {};
-	descriptorRange[0].BaseShaderRegister = 0;														// 0から始まる
-	descriptorRange[0].NumDescriptors = 1;															// 数は1つ
-	descriptorRange[0].RangeType = D3D12_DESCRIPTOR_RANGE_TYPE_SRV;									// SRVを使う
-	descriptorRange[0].OffsetInDescriptorsFromTableStart = D3D12_DESCRIPTOR_RANGE_OFFSET_APPEND;	// Offsetを自動計算
+	global_->AddItem(name, "minRotate", Vector3{});
+	global_->AddItem(name, "maxRotate", Vector3{});
 
-	// RootSignature作成
-	D3D12_ROOT_SIGNATURE_DESC descriptionRootSignature{};
-	descriptionRootSignature.Flags = D3D12_ROOT_SIGNATURE_FLAG_ALLOW_INPUT_ASSEMBLER_INPUT_LAYOUT;
+	global_->AddItem(name, "minScale", float{});
+	global_->AddItem(name, "maxScale", float{});
 
-	// RootParameter作成。PixelShaderのMaterialとVertezShaderのTransform
-	D3D12_ROOT_PARAMETER rootParameters[3] = {};
-	rootParameters[0].ParameterType = D3D12_ROOT_PARAMETER_TYPE_CBV;			// CBVを使う
-	rootParameters[0].ShaderVisibility = D3D12_SHADER_VISIBILITY_PIXEL;			// PixelShaderで使う
-	rootParameters[0].Descriptor.ShaderRegister = 0;							// レジスタ番号0とバインド
+	global_->AddItem(name, "minVelocity", Vector3{});
+	global_->AddItem(name, "maxVelocity", Vector3{});
 
-	rootParameters[1].ParameterType = D3D12_ROOT_PARAMETER_TYPE_DESCRIPTOR_TABLE;		// DescriptorTableを使う
-	rootParameters[1].ShaderVisibility = D3D12_SHADER_VISIBILITY_VERTEX;				// VertexShaderで使う
-	rootParameters[1].DescriptorTable.pDescriptorRanges = descriptorRangeForInstancing;			// Tableの中身の配列を指定
-	rootParameters[1].DescriptorTable.NumDescriptorRanges = _countof(descriptorRangeForInstancing);		// Tableで利用する数
+	global_->AddItem(name, "minLifeTime", float{});
+	global_->AddItem(name, "maxLifeTime", float{});
 
-	rootParameters[2].ParameterType = D3D12_ROOT_PARAMETER_TYPE_DESCRIPTOR_TABLE;			// DescriptorTableで使う
-	rootParameters[2].ShaderVisibility = D3D12_SHADER_VISIBILITY_PIXEL;						// PixelShaderで使う
-	rootParameters[2].DescriptorTable.pDescriptorRanges = descriptorRange;					// Tableの中身の配列を指定
-	rootParameters[2].DescriptorTable.NumDescriptorRanges = _countof(descriptorRange);		// Tableで利用する数								// レジスタ番号1を使う
+	global_->AddItem(name, "minColor", Vector3{});
+	global_->AddItem(name, "maxColor", Vector3{});
 
-	descriptionRootSignature.pParameters = rootParameters;						// ルートパラメータ配列へのポインタ
-	descriptionRootSignature.NumParameters = _countof(rootParameters);			// 配列の長さ
+	global_->AddItem(name, "minAlpha", float{});
+	global_->AddItem(name, "maxAlpha", float{});
 
-	D3D12_STATIC_SAMPLER_DESC staticSamplers[1] = {};
-	staticSamplers[0].Filter = D3D12_FILTER_MIN_MAG_MIP_LINEAR;
-	staticSamplers[0].AddressU = D3D12_TEXTURE_ADDRESS_MODE_WRAP;
-	staticSamplers[0].AddressV = D3D12_TEXTURE_ADDRESS_MODE_WRAP;
-	staticSamplers[0].AddressW = D3D12_TEXTURE_ADDRESS_MODE_WRAP;
-	staticSamplers[0].ComparisonFunc = D3D12_COMPARISON_FUNC_NEVER;
-	staticSamplers[0].MaxLOD = D3D12_FLOAT32_MAX;
-	staticSamplers[0].ShaderRegister = 0;
-	staticSamplers[0].ShaderVisibility = D3D12_SHADER_VISIBILITY_PIXEL;
-	descriptionRootSignature.pStaticSamplers = staticSamplers;
-	descriptionRootSignature.NumStaticSamplers = _countof(staticSamplers);
-
-	// シリアライズしてバイナリにする
-	HRESULT hr = D3D12SerializeRootSignature(&descriptionRootSignature, D3D_ROOT_SIGNATURE_VERSION_1, &signatureBlob, &errorBlob);
-	if (FAILED(hr)) {
-		Logger::Log(reinterpret_cast<char*>(errorBlob->GetBufferPointer()));
-		assert(false);
-	}
-	// バイナリをもとに生成
-
-	hr = dxManager_->GetDevice()->CreateRootSignature(0, signatureBlob->GetBufferPointer(), signatureBlob->GetBufferSize(), IID_PPV_ARGS(&rootSignature_));
-	assert(SUCCEEDED(hr));
-}
-
-D3D12_INPUT_LAYOUT_DESC ParticleManager::CreateInputElementDesc()
-{
-	// InputLayout
-	D3D12_INPUT_ELEMENT_DESC inputElementDescs[3] = {};
-	inputElementDescs[0].SemanticName = "POSITION";
-	inputElementDescs[0].SemanticIndex = 0;
-	inputElementDescs[0].Format = DXGI_FORMAT_R32G32B32A32_FLOAT;
-	inputElementDescs[0].AlignedByteOffset = D3D12_APPEND_ALIGNED_ELEMENT;
-	inputElementDescs[1].SemanticName = "TEXCOORD";
-	inputElementDescs[1].SemanticIndex = 0;
-	inputElementDescs[1].Format = DXGI_FORMAT_R32G32_FLOAT;
-	inputElementDescs[1].AlignedByteOffset = D3D12_APPEND_ALIGNED_ELEMENT;
-	inputElementDescs[2].SemanticName = "NORMAL";
-	inputElementDescs[2].SemanticIndex = 0;
-	inputElementDescs[2].Format = DXGI_FORMAT_R32G32B32_FLOAT;
-	inputElementDescs[2].AlignedByteOffset = D3D12_APPEND_ALIGNED_ELEMENT;
-	D3D12_INPUT_LAYOUT_DESC inputLayoutDesc{};
-	inputLayoutDesc.pInputElementDescs = inputElementDescs;
-	inputLayoutDesc.NumElements = _countof(inputElementDescs);
-
-	return inputLayoutDesc;
-}
-
-void ParticleManager::CreateBlendState()
-{
-	// すべての色要素を書き込む
-	blendDesc_.RenderTarget[0].RenderTargetWriteMask = D3D12_COLOR_WRITE_ENABLE_ALL;
-	blendDesc_.RenderTarget[0].BlendEnable = TRUE;
-	blendDesc_.RenderTarget[0].SrcBlend = D3D12_BLEND_SRC_ALPHA;
-	blendDesc_.RenderTarget[0].BlendOp = D3D12_BLEND_OP_ADD;
-	blendDesc_.RenderTarget[0].DestBlend = D3D12_BLEND_ONE;
-	blendDesc_.RenderTarget[0].SrcBlendAlpha = D3D12_BLEND_ONE;
-	blendDesc_.RenderTarget[0].BlendOpAlpha = D3D12_BLEND_OP_ADD;
-	blendDesc_.RenderTarget[0].DestBlendAlpha = D3D12_BLEND_ZERO;
-}
-
-void ParticleManager::CreateRasterizerState()
-{
-	// 裏面(時計回り)を表示しない
-	rasterizerDesc_.CullMode = D3D12_CULL_MODE_NONE;
-	// 三角形の中を塗りつぶす
-	rasterizerDesc_.FillMode = D3D12_FILL_MODE_SOLID;
-}
-
-void ParticleManager::LoadShader()
-{
-	// Shaderをコンパイルする
-	vertexShaderBlob_ = dxManager_->CompileShader(L"./resource/shaders/Particle.VS.hlsl", L"vs_6_0");
-	assert(vertexShaderBlob_ != nullptr);
-
-	pixelShaderBlob_ = dxManager_->CompileShader(L"./resource/shaders/Particle.PS.hlsl", L"ps_6_0");
-	assert(pixelShaderBlob_ != nullptr);
-}
-
-void ParticleManager::CreatePipelineState()
-{
-	HRESULT hr;
-
-	// PSOを生成する
-	D3D12_GRAPHICS_PIPELINE_STATE_DESC graphicsPipelineStateDesc{};
-	graphicsPipelineStateDesc.pRootSignature = rootSignature_.Get();			// RootSignature
-	graphicsPipelineStateDesc.InputLayout = inputLayoutDesc_;			// InputLayout
-	//graphicsPipelineStateDesc.InputLayout = inputLayoutDesc;			// InputLayout
-	graphicsPipelineStateDesc.VS = { vertexShaderBlob_->GetBufferPointer(), vertexShaderBlob_->GetBufferSize() };			// vertexShader
-	graphicsPipelineStateDesc.PS = { pixelShaderBlob_->GetBufferPointer(), pixelShaderBlob_->GetBufferSize() };			// PixelShade
-	graphicsPipelineStateDesc.BlendState = blendDesc_;					// BlendState
-	graphicsPipelineStateDesc.RasterizerState = rasterizerDesc_;			// RasterizerState
-	// 書き込むRTVの情報
-	graphicsPipelineStateDesc.NumRenderTargets = 1;
-	graphicsPipelineStateDesc.RTVFormats[0] = DXGI_FORMAT_R8G8B8A8_UNORM_SRGB;
-	// 利用するトポロジ(形状)のタイプ。三角形
-	graphicsPipelineStateDesc.PrimitiveTopologyType = D3D12_PRIMITIVE_TOPOLOGY_TYPE_TRIANGLE;
-	// どのように画面を打ち込むかの設定
-	graphicsPipelineStateDesc.SampleDesc.Count = 1;
-	graphicsPipelineStateDesc.SampleMask = D3D12_DEFAULT_SAMPLE_MASK;
-
-	// DepthStencilStateの設定
-	D3D12_DEPTH_STENCIL_DESC depthStencilDesc{};
-	// Depthの機能を有効化する
-	depthStencilDesc.DepthEnable = true;
-	// 書き込みします
-	depthStencilDesc.DepthWriteMask = D3D12_DEPTH_WRITE_MASK_ZERO;
-	// 比較関数はLessEqual。つまり、近ければ描画される
-	depthStencilDesc.DepthFunc = D3D12_COMPARISON_FUNC_LESS_EQUAL;
-
-	// DepthStencilの設定
-	graphicsPipelineStateDesc.DepthStencilState = depthStencilDesc;
-	graphicsPipelineStateDesc.DSVFormat = DXGI_FORMAT_D24_UNORM_S8_UINT;
-
-	// 実際に生成
-	hr = dxManager_->GetDevice()->CreateGraphicsPipelineState(&graphicsPipelineStateDesc, IID_PPV_ARGS(&graphicsPipelineState_));
-	assert(SUCCEEDED(hr));
 }
 
 void ParticleManager::CreateParticleResource()
@@ -375,22 +243,73 @@ void ParticleManager::CreateMaterialResource()
 	materialData_->uvTransform = MakeIdentity4x4();
 }
 
-ParticleManager::Particle ParticleManager::MakeNewParticle(std::mt19937& randomEngine, const Vector3& translate)
+ParticleManager::Particle ParticleManager::MakeNewParticle(const std::string name, std::mt19937& randomEngine, const Vector3& translate)
 {
-	std::uniform_real_distribution<float> distribution(-1.0f, 1.0f);
-	std::uniform_real_distribution<float> distColor(0.0f, 1.0f);
-	std::uniform_real_distribution<float> distTime(1.0f, 3.0f);
-	Particle particle;
-	particle.transform.scale = { 1.0f, 1.0f, 1.0f };
-	particle.transform.rotate = { 0.0f, 0.0f, 0.0f };
-	Vector3 randomTranslate = { distribution(randomEngine), distribution(randomEngine), distribution(randomEngine) };
+	Particle particle{};
+
+	const auto& params = particleParams_[name];
+
+	std::uniform_real_distribution<float> distTranslationX(params.translateX.x, params.translateX.y);
+	std::uniform_real_distribution<float> distTranslationY(params.translateY.x, params.translateY.y);
+	std::uniform_real_distribution<float> distTranslationZ(params.translateZ.x, params.translateZ.y);
+
+	std::uniform_real_distribution<float> distRotationX(params.rotateX.x, params.rotateX.y);
+	std::uniform_real_distribution<float> distRotationY(params.rotateY.x, params.rotateY.y);
+	std::uniform_real_distribution<float> distRotationZ(params.rotateZ.x, params.rotateZ.y);
+
+	std::uniform_real_distribution<float> distScale(params.scale.x, params.scale.y);
+
+	std::uniform_real_distribution<float> distVelocityX(params.velocityX.x, params.velocityX.y);
+	std::uniform_real_distribution<float> distVelocityY(params.velocityY.x, params.velocityY.y);
+	std::uniform_real_distribution<float> distVelocityZ(params.velocityZ.x, params.velocityZ.y);
+
+	std::uniform_real_distribution<float> distTime(params.lifeTime.x, params.lifeTime.y);
+	std::uniform_real_distribution<float> distColorR(params.colorMin.x, params.colorMax.x);
+	std::uniform_real_distribution<float> distColorG(params.colorMin.y, params.colorMax.y);
+	std::uniform_real_distribution<float> distColorB(params.colorMin.z, params.colorMax.z);
+	float randomScale = distScale(randomEngine);
+	particle.transform.scale = { randomScale, randomScale, randomScale };
+	particle.transform.rotate = { distRotationX(randomEngine), distRotationY(randomEngine), distRotationZ(randomEngine) };
+	Vector3 randomTranslate = { distTranslationX(randomEngine), distTranslationY(randomEngine), distTranslationZ(randomEngine) };
 	particle.transform.translate = translate + randomTranslate;
-	particle.velocity = { distribution(randomEngine), distribution(randomEngine), distribution(randomEngine) };
-	particle.color = { distColor(randomEngine) , distColor(randomEngine) , distColor(randomEngine) , 1.0f };
+	particle.velocity = { distVelocityX(randomEngine), distVelocityY(randomEngine), distVelocityZ(randomEngine) };
+	particle.color = { distColorR(randomEngine) , distColorG(randomEngine) , distColorB(randomEngine) , 1.0f };
 	particle.lifeTime = distTime(randomEngine);
 	particle.currentTime = 0.0f;
 
 	return particle;
+}
+
+ParticleManager::ParticleParameters ParticleManager::LoadParticleParameters(GlobalVariables* global, const std::string& groupName)
+{
+	ParticleParameters params;
+
+	// Translate
+	params.translateX = { global->GetVector3Value(groupName, "minTranslate").x, global->GetVector3Value(groupName, "maxTranslate").x };
+	params.translateY = { global->GetVector3Value(groupName, "minTranslate").y, global->GetVector3Value(groupName, "maxTranslate").y };
+	params.translateZ = { global->GetVector3Value(groupName, "minTranslate").z, global->GetVector3Value(groupName, "maxTranslate").z };
+
+	// Rotate
+	params.rotateX = { global->GetVector3Value(groupName, "minRotate").x, global->GetVector3Value(groupName, "maxRotate").x };
+	params.rotateY = { global->GetVector3Value(groupName, "minRotate").y, global->GetVector3Value(groupName, "maxRotate").y };
+	params.rotateZ = { global->GetVector3Value(groupName, "minRotate").z, global->GetVector3Value(groupName, "maxRotate").z };
+
+	// Scale
+	params.scale = { global->GetFloatValue(groupName, "minScale"), global->GetFloatValue(groupName, "maxScale") };
+
+	// Velocity
+	params.velocityX = { global->GetVector3Value(groupName, "minVelocity").x, global->GetVector3Value(groupName, "maxVelocity").x };
+	params.velocityY = { global->GetVector3Value(groupName, "minVelocity").y, global->GetVector3Value(groupName, "maxVelocity").y };
+	params.velocityZ = { global->GetVector3Value(groupName, "minVelocity").z, global->GetVector3Value(groupName, "maxVelocity").z };
+
+	// LifeTime
+	params.lifeTime = { global->GetFloatValue(groupName, "minLifeTime"), global->GetFloatValue(groupName, "maxLifeTime") };
+
+	// Color
+	params.colorMin = global->GetVector3Value(groupName, "minColor");
+	params.colorMax = global->GetVector3Value(groupName, "maxColor");
+
+	return params;
 }
 
 std::list<ParticleManager::Particle> ParticleManager::Emit(const std::string name, const Vector3& position, uint32_t count)
@@ -398,7 +317,7 @@ std::list<ParticleManager::Particle> ParticleManager::Emit(const std::string nam
 	ParticleGroup& particleGroup = particleGroups_[name];
 	std::list<Particle> newParticles;
 	for (uint32_t nowCount = 0; nowCount < count; ++nowCount) {
-		Particle particle =MakeNewParticle(randomEngine, position);
+		Particle particle = MakeNewParticle(name, randomEngine, position);
 		newParticles.push_back(particle);
 	}
 	particleGroup.particleList.splice(particleGroup.particleList.end(), newParticles);

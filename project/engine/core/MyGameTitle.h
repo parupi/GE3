@@ -12,8 +12,8 @@
 #include "ModelManager.h"
 #include <ParticleManager.h>
 #include "GuchisFramework.h"
-//#include "ImGuiManager.h"
-//#include "GlobalVariables.h"
+#include "ImGuiManager.h"
+#include "GlobalVariables.h"
 
 
 class MyGameTitle : public GuchisFramework

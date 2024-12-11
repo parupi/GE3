@@ -2,7 +2,7 @@
 #include "function.h"
 #ifdef _DEBUG
 #include <imgui.h>
-#endif // _DEBUG
+#endif _DEBUG
 
 Sprite::~Sprite() {
 

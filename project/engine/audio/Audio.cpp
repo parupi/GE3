@@ -193,6 +193,8 @@ void Audio::Finalize()
 	}
 	masterVoice->DestroyVoice();
 	xAudio2.Reset();
+	delete instance;
+	instance = nullptr;
 }
 
 int Audio::SearchSourceVoice(IXAudio2SourceVoice** sourceVoices)

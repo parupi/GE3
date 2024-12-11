@@ -539,11 +539,6 @@ void DirectXManager::BeginDraw()
 	// 深度ビューのクリア
 	ClearDepthStencilView();
 
-
-
-	// ImGuiの描画コマンドを積む
-	//RenderImGui();
-
 	// ビューポートとシザーレクトの設定
 	SetViewportAndScissorRect();
 }
@@ -564,7 +559,6 @@ void DirectXManager::EndDraw()
 	// コマンドリストの内容和確定させる。すべてのコマンドを詰んでからCloseすること
 	hr = commandList_->Close();
 	assert(SUCCEEDED(hr));
-
 
 	// GPUにコマンドリストの実行を行わせる
 	ComPtr<ID3D12CommandList> commandLists[] = { commandList_ };

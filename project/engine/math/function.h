@@ -3,42 +3,38 @@
 #include "assert.h"
 #include "cmath"
 #include <Matrix4x4.h>
+#include <Quaternion.h>
 #include <imgui.h>
 
 static const int kColumnWidth = 60;
 static const int kRowHeight = 20;
 
-struct Transform {
+struct EulerTransform {
 	Vector3 scale;
 	Vector3 rotate;
 	Vector3 translate;
 };
 
-//// 内積
-//float Dot(const Vector3& v1, const Vector3& v2);
-//
-//// 長さ（ノルム）
-//float Length(const Vector3& v);
-//Vector3 Normalize(const Vector3& v);
+struct QuaternionTransform {
+	Vector3 scale;
+	Quaternion rotate;
+	Vector3 translate;
+};
+
 
 // 正規化
 float Normalize(float value);
 
 float Lerp(float a, float b, float t);
 
-// 平行移動行列
-Matrix4x4 MakeTranslateMatrix(const Vector3& translate);
-
-// 拡大縮小行列
-Matrix4x4 MakeScaleMatrix(const Vector3& scale);
 
 // 座標変換
 //Vector3 Transform(const Vector3& vector, const Matrix4x4& matrix);
-Vector3 Transformm_(const Vector3& vector, const Matrix4x4& matrix);
+Vector3 Transform(const Vector3& vector, const Matrix4x4& matrix);
 
 Matrix4x4 MakeRotateXYZMatrix(Vector3 rotate);
 
-Matrix4x4 MakeAffineMatrix(const Vector3& scale, const Vector3& rotate, const Vector3& translate);
+//Matrix4x4 MakeAffineMatrix(const Vector3& scale, const Vector3& rotate, const Vector3& translate);
 
 // tanθの逆数
 float cotf(float theta);
