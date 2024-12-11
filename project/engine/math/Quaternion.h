@@ -40,7 +40,7 @@ float Norm(const Quaternion& q);
 Quaternion Normalize(const Quaternion& q);
 // クォータニオンの逆
 Quaternion Inverse(const Quaternion& q);
-// クォータニオンの生成
+// Vector3からクォータニオンの生成
 Quaternion MakeRotateAxisAngleQuaternion(const Vector3& axis, float angle);
 // 球面線形補間
 Quaternion Slerp(Quaternion q0, Quaternion q1, float t);

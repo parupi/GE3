@@ -56,6 +56,8 @@ void Input::Finalize()
     if (devMouse_) {
         devMouse_->Unacquire();
     }
+    delete instance;
+    instance = nullptr;
 }
 
 // ジョイスティックのセットアップ
@@ -188,13 +190,3 @@ BOOL CALLBACK Input::EnumJoysticksCallback(const DIDEVICEINSTANCE* pdidInstance,
 
     return DIENUM_CONTINUE;
 }
-//
-//// デストラクタ
-//Input::~Input() {
-//    if (devKeyboard_) {
-//        devKeyboard_->Unacquire();
-//    }
-//    if (devMouse_) {
-//        devMouse_->Unacquire();
-//    }
-//}

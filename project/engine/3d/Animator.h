@@ -5,17 +5,22 @@
 #include <vector>
 #include <map>
 #include <string>
+#include <optional>
+#include <Model.h>
+//#include <Skeleton.h>
 
-class Model;
+//class Model;
+class Skeleton;
 
 class Animator {
 public:
 	// 初期化
-	void Initialize(Model* model, const std::string& directoryPath, const std::string& filename);
+	void Initialize(Model* model, const std::string& filename);
 	// 再生
 	void Update();
-
-private: // 構造体
+	// Skeletonを適応する
+	//void ApplySkeleton();
+public: // 構造体
 	template <typename tValue>
 	struct Keyframe {
 		float time;
@@ -28,7 +33,7 @@ private: // 構造体
 	struct AnimationCurve {
 		std::vector<Keyframe<tValue>> keyframes;
 	};
-	
+
 	struct NodeAnimation {
 		AnimationCurve<Vector3> translate;
 		AnimationCurve<Quaternion> rotate;
@@ -42,14 +47,17 @@ private: // 構造体
 private:
 	// アニメーションを読む処理
 	Animation LoadAnimationFile(const std::string& directoryPath, const std::string& filename);
+public:
 	// 任意の時刻を取得する (Vector3)
-	Vector3 CalculateValue(const std::vector<KeyframeVector3>& keyframes, float time);
+	static Vector3 CalculateValue(const std::vector<KeyframeVector3>& keyframes, float time);
 	// 任意の時刻を取得する (Quaternion)
-	Quaternion CalculateValue(const std::vector<KeyframeQuaternion>& keyframes, float time);
+	static Quaternion CalculateValue(const std::vector<KeyframeQuaternion>& keyframes, float time);
 private:
 	// アニメーション
 	Animation animation;
-	// モデル
+	// スケルトン
+	std::unique_ptr<Skeleton> skeleton_;
+	// モデルデータ
 	Model* model_;
 	// 現在のアニメーションタイム
 	float animationTime = 0.0f;
@@ -58,5 +66,6 @@ private:
 
 public: // ゲッター // セッター //
 	Matrix4x4 GetLocalMatrix() const { return localMatrix; }
-
+	//void SetSkeleton(Skeleton* skeleton) { skeleton_ = skeleton; }
+	Skeleton* GetSkeleton() const { return skeleton_.get(); }
 };

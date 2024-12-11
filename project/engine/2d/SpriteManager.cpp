@@ -98,6 +98,7 @@ void SpriteManager::CreateRootSignature() {
 	descriptionRootSignature.NumStaticSamplers = _countof(staticSamplers);
 
 	// シリアライズしてバイナリにする
+
 	HRESULT hr = D3D12SerializeRootSignature(&descriptionRootSignature, D3D_ROOT_SIGNATURE_VERSION_1, &signatureBlob, &errorBlob);
 	if (FAILED(hr)) {
 		Logger::Log(reinterpret_cast<char*>(errorBlob->GetBufferPointer()));
@@ -124,7 +125,7 @@ void SpriteManager::CreateInputElementDesc()
 	inputElementDescs_[2].SemanticIndex = 0;
 	inputElementDescs_[2].Format = DXGI_FORMAT_R32G32B32_FLOAT;
 	inputElementDescs_[2].AlignedByteOffset = D3D12_APPEND_ALIGNED_ELEMENT;
-	D3D12_INPUT_LAYOUT_DESC inputLayoutDesc{};
+
 	inputLayoutDesc_.pInputElementDescs = inputElementDescs_;
 	inputLayoutDesc_.NumElements = _countof(inputElementDescs_);
 }
@@ -160,16 +161,6 @@ void SpriteManager::LoadShader()
 	assert(pixelShaderBlob_ != nullptr);
 }
 
-void SpriteManager::CreateDepthStencilState()
-{
-	// Depthの機能を有効化する
-	depthStencilDesc_.DepthEnable = true;
-	// 書き込みします
-	depthStencilDesc_.DepthWriteMask = D3D12_DEPTH_WRITE_MASK_ALL;
-	// 比較関数はLessEqual。つまり、近ければ描画される
-	depthStencilDesc_.DepthFunc = D3D12_COMPARISON_FUNC_LESS_EQUAL;
-}
-
 
 void SpriteManager::CreatePipelineState()
 {
@@ -179,6 +170,7 @@ void SpriteManager::CreatePipelineState()
 	D3D12_GRAPHICS_PIPELINE_STATE_DESC graphicsPipelineStateDesc{};
 	graphicsPipelineStateDesc.pRootSignature = rootSignature_.Get();			// RootSignature
 	graphicsPipelineStateDesc.InputLayout = inputLayoutDesc_;			// InputLayout
+	//graphicsPipelineStateDesc.InputLayout = inputLayoutDesc;			// InputLayout
 	graphicsPipelineStateDesc.VS = { vertexShaderBlob_->GetBufferPointer(), vertexShaderBlob_->GetBufferSize() };			// vertexShader
 	graphicsPipelineStateDesc.PS = { pixelShaderBlob_->GetBufferPointer(), pixelShaderBlob_->GetBufferSize() };			// PixelShade
 	graphicsPipelineStateDesc.BlendState = blendDesc_;					// BlendState
@@ -191,11 +183,22 @@ void SpriteManager::CreatePipelineState()
 	// どのように画面を打ち込むかの設定
 	graphicsPipelineStateDesc.SampleDesc.Count = 1;
 	graphicsPipelineStateDesc.SampleMask = D3D12_DEFAULT_SAMPLE_MASK;
+
+	// DepthStencilStateの設定
+	D3D12_DEPTH_STENCIL_DESC depthStencilDesc{};
+	// Depthの機能を有効化する
+	depthStencilDesc.DepthEnable = true;
+	// 書き込みします
+	depthStencilDesc.DepthWriteMask = D3D12_DEPTH_WRITE_MASK_ALL;
+	// 比較関数はLessEqual。つまり、近ければ描画される
+	depthStencilDesc.DepthFunc = D3D12_COMPARISON_FUNC_LESS_EQUAL;
+
 	// DepthStencilの設定
-	graphicsPipelineStateDesc.DepthStencilState = depthStencilDesc_;
+	graphicsPipelineStateDesc.DepthStencilState = depthStencilDesc;
 	graphicsPipelineStateDesc.DSVFormat = DXGI_FORMAT_D24_UNORM_S8_UINT;
 
 	// 実際に生成
+	//Microsoft::WRL::ComPtr<ID3D12PipelineState> graphicsPipelineState = nullptr;
 	hr = dxManager_->GetDevice()->CreateGraphicsPipelineState(&graphicsPipelineStateDesc, IID_PPV_ARGS(&graphicsPipelineState_));
 	assert(SUCCEEDED(hr));
 }

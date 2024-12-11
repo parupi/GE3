@@ -1,16 +1,40 @@
 #include "Object3d.h"
 #include "Object3dManager.h"
 #include "TextureManager.h"
-#include "imgui.h"
+//#include "imgui.h"
 #include <WorldTransform.h>
 #include <numbers>
-
-void Object3d::Initialize()
+//#include <Skeleton.h>
+//#include <Animator.h>
+#include "ModelManager.h"
+Object3d::~Object3d()
 {
+	//delete animator_;
+}
+
+void Object3d::Initialize(const std::string& fileName)
+{
+	// モデルを検索してセットする
+	model_ = ModelManager::GetInstance()->FindModel(fileName);
+
 	objectManager_ = Object3dManager::GetInstance();
 
-	CreateMaterialResource();	
+	//if (model_->GetModelData().isAnimation) {
+	//	animator_ = new Animator();
+	//	animator_->Initialize(model_, fileName);
+	//	//model_->SetSkeleton(animator_->GetSkeleton());
+	//}
+
+	CreateMaterialResource();
 	CreateCameraResource();
+}
+
+void Object3d::AnimationUpdate()
+{
+	model_->Update();
+	//if (model_->GetModelData().isAnimation) {
+	//	animator_->Update();
+	//}
 }
 
 void Object3d::Draw(WorldTransform& worldTransform)
@@ -18,13 +42,37 @@ void Object3d::Draw(WorldTransform& worldTransform)
 	camera_ = objectManager_->GetDefaultCamera();
 	cameraData_->worldPosition = camera_->GetTranslate();
 
+	Matrix4x4 worldViewProjectionMatrix;
+	if (camera_) {
+		const Matrix4x4& viewProjectionMatrix = camera_->GetViewProjectionMatrix();
+		worldViewProjectionMatrix = worldTransform.GetMatWorld() * viewProjectionMatrix;
+	}
+	else {
+		worldViewProjectionMatrix = worldTransform.GetMatWorld();
+	}
+
+	if (model_->GetModelData().isAnimation) {
+		if (model_->GetModelData().isHasBones) {
+			worldTransform.SetMapWVP(/*model_->GetModelData().rootNode.localMatrix * */worldViewProjectionMatrix);
+			worldTransform.SetMapWorld(/*model_->GetModelData().rootNode.localMatrix * */worldTransform.GetMatWorld());
+		}
+		else {
+			worldTransform.SetMapWVP(model_->GetModelData().rootNode.localMatrix * worldViewProjectionMatrix);
+			worldTransform.SetMapWorld(model_->GetModelData().rootNode.localMatrix * worldTransform.GetMatWorld());
+		}
+	}
+	else {
+		worldTransform.SetMapWVP(/*model_->GetModelData().rootNode.localMatrix * */worldViewProjectionMatrix);
+		worldTransform.SetMapWorld(/*model_->GetModelData().rootNode.localMatrix * */worldTransform.GetMatWorld());
+	}
+
 	// cameraの場所を指定
 	objectManager_->GetDxManager()->GetCommandList()->SetGraphicsRootConstantBufferView(3, cameraResource_->GetGPUVirtualAddress());
 	// マテリアルCBufferの場所を指定
 	objectManager_->GetDxManager()->GetCommandList()->SetGraphicsRootConstantBufferView(0, materialResource_->GetGPUVirtualAddress());
 	// 3Dモデルが割り当てられていれば描画する
-	if (model_){
-		model_->Draw(worldTransform, camera_);
+	if (model_) {
+		model_->Draw(worldTransform);
 	}
 }
 

@@ -17,6 +17,12 @@ void ModelManager::Initialize(DirectXManager* dxManager, SrvManager* srvManager)
 	modelLoader->Initialize(dxManager, srvManager);
 }
 
+void ModelManager::Finalize()
+{
+	delete instance;
+	instance = nullptr;
+}
+
 void ModelManager::LoadModel(const std::string& directoryPath, const std::string& fileName)
 {
 	// 読み込み済みモデルを検索

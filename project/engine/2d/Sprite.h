@@ -75,7 +75,7 @@ private:
 	bool isFlipY_ = false;
 
 private: // 実用化用変数
-	Transform transform_{ {1.0f, 1.0f, 1.0f}, {0.0f, 0.0f, 0.0f}, {0.0f, 0.0f, 0.0f} };
+	EulerTransform transform_{ {1.0f, 1.0f, 1.0f}, {0.0f, 0.0f, 0.0f}, {0.0f, 0.0f, 0.0f} };
 	Vector2 position_ = { 0.0f, 0.0f };
 	float rotation_ = 0.0f;
 	Vector2 size_ = { 80.0f, 80.0f };

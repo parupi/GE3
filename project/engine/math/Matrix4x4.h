@@ -46,6 +46,12 @@ Matrix4x4 Transpose(const Matrix4x4& m);
 // 単位行列を作成
 Matrix4x4 MakeIdentity4x4();
 
+// 平行移動行列
+Matrix4x4 MakeTranslateMatrix(const Vector3& translate);
+
+// 拡大縮小行列
+Matrix4x4 MakeScaleMatrix(const Vector3& scale);
+
 // X軸回転行列を作成
 Matrix4x4 MakeRotateXMatrix(float radian);
 
@@ -55,12 +61,14 @@ Matrix4x4 MakeRotateYMatrix(float radian);
 // Z軸回転行列を作成
 Matrix4x4 MakeRotateZMatrix(float radian);
 
-// 3x3行列式を計算するヘルパー関数
-float Determinant3x3(float a, float b, float c, float d, float e, float f, float g, float h, float i);
+Matrix4x4 MakeRotateXYZMatrix(Vector3 rotate);
 
-// 4x4行列の行列式を計算する関数
-float Determinant(const Matrix4x4& m);
+Matrix4x4 MakeAffineMatrix(const Vector3& scale, const Vector3& rotate, const Vector3& translate);
+
+Matrix4x4 MakeAffineMatrix(const Vector3& scale, const Quaternion& rotate, const Vector3& translate);
 
 Matrix4x4 MakeRotateMatrix(const Quaternion& quaternion);
+
+Matrix4x4 MakeRotateAxisAngle(const Vector3& axis, float angle);
 
 void PrintOnImGui(const Matrix4x4& matrix, const char* label = "Matrix");

@@ -138,12 +138,12 @@ Quaternion Slerp(Quaternion q0, Quaternion q1, float t)
 
 float Dot(const Quaternion& q0, const Quaternion& q1)
 {
-    return { q0.x * q1.x + q0.y * q1.y + q0.z * q1.z + q0.w * q1.w };
+    return q0.x * q1.x + q0.y * q1.y + q0.z * q1.z + q0.w * q1.w;
 }
 
 // ImGuiを使ったクォータニオンの描画
 void PrintOnImGui(const Quaternion& q, const char* label) {
-    ImGui::Begin("Quaternion");
-    ImGui::Text("%s: (x: %.2f, y: %.2f, z: %.2f, w: %.2f)", label, q.x, q.y, q.z, q.w);
+    ImGui::Begin(label);
+    ImGui::Text("%s: (x: %.2f, y: %.2f, z: %.2f, w: %.2f)", "Quaternion", q.x, q.y, q.z, q.w);
     ImGui::End();
 }

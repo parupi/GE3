@@ -1,38 +1,40 @@
 #pragma once
-#include "DirectXManager.h"
-#include <memory>
-#include <mutex>
-// スプライト共通部
-class SpriteManager
+#include <DirectXManager.h>
+#include <SrvManager.h>
+#include "Camera.h"
+class ParticleResources
 {
-public:
-	static SpriteManager* instance;
-	static std::once_flag initInstanceFlag;
+private:
+	static ParticleResources* instance;
 
-	SpriteManager() = default;
-	~SpriteManager() = default;
-	SpriteManager(SpriteManager&) = default;
-	SpriteManager& operator=(SpriteManager&) = default;
+	ParticleResources() = default;
+	~ParticleResources() = default;
+	ParticleResources(ParticleResources&) = default;
+	ParticleResources& operator=(ParticleResources&) = default;
 public:
 	// シングルトンインスタンスの取得
-	static SpriteManager* GetInstance();
+	static ParticleResources* GetInstance();
 	// 初期化
-	void Initialize(DirectXManager* directXManager);
-	// 描画前処理
-	void DrawSet();
+	void Initialize(DirectXManager* dxManager, SrvManager* srvManager);
 	// 終了
 	void Finalize();
-
+	// 描画前処理
+	void DrawSet();
 private:
+
 	void CreateRootSignature();
 	void CreateInputElementDesc();
 	void CreateBlendState();
 	void CreateRasterizerState();
 	void LoadShader();
 	void CreatePipelineState();
+
 private:
-	// DirectXのポインタ
+	// DxManager
 	DirectXManager* dxManager_ = nullptr;
+	SrvManager* srvManager_ = nullptr;
+	Camera* camera_ = nullptr;
+
 	// ルートシグネチャ
 	Microsoft::WRL::ComPtr<ID3D12RootSignature> rootSignature_ = nullptr;
 	// PSO
@@ -51,6 +53,9 @@ private:
 	ID3DBlob* errorBlob = nullptr;
 
 public:
-	DirectXManager* GetDxManager() const { return dxManager_; }
-
+	DirectXManager* GetDxManager() { return dxManager_; }
+	SrvManager* GetSrvManager() { return srvManager_; }
+	Camera* GetCamera() { return camera_; }
+	void SetCamera(Camera* camera) { camera_ = camera; }
 };
+

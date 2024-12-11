@@ -13,7 +13,7 @@ public: // メンバ関数
 	void FollowCamera(const Vector3& target);
 
 private:
-	Transform transform_;
+	EulerTransform transform_;
 	Matrix4x4 worldMatrix_;
 	Matrix4x4 viewMatrix_;
 	Matrix4x4 projectionMatrix_;
