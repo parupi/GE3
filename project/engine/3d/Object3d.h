@@ -20,7 +20,7 @@ public: // メンバ関数
 	Object3d() = default;
 	~Object3d();
 
-	void Initialize(const std::string& filePath);
+	void Initialize(const std::string& filePath = "");
 	// アニメーション用アップデート
 	void AnimationUpdate();
 	void Draw(WorldTransform& worldTransform);

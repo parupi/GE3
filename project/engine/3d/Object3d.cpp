@@ -15,7 +15,9 @@ Object3d::~Object3d()
 void Object3d::Initialize(const std::string& fileName)
 {
 	// モデルを検索してセットする
-	model_ = ModelManager::GetInstance()->FindModel(fileName);
+	if (fileName != "") {
+		model_ = ModelManager::GetInstance()->FindModel(fileName);
+	}
 
 	objectManager_ = Object3dManager::GetInstance();
 
