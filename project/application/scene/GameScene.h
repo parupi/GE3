@@ -3,11 +3,13 @@
 #include <Sprite.h>
 #include <Model.h>
 #include <vector>
-#include <Camera.h>
 #include <BaseScene.h>
 #include <memory>
 #include <Audio.h>
-#include <CameraManager.h>
+#include "camera/GameCamera.h"
+#include "charcter/player/Player.h"
+#include <charcter/Enemy.h>
+
 class GameScene : public BaseScene
 {
 public:
@@ -21,15 +23,8 @@ public:
 	void Draw() override;
 
 private:
-	CameraManager cameraManager_;
-	std::shared_ptr<Camera> normalCamera_;
-	std::shared_ptr<Camera> bossCamera_;
-
-	Object3d* object_;
-	std::vector<Sprite*> sprites;
-
-	Vector4 color1 = { 1.0f, 1.0f, 1.0f, 1.0f };
-	Vector4 color2 = { 1.0f, 1.0f, 1.0f, 1.0f };
-	uint32_t soundHandle = 0u;
+	std::unique_ptr<GameCamera> gameCamera_;
+	std::unique_ptr<Player> player_;
+	std::unique_ptr<Enemy> enemy_;
 };
 

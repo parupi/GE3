@@ -42,6 +42,8 @@ Quaternion Normalize(const Quaternion& q);
 Quaternion Inverse(const Quaternion& q);
 // Vector3からクォータニオンの生成
 Quaternion MakeRotateAxisAngleQuaternion(const Vector3& axis, float angle);
+// fromからtoに向かせる関数
+Quaternion FromToRotation(const Vector3& from, const Vector3& to);
 // 球面線形補間
 Quaternion Slerp(Quaternion q0, Quaternion q1, float t);
 // 内積

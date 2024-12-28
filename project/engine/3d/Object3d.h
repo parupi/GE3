@@ -45,7 +45,6 @@ private: // メンバ変数
 	Object3dManager* objectManager_ = nullptr;
 	Model* model_ = nullptr;
 	Camera* camera_ = nullptr;
-	//Animator* animator_ = nullptr;
 	
 	Microsoft::WRL::ComPtr<ID3D12Resource> materialResource_ = nullptr;
 	Microsoft::WRL::ComPtr<ID3D12Resource> cameraResource_ = nullptr;
@@ -73,5 +72,3 @@ public: // ゲッター // セッター //
 	const bool& GetIsLighting() const { return materialData_->enableLighting; }
 	void SetIsLighting(const bool isLighting) { materialData_->enableLighting = isLighting; }
 };
-
-//static_assert(!std::is_copy_assignable_v<Object3d>);

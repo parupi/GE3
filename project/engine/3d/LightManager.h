@@ -43,8 +43,18 @@ struct SpotLight {
 
 class LightManager
 {
+private:
+	static LightManager* instance;
+	static std::once_flag initInstanceFlag;
+
+	LightManager() = default;
+	~LightManager() = default;
+	LightManager(LightManager&) = default;
+	LightManager& operator=(LightManager&) = default;
 public:
-	void Initialize();
+	// シングルトンインスタンスの取得
+	static LightManager* GetInstance();
+	void Initialize(DirectXManager* dxManager);
 	void BindLightsToShader();
 private:
 	void CreateDirLightResource();

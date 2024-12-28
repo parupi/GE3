@@ -1,6 +1,7 @@
 #include "MyGameTitle.h"
 #include <SceneFactory.h>
 #include <ParticleResources.h>
+#include "LightManager.h"
 
 void MyGameTitle::Initialize()
 {
@@ -17,6 +18,8 @@ void MyGameTitle::Initialize()
 	SpriteManager::GetInstance()->Initialize(dxManager.get());
 	// オブジェクト共通部
 	Object3dManager::GetInstance()->Initialize(dxManager.get());
+	// ライトの生成
+	LightManager::GetInstance()->Initialize(dxManager.get());
 
 	// 最初のシーンを生成
 	sceneFactory_ = std::make_unique<SceneFactory>();
@@ -27,6 +30,8 @@ void MyGameTitle::Initialize()
 
 	// インスタンス生成
 	GlobalVariables::GetInstance();
+	// ファイルを読む
+	LoadFile();
 }
 
 void MyGameTitle::Finalize()
@@ -59,5 +64,11 @@ void MyGameTitle::Draw()
 	ImGuiManager::GetInstance()->Draw();
 
 	dxManager->EndDraw();
+}
+
+void MyGameTitle::LoadFile()
+{
+	ModelManager::GetInstance()->LoadModel("resource", "plane.obj");
+
 }
 

@@ -6,8 +6,8 @@
 void TitleScene::Initialize()
 {
 	// カメラの生成
-	camera_ = std::make_unique<Camera>();
-	Object3dManager::GetInstance()->SetDefaultCamera(camera_.get());
+	//camera_ = std::make_unique<Camera>("");
+	//Object3dManager::GetInstance()->SetDefaultCamera(camera_.get());
 
 }
 

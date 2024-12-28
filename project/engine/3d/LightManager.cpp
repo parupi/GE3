@@ -2,9 +2,20 @@
 #include <Object3dManager.h>
 #include <numbers>
 
-void LightManager::Initialize()
+LightManager* LightManager::instance = nullptr;
+std::once_flag LightManager::initInstanceFlag;
+
+LightManager* LightManager::GetInstance()
 {
-	dxManager_ = Object3dManager::GetInstance()->GetDxManager();
+	std::call_once(initInstanceFlag, []() {
+		instance = new LightManager();
+		});
+	return instance;
+}
+
+void LightManager::Initialize(DirectXManager* dxManager)
+{
+	dxManager_ = dxManager;
 
 	CreateDirLightResource();
 	CreatePointLightResource();
@@ -39,7 +50,7 @@ void LightManager::CreateDirLightResource()
 	dirLightResource3_->Map(0, nullptr, reinterpret_cast<void**>(&dirLightData3_));
 	dirLightData1_->color = { 1.0f, 1.0f, 1.0f, 1.0f };
 	dirLightData1_->direction = { 0.0f, -2.0f, 1.0f };
-	dirLightData1_->enabled = false;
+	dirLightData1_->enabled = true;
 	dirLightData1_->intensity = 1.0f;
 	dirLightData2_->color = { 1.0f, 1.0f, 1.0f, 1.0f };
 	dirLightData2_->direction = { 0.0f, -2.0f, 1.0f };

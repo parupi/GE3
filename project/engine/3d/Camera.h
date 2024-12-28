@@ -1,10 +1,11 @@
 #pragma once
 #include <function.h>
 #include <WindowManager.h>
+#include "GlobalVariables.h"
 class Camera
 {
 public: // メンバ関数
-	Camera();
+	Camera(const std::string cameraName);
 
 	// 更新
 	void Update();
@@ -13,6 +14,10 @@ public: // メンバ関数
 	void FollowCamera(const Vector3& target);
 
 private:
+	GlobalVariables* global_ = GlobalVariables::GetInstance();
+	// カメラの名前を保存しておく
+	std::string cameraName_;
+
 	EulerTransform transform_;
 	Matrix4x4 worldMatrix_;
 	Matrix4x4 viewMatrix_;

@@ -27,5 +27,7 @@ public:
 	void Update() override;
 	// 描画
 	void Draw() override;
+	// リソースの読み込み
+	void LoadFile();
 };
 

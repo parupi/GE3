@@ -9,7 +9,6 @@
 #include "ModelManager.h"
 Object3d::~Object3d()
 {
-	//delete animator_;
 }
 
 void Object3d::Initialize(const std::string& fileName)
@@ -21,12 +20,6 @@ void Object3d::Initialize(const std::string& fileName)
 
 	objectManager_ = Object3dManager::GetInstance();
 
-	//if (model_->GetModelData().isAnimation) {
-	//	animator_ = new Animator();
-	//	animator_->Initialize(model_, fileName);
-	//	//model_->SetSkeleton(animator_->GetSkeleton());
-	//}
-
 	CreateMaterialResource();
 	CreateCameraResource();
 }
@@ -34,9 +27,6 @@ void Object3d::Initialize(const std::string& fileName)
 void Object3d::AnimationUpdate()
 {
 	model_->Update();
-	//if (model_->GetModelData().isAnimation) {
-	//	animator_->Update();
-	//}
 }
 
 void Object3d::Draw(WorldTransform& worldTransform)
@@ -55,8 +45,8 @@ void Object3d::Draw(WorldTransform& worldTransform)
 
 	if (model_->GetModelData().isAnimation) {
 		if (model_->GetModelData().isHasBones) {
-			worldTransform.SetMapWVP(/*model_->GetModelData().rootNode.localMatrix * */worldViewProjectionMatrix);
-			worldTransform.SetMapWorld(/*model_->GetModelData().rootNode.localMatrix * */worldTransform.GetMatWorld());
+			worldTransform.SetMapWVP(worldViewProjectionMatrix);
+			worldTransform.SetMapWorld(worldTransform.GetMatWorld());
 		}
 		else {
 			worldTransform.SetMapWVP(model_->GetModelData().rootNode.localMatrix * worldViewProjectionMatrix);
@@ -64,8 +54,8 @@ void Object3d::Draw(WorldTransform& worldTransform)
 		}
 	}
 	else {
-		worldTransform.SetMapWVP(/*model_->GetModelData().rootNode.localMatrix * */worldViewProjectionMatrix);
-		worldTransform.SetMapWorld(/*model_->GetModelData().rootNode.localMatrix * */worldTransform.GetMatWorld());
+		worldTransform.SetMapWVP(worldViewProjectionMatrix);
+		worldTransform.SetMapWorld(worldTransform.GetMatWorld());
 	}
 
 	// cameraの場所を指定
