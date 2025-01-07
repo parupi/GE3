@@ -10,4 +10,6 @@ private:
     void Move(Player* player);
 private:
     const float playerSpeed = 0.5f;
+
+
 };

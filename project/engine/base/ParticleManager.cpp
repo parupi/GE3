@@ -56,26 +56,10 @@ void ParticleManager::Update()
 
 			// パーティクルの更新処理
 			float alpha{};
-			if (groupName == "snow") {
-				if ((*particleIterator).transform.translate.y <= 0) {
-					(*particleIterator).currentTime += kDeltaTime;
-					alpha = 1.0f - ((*particleIterator).currentTime / (*particleIterator).lifeTime);
-				}
-				else {
-					(*particleIterator).transform.translate += (*particleIterator).velocity * kDeltaTime;
-					alpha = 1.0f;
-				}
-			}
-			else {
-				if ((*particleIterator).transform.translate.y >= -15.0f) {
-					(*particleIterator).transform.translate += (*particleIterator).velocity * kDeltaTime;
-					(*particleIterator).transform.rotate += {0.1f, 0.1f, 0.1f};
-					alpha = alpha_[groupName];
-				}
-				else {
-					(*particleIterator).currentTime += kDeltaTime;
-				}
-			}
+
+			(*particleIterator).transform.translate += (*particleIterator).velocity * kDeltaTime;
+			(*particleIterator).currentTime += kDeltaTime;
+			alpha = 1.0f - ((*particleIterator).currentTime / (*particleIterator).lifeTime);
 
 			// ワールド行列の計算
 			scaleMatrix = MakeScaleMatrix((*particleIterator).transform.scale);

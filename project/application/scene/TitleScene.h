@@ -3,6 +3,7 @@
 #include <BaseScene.h>
 #include "SceneManager.h"
 #include <memory>
+#include "Sprite.h"
 class TitleScene : public BaseScene
 {
 public:
@@ -16,6 +17,6 @@ public:
 	void Draw() override;
 
 private:
-	std::unique_ptr<Camera> camera_ = nullptr;
+	std::unique_ptr<Sprite> titleUI_;
 };
 

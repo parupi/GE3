@@ -17,7 +17,7 @@ void DebugSphere::Finalize()
 
 void DebugSphere::Update(const Vector3& position)
 {
-	transform_.scale_ = { 0.05f, 0.05f, 0.05f };
+	transform_.scale_ = { 0.1f, 0.1f, 0.1f };
 	transform_.translation_ = position;
 	transform_.TransferMatrix();
 }

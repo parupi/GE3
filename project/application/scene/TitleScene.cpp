@@ -5,10 +5,9 @@
 
 void TitleScene::Initialize()
 {
-	// カメラの生成
-	//camera_ = std::make_unique<Camera>("");
-	//Object3dManager::GetInstance()->SetDefaultCamera(camera_.get());
-
+	TextureManager::GetInstance()->LoadTexture("resource/UI/TitleUI.png");
+	titleUI_ = std::make_unique<Sprite>();
+	titleUI_->Initialize("resource/UI/TitleUI.png");
 }
 
 void TitleScene::Finalize()
@@ -21,8 +20,12 @@ void TitleScene::Update()
 		// シーンの切り替え依頼
 		SceneManager::GetInstance()->ChangeScene("GAMEPLAY");
 	}
+
+	titleUI_->Update();
 }
 
 void TitleScene::Draw()
 {
+	SpriteManager::GetInstance()->DrawSet();
+	titleUI_->Draw();
 }

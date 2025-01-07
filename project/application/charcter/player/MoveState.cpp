@@ -1,6 +1,7 @@
 #include "MoveState.h"
 #include "IdleState.h"
 #include "Player.h"
+#include "attack/FirstAttackState.h"
 
 void MoveState::Enter(Player* player) {
     // 移動状態への遷移時の初期化処理
@@ -13,6 +14,8 @@ void MoveState::Update(Player* player) {
         player->GetInput()->PushKey(DIK_S) || player->GetInput()->PushKey(DIK_D))) {
         player->ChangeState(std::make_unique<IdleState>());
     }
+
+
 }
 
 void MoveState::Exit(Player* player) {
@@ -50,4 +53,8 @@ void MoveState::Move(Player* player) {
 
     Vector3 newTranslation = player->GetTranslate() + velocity * playerSpeed;
     player->SetTranslate(newTranslation);
+
+    if (player->GetInput()->TriggerKey(DIK_SPACE)) {
+        player->ChangeState(std::make_unique<FirstAttackState>());
+    }
 }

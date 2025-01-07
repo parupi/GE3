@@ -5,6 +5,7 @@
 #include <Matrix4x4.h>
 #include <Quaternion.h>
 #include <imgui.h>
+#include "Vector4.h"
 
 static const int kColumnWidth = 60;
 static const int kRowHeight = 20;
@@ -21,6 +22,10 @@ struct QuaternionTransform {
 	Vector3 translate;
 };
 
+struct Vertex {
+	Vector3 position; // 頂点の座標
+	Vector4 color;    // 線の色
+};
 
 // 正規化
 float Normalize(float value);
@@ -65,3 +70,5 @@ Vector3 ExtractTranslation(const Matrix4x4& matrix);
 //Matrix4x4 MakeRotaeAxisAngle(const Vector3& axis, float angle);
 
 Matrix4x4 DirectionToDirection(const Vector3& from, const Vector3& to);
+
+void DrawAABB(const Vector3& min, const Vector3& max, const Vector4& color);

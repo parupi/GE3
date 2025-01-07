@@ -2,6 +2,7 @@
 #include <SceneFactory.h>
 #include <ParticleResources.h>
 #include "LightManager.h"
+#include <Line3dManager.h>
 
 void MyGameTitle::Initialize()
 {
@@ -20,13 +21,15 @@ void MyGameTitle::Initialize()
 	Object3dManager::GetInstance()->Initialize(dxManager.get());
 	// ライトの生成
 	LightManager::GetInstance()->Initialize(dxManager.get());
+	// 線描画
+	Line3dManager::GetInstance()->Initialize(dxManager.get());
 
 	// 最初のシーンを生成
 	sceneFactory_ = std::make_unique<SceneFactory>();
 	// シーンマネージャーに最初のシーンをセット
 	SceneManager::GetInstance()->SetSceneFactory(sceneFactory_.get());
 	// シーンマネージャーに最初のシーンをセット
-	SceneManager::GetInstance()->ChangeScene("GAMEPLAY");
+	SceneManager::GetInstance()->ChangeScene("TITLE");
 
 	// インスタンス生成
 	GlobalVariables::GetInstance();
@@ -69,6 +72,10 @@ void MyGameTitle::Draw()
 void MyGameTitle::LoadFile()
 {
 	ModelManager::GetInstance()->LoadModel("resource", "plane.obj");
-
+	ModelManager::GetInstance()->LoadModel("resource", "float_body.obj");
+	ModelManager::GetInstance()->LoadModel("resource", "float_head.obj");
+	ModelManager::GetInstance()->LoadModel("resource", "ICO.obj");
+	ModelManager::GetInstance()->LoadModel("resource", "sord/sord.obj");
+	ModelManager::GetInstance()->LoadModel("resource", "models/player/player.obj");
 }
 
