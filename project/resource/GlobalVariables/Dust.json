@@ -1,0 +1,50 @@
+{
+    "Dust": {
+        "maxAlpha": 1.0,
+        "maxColor": [
+            0.6000000238418579,
+            0.0,
+            0.0
+        ],
+        "maxLifeTime": 0.0,
+        "maxRotate": [
+            0.0,
+            0.0,
+            0.0
+        ],
+        "maxScale": 0.0,
+        "maxTranslate": [
+            0.0,
+            0.0,
+            0.0
+        ],
+        "maxVelocity": [
+            0.0,
+            0.0,
+            0.0
+        ],
+        "minAlpha": 1.0,
+        "minColor": [
+            0.4000000059604645,
+            0.0,
+            0.0
+        ],
+        "minLifeTime": 0.0,
+        "minRotate": [
+            0.0,
+            0.0,
+            0.0
+        ],
+        "minScale": 0.0,
+        "minTranslate": [
+            0.0,
+            0.0,
+            0.0
+        ],
+        "minVelocity": [
+            0.0,
+            0.0,
+            0.0
+        ]
+    }
+}

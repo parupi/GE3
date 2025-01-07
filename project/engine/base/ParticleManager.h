@@ -139,7 +139,7 @@ private:
 	std::mt19937 randomEngine;
 
 	std::unordered_map<std::string, ParticleGroup> particleGroups_;
-	
+
 	// 名前ごとにまとめて管理する1つのマップ
 	std::unordered_map<std::string, ParticleParameters> particleParams_;
 	// アルファ値だけグループごとに変えれるようにしとく
@@ -158,6 +158,6 @@ private:
 
 	Microsoft::WRL::ComPtr<ID3D12Resource> vertexResource;
 
-	public:
+public:
 	void SetAlpha(const std::string name, float alpha) { alpha_[name] = alpha; }
 };

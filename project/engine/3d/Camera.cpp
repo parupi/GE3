@@ -20,9 +20,6 @@ Camera::Camera(const std::string cameraName)
 
 void Camera::Update()
 {
-	//transform_.translate = global_->GetVector3Value(cameraName_, "Translate");
-	//transform_.rotate = global_->GetVector3Value(cameraName_, "Rotate");
-
 	worldMatrix_ = MakeAffineMatrix(transform_.scale, transform_.rotate, transform_.translate);
 	viewMatrix_ = Inverse(worldMatrix_);
 	projectionMatrix_ = MakePerspectiveFovMatrix(horizontalFOV_, aspectRatio_, nearClip_, farClip_);

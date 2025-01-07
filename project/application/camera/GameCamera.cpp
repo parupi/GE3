@@ -32,7 +32,7 @@ void GameCamera::Update()
 
         float x = std::cos(orbitAngle_) * orbitRadius_;
         float z = std::sin(orbitAngle_) * orbitRadius_;
-        Vector3 cameraPosition = playerPosition + Vector3(x, 4.0f, z); // 上方向のオフセットを4.0に設定
+        Vector3 cameraPosition = playerPosition + Vector3(x, 8.0f, z); // 上方向のオフセットを4.0に設定
 
         // カメラの位置と向きを設定
         gameCamera_->SetTranslate(cameraPosition);
@@ -40,12 +40,12 @@ void GameCamera::Update()
         // カメラの向きをプレイヤーに向ける
         Vector3 direction = Normalize(playerPosition - cameraPosition);
         float yaw = std::atan2(direction.x, direction.z);
-        gameCamera_->SetRotate(Vector3(0.0f, yaw, 0.0f));
+        gameCamera_->SetRotate(Vector3(0.2f, yaw, 0.0f));
 
-        ImGui::Begin("Camera Manager");
-        ImGui::DragFloat3("normalPos", &cameraPosition.x, 0.01f);
-        ImGui::DragFloat("normalRotate", &yaw, 0.01f);
-        ImGui::End();
+        //ImGui::Begin("Camera Manager");
+        //ImGui::DragFloat3("normalPos", &cameraPosition.x, 0.01f);
+        //ImGui::DragFloat("normalRotate", &yaw, 0.01f);
+        //ImGui::End();
     }
 
     // カメラの更新処理

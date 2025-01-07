@@ -8,4 +8,3 @@ public:
     virtual void Update(Player* player) = 0;
     virtual void Exit(Player* player) = 0;
 };
-
